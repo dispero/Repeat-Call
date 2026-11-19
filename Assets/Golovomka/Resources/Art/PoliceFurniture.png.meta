@@ -1,0 +1,2173 @@
+fileFormatVersion: 2
+guid: fa665fea1377c604d855821bd66f13a4
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 6075612727285882595
+    second: PoliceFurniture_0
+  - first:
+      213: 596186142262092997
+    second: PoliceFurniture_1
+  - first:
+      213: -4630180631823536572
+    second: PoliceFurniture_2
+  - first:
+      213: -1984959398561245258
+    second: PoliceFurniture_3
+  - first:
+      213: -1522220576283866321
+    second: PoliceFurniture_4
+  - first:
+      213: 1776293941308316294
+    second: PoliceFurniture_5
+  - first:
+      213: -6503713276354631308
+    second: PoliceFurniture_6
+  - first:
+      213: 7436191208342896149
+    second: PoliceFurniture_7
+  - first:
+      213: -6869041793282058278
+    second: PoliceFurniture_8
+  - first:
+      213: -7703330011417824603
+    second: PoliceFurniture_9
+  - first:
+      213: 2169980091381764301
+    second: PoliceFurniture_10
+  - first:
+      213: 4846962062745050262
+    second: PoliceFurniture_11
+  - first:
+      213: 4631234375001972682
+    second: PoliceFurniture_12
+  - first:
+      213: 7335430314506689822
+    second: PoliceFurniture_13
+  - first:
+      213: -6578770234303575111
+    second: PoliceFurniture_14
+  - first:
+      213: 161983504210545420
+    second: PoliceFurniture_15
+  - first:
+      213: -5017126527155680055
+    second: PoliceFurniture_16
+  - first:
+      213: 4820146697935262921
+    second: PoliceFurniture_17
+  - first:
+      213: 2666334036607759499
+    second: PoliceFurniture_18
+  - first:
+      213: -4776127797376206186
+    second: PoliceFurniture_19
+  - first:
+      213: 4165882373814316455
+    second: PoliceFurniture_20
+  - first:
+      213: -1331886687356988378
+    second: PoliceFurniture_21
+  - first:
+      213: -6134496003268231033
+    second: PoliceFurniture_22
+  - first:
+      213: 5510600721613951131
+    second: PoliceFurniture_23
+  - first:
+      213: -7310425714924139153
+    second: PoliceFurniture_24
+  - first:
+      213: -1713317415721232793
+    second: PoliceFurniture_25
+  - first:
+      213: 146547038681375966
+    second: PoliceFurniture_26
+  - first:
+      213: 8914136712680656390
+    second: PoliceFurniture_27
+  - first:
+      213: 3547064450298429731
+    second: PoliceFurniture_28
+  - first:
+      213: -2386271158173697845
+    second: PoliceFurniture_29
+  - first:
+      213: -285530842798536690
+    second: PoliceFurniture_30
+  - first:
+      213: -787316355600420952
+    second: PoliceFurniture_31
+  - first:
+      213: -2561211868432448895
+    second: PoliceFurniture_32
+  - first:
+      213: 8956905936393593713
+    second: PoliceFurniture_33
+  - first:
+      213: 2717095403974932438
+    second: PoliceFurniture_34
+  - first:
+      213: -6759016384645123783
+    second: PoliceFurniture_35
+  - first:
+      213: 1770113103248559367
+    second: PoliceFurniture_36
+  - first:
+      213: -1153026906095683876
+    second: PoliceFurniture_37
+  - first:
+      213: -1977440788902258135
+    second: PoliceFurniture_38
+  - first:
+      213: -289041677752685072
+    second: PoliceFurniture_39
+  - first:
+      213: 2280863897920839373
+    second: PoliceFurniture_40
+  - first:
+      213: 8387288153142362770
+    second: PoliceFurniture_41
+  - first:
+      213: 7966653009562996687
+    second: PoliceFurniture_42
+  - first:
+      213: -8480226554880113373
+    second: PoliceFurniture_43
+  - first:
+      213: 7667489566600343359
+    second: PoliceFurniture_44
+  - first:
+      213: -550439851357604715
+    second: PoliceFurniture_45
+  - first:
+      213: -8475751055036287132
+    second: PoliceFurniture_46
+  - first:
+      213: -5326460150228813079
+    second: PoliceFurniture_47
+  - first:
+      213: 3319193212103043909
+    second: PoliceFurniture_48
+  - first:
+      213: 3437168078509865787
+    second: PoliceFurniture_49
+  - first:
+      213: -2396467067966226478
+    second: PoliceFurniture_50
+  - first:
+      213: 7392000488140478552
+    second: PoliceFurniture_51
+  - first:
+      213: 8824014821425778427
+    second: PoliceFurniture_52
+  - first:
+      213: 2052525400164229553
+    second: PoliceFurniture_53
+  - first:
+      213: -8105937992698737849
+    second: PoliceFurniture_54
+  - first:
+      213: 1779818530256166031
+    second: PoliceFurniture_55
+  - first:
+      213: 2276301955467466519
+    second: PoliceFurniture_56
+  - first:
+      213: -4243942541417993834
+    second: PoliceFurniture_57
+  - first:
+      213: 860490519597919766
+    second: PoliceFurniture_58
+  - first:
+      213: 8764741093678464952
+    second: PoliceFurniture_59
+  - first:
+      213: -4229246188036108663
+    second: PoliceFurniture_60
+  - first:
+      213: 255158040324609760
+    second: PoliceFurniture_61
+  - first:
+      213: 728922993216900850
+    second: PoliceFurniture_62
+  - first:
+      213: 6717931938877951017
+    second: PoliceFurniture_63
+  - first:
+      213: -3959027634712070592
+    second: PoliceFurniture_64
+  - first:
+      213: -2286979295834058888
+    second: PoliceFurniture_65
+  - first:
+      213: 18803583279755384
+    second: PoliceFurniture_66
+  - first:
+      213: -8105238470013721024
+    second: PoliceFurniture_67
+  - first:
+      213: -6082549483244161769
+    second: PoliceFurniture_68
+  - first:
+      213: -8621242060928114728
+    second: PoliceFurniture_69
+  - first:
+      213: -3576071306305215713
+    second: PoliceFurniture_70
+  - first:
+      213: 5516565597651867952
+    second: PoliceFurniture_71
+  - first:
+      213: 1135595349782558996
+    second: PoliceFurniture_72
+  - first:
+      213: -4436821844097008236
+    second: PoliceFurniture_73
+  - first:
+      213: 2183156336864614350
+    second: PoliceFurniture_74
+  - first:
+      213: -2255635951730675872
+    second: PoliceFurniture_75
+  - first:
+      213: -4836594720361306626
+    second: PoliceFurniture_76
+  - first:
+      213: 2157471193639015422
+    second: PoliceFurniture_77
+  - first:
+      213: 2967893457436731673
+    second: PoliceFurniture_78
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationMethod: 0
+  spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
+  textureType: 0
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: PoliceFurniture_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 387
+        width: 727
+        height: 849
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3ee97b2e599e05450800000000000000
+      internalID: 6075612727285882595
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_1
+      rect:
+        serializedVersion: 2
+        x: 30
+        y: 1097
+        width: 90
+        height: 111
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5c4ea8d3324164800800000000000000
+      internalID: 596186142262092997
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_2
+      rect:
+        serializedVersion: 2
+        x: 321
+        y: 1191
+        width: 26
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 44ea3424f3b4ebfb0800000000000000
+      internalID: -4630180631823536572
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_3
+      rect:
+        serializedVersion: 2
+        x: 536
+        y: 1185
+        width: 22
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6b71f2b91f10474e0800000000000000
+      internalID: -1984959398561245258
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_4
+      rect:
+        serializedVersion: 2
+        x: 727
+        y: 515
+        width: 452
+        height: 684
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f2b4fc0737cffdae0800000000000000
+      internalID: -1522220576283866321
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_5
+      rect:
+        serializedVersion: 2
+        x: 635
+        y: 1172
+        width: 9
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 68a5c5cade9a6a810800000000000000
+      internalID: 1776293941308316294
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_6
+      rect:
+        serializedVersion: 2
+        x: 1131
+        y: 1130
+        width: 20
+        height: 40
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 479e3e9bb3b2eb5a0800000000000000
+      internalID: -6503713276354631308
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_7
+      rect:
+        serializedVersion: 2
+        x: 711
+        y: 1098
+        width: 14
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 51e392f5188a23760800000000000000
+      internalID: 7436191208342896149
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_8
+      rect:
+        serializedVersion: 2
+        x: 731
+        y: 1092
+        width: 23
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ad75c1cf1e24ca0a0800000000000000
+      internalID: -6869041793282058278
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_9
+      rect:
+        serializedVersion: 2
+        x: 627
+        y: 1082
+        width: 17
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5a2b5d92b26481590800000000000000
+      internalID: -7703330011417824603
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_10
+      rect:
+        serializedVersion: 2
+        x: 721
+        y: 1078
+        width: 18
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dc0da7465615d1e10800000000000000
+      internalID: 2169980091381764301
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_11
+      rect:
+        serializedVersion: 2
+        x: 721
+        y: 922
+        width: 9
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 69c96b5d05ed34340800000000000000
+      internalID: 4846962062745050262
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_12
+      rect:
+        serializedVersion: 2
+        x: 735
+        y: 919
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: acf12917023754040800000000000000
+      internalID: 4631234375001972682
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_13
+      rect:
+        serializedVersion: 2
+        x: 1149
+        y: 808
+        width: 8
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e1d9dca910facc560800000000000000
+      internalID: 7335430314506689822
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_14
+      rect:
+        serializedVersion: 2
+        x: 699
+        y: 787
+        width: 7
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9bb0c65e35383b4a0800000000000000
+      internalID: -6578770234303575111
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_15
+      rect:
+        serializedVersion: 2
+        x: 705
+        y: 791
+        width: 19
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c0b41fb832b7f3200800000000000000
+      internalID: 161983504210545420
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_16
+      rect:
+        serializedVersion: 2
+        x: 723
+        y: 795
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9cc42b361069f5ab0800000000000000
+      internalID: -5017126527155680055
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_17
+      rect:
+        serializedVersion: 2
+        x: 603
+        y: 644
+        width: 8
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9c414bf22e994e240800000000000000
+      internalID: 4820146697935262921
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_18
+      rect:
+        serializedVersion: 2
+        x: 747
+        y: 650
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b84f980fda8b00520800000000000000
+      internalID: 2666334036607759499
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_19
+      rect:
+        serializedVersion: 2
+        x: 924
+        y: 643
+        width: 8
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 69ab583c219c7bdb0800000000000000
+      internalID: -4776127797376206186
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_20
+      rect:
+        serializedVersion: 2
+        x: 1206
+        y: 622
+        width: 45
+        height: 39
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7ad634b72ff20d930800000000000000
+      internalID: 4165882373814316455
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_21
+      rect:
+        serializedVersion: 2
+        x: 1165
+        y: 628
+        width: 20
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 624d30f4d10348de0800000000000000
+      internalID: -1331886687356988378
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_22
+      rect:
+        serializedVersion: 2
+        x: 856
+        y: 600
+        width: 19
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 780c4211364eddaa0800000000000000
+      internalID: -6134496003268231033
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_23
+      rect:
+        serializedVersion: 2
+        x: 874
+        y: 595
+        width: 9
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b909fcee826997c40800000000000000
+      internalID: 5510600721613951131
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_24
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 37
+        width: 477
+        height: 558
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f6dc0196b862c8a90800000000000000
+      internalID: -7310425714924139153
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_25
+      rect:
+        serializedVersion: 2
+        x: 177
+        y: 578
+        width: 17
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 766127053e21938e0800000000000000
+      internalID: -1713317415721232793
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_26
+      rect:
+        serializedVersion: 2
+        x: 478
+        y: 570
+        width: 9
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ed42d7751c3a80200800000000000000
+      internalID: 146547038681375966
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_27
+      rect:
+        serializedVersion: 2
+        x: 585
+        y: 562
+        width: 13
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 60e499e6c1065bb70800000000000000
+      internalID: 8914136712680656390
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_28
+      rect:
+        serializedVersion: 2
+        x: 1186
+        y: 544
+        width: 31
+        height: 39
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 321447b0354b93130800000000000000
+      internalID: 3547064450298429731
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_29
+      rect:
+        serializedVersion: 2
+        x: 478
+        y: 549
+        width: 19
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bc8fb4f460342eed0800000000000000
+      internalID: -2386271158173697845
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_30
+      rect:
+        serializedVersion: 2
+        x: 520
+        y: 552
+        width: 15
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e0843961637990cf0800000000000000
+      internalID: -285530842798536690
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_31
+      rect:
+        serializedVersion: 2
+        x: 531
+        y: 543
+        width: 21
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8afe49a22f3e215f0800000000000000
+      internalID: -787316355600420952
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_32
+      rect:
+        serializedVersion: 2
+        x: 1043
+        y: 531
+        width: 15
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 182c193206fb47cd0800000000000000
+      internalID: -2561211868432448895
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_33
+      rect:
+        serializedVersion: 2
+        x: 1083
+        y: 538
+        width: 11
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 173e3515e725d4c70800000000000000
+      internalID: 8956905936393593713
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_34
+      rect:
+        serializedVersion: 2
+        x: 1148
+        y: 552
+        width: 21
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6d7b5c6cfdf05b520800000000000000
+      internalID: 2717095403974932438
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_35
+      rect:
+        serializedVersion: 2
+        x: 1178
+        y: 529
+        width: 23
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 931be22b8662332a0800000000000000
+      internalID: -6759016384645123783
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_36
+      rect:
+        serializedVersion: 2
+        x: 424
+        y: 478
+        width: 85
+        height: 72
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 70d056b2d74b09810800000000000000
+      internalID: 1770113103248559367
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_37
+      rect:
+        serializedVersion: 2
+        x: 540
+        y: 542
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cd6f2bd4320afffe0800000000000000
+      internalID: -1153026906095683876
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_38
+      rect:
+        serializedVersion: 2
+        x: 906
+        y: 525
+        width: 24
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 92adc155418be84e0800000000000000
+      internalID: -1977440788902258135
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_39
+      rect:
+        serializedVersion: 2
+        x: 965
+        y: 527
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0fda440202e1dfbf0800000000000000
+      internalID: -289041677752685072
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_40
+      rect:
+        serializedVersion: 2
+        x: 506
+        y: 521
+        width: 7
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dce959071a147af10800000000000000
+      internalID: 2280863897920839373
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_41
+      rect:
+        serializedVersion: 2
+        x: 510
+        y: 533
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 29284e43322a56470800000000000000
+      internalID: 8387288153142362770
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_42
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 521
+        width: 12
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fcf8ccbf3bc3f8e60800000000000000
+      internalID: 7966653009562996687
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_43
+      rect:
+        serializedVersion: 2
+        x: 673
+        y: 513
+        width: 19
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3254985e0ee205a80800000000000000
+      internalID: -8480226554880113373
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_44
+      rect:
+        serializedVersion: 2
+        x: 723
+        y: 529
+        width: 14
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f3f2a300325686a60800000000000000
+      internalID: 7667489566600343359
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_45
+      rect:
+        serializedVersion: 2
+        x: 778
+        y: 513
+        width: 19
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5947c9d1fd17c58f0800000000000000
+      internalID: -550439851357604715
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_46
+      rect:
+        serializedVersion: 2
+        x: 997
+        y: 515
+        width: 17
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4677be76255106a80800000000000000
+      internalID: -8475751055036287132
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_47
+      rect:
+        serializedVersion: 2
+        x: 1033
+        y: 528
+        width: 11
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9ea7653d6bc9416b0800000000000000
+      internalID: -5326460150228813079
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_48
+      rect:
+        serializedVersion: 2
+        x: 12
+        y: 479
+        width: 27
+        height: 46
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 54b2a4cf3a4201e20800000000000000
+      internalID: 3319193212103043909
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_49
+      rect:
+        serializedVersion: 2
+        x: 54
+        y: 503
+        width: 19
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b3b74e0182643bf20800000000000000
+      internalID: 3437168078509865787
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_50
+      rect:
+        serializedVersion: 2
+        x: 938
+        y: 503
+        width: 12
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2df73f116e90ebed0800000000000000
+      internalID: -2396467067966226478
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_51
+      rect:
+        serializedVersion: 2
+        x: 1045
+        y: 497
+        width: 29
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 858902b8749a59660800000000000000
+      internalID: 7392000488140478552
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_52
+      rect:
+        serializedVersion: 2
+        x: 1109
+        y: 513
+        width: 9
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bfe8ddb7ab2357a70800000000000000
+      internalID: 8824014821425778427
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_53
+      rect:
+        serializedVersion: 2
+        x: 46
+        y: 495
+        width: 9
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1b161490af80c7c10800000000000000
+      internalID: 2052525400164229553
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_54
+      rect:
+        serializedVersion: 2
+        x: 76
+        y: 454
+        width: 68
+        height: 53
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 74b49ddb75ce18f80800000000000000
+      internalID: -8105937992698737849
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_55
+      rect:
+        serializedVersion: 2
+        x: 533
+        y: 0
+        width: 678
+        height: 485
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f8c939cf58f23b810800000000000000
+      internalID: 1779818530256166031
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_56
+      rect:
+        serializedVersion: 2
+        x: 671
+        y: 483
+        width: 540
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7175a21719c079f10800000000000000
+      internalID: 2276301955467466519
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_57
+      rect:
+        serializedVersion: 2
+        x: 1210
+        y: 142
+        width: 7
+        height: 342
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 699ac937ebc7a15c0800000000000000
+      internalID: -4243942541417993834
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_58
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 353
+        width: 39
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 61ea939819311fb00800000000000000
+      internalID: 860490519597919766
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_59
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 333
+        width: 102
+        height: 149
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8bf39fc469d92a970800000000000000
+      internalID: 8764741093678464952
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_60
+      rect:
+        serializedVersion: 2
+        x: 498
+        y: 372
+        width: 14
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 98ece6edff2be45c0800000000000000
+      internalID: -4229246188036108663
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_61
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 210
+        width: 65
+        height: 95
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0e61223c2e08a8300800000000000000
+      internalID: 255158040324609760
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_62
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 302
+        width: 45
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2fece4fa997ad1a00800000000000000
+      internalID: 728922993216900850
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_63
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 274
+        width: 15
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 92c421a5183ea3d50800000000000000
+      internalID: 6717931938877951017
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_64
+      rect:
+        serializedVersion: 2
+        x: 476
+        y: 287
+        width: 21
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 04638019755be09c0800000000000000
+      internalID: -3959027634712070592
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_65
+      rect:
+        serializedVersion: 2
+        x: 498
+        y: 246
+        width: 34
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 87f432782740340e0800000000000000
+      internalID: -2286979295834058888
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_66
+      rect:
+        serializedVersion: 2
+        x: 526
+        y: 264
+        width: 86
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 870f4e562cdc24000800000000000000
+      internalID: 18803583279755384
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_67
+      rect:
+        serializedVersion: 2
+        x: 529
+        y: 256
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 046600f0e88648f80800000000000000
+      internalID: -8105238470013721024
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_68
+      rect:
+        serializedVersion: 2
+        x: 54
+        y: 241
+        width: 7
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 715fe72c871769ba0800000000000000
+      internalID: -6082549483244161769
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_69
+      rect:
+        serializedVersion: 2
+        x: 456
+        y: 237
+        width: 19
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8df19bbd5023b5880800000000000000
+      internalID: -8621242060928114728
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_70
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 160
+        width: 5
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f13e530081e3f5ec0800000000000000
+      internalID: -3576071306305215713
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_71
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 192
+        width: 17
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0391e2cde27ce8c40800000000000000
+      internalID: 5516565597651867952
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_72
+      rect:
+        serializedVersion: 2
+        x: 480
+        y: 57
+        width: 15
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 419ff5834f172cf00800000000000000
+      internalID: 1135595349782558996
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_73
+      rect:
+        serializedVersion: 2
+        x: 494
+        y: 60
+        width: 22
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 49d77e24a0e3d62c0800000000000000
+      internalID: -4436821844097008236
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_74
+      rect:
+        serializedVersion: 2
+        x: 1141
+        y: 47
+        width: 18
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ec755fb1f112c4e10800000000000000
+      internalID: 2183156336864614350
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_75
+      rect:
+        serializedVersion: 2
+        x: 1204
+        y: 35
+        width: 33
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 06f2e728d0f52b0e0800000000000000
+      internalID: -2255635951730675872
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_76
+      rect:
+        serializedVersion: 2
+        x: 514
+        y: 39
+        width: 20
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ef5a55a2ab6f0ecb0800000000000000
+      internalID: -4836594720361306626
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_77
+      rect:
+        serializedVersion: 2
+        x: 571
+        y: 32
+        width: 11
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ef3ddfdae90e0fd10800000000000000
+      internalID: 2157471193639015422
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PoliceFurniture_78
+      rect:
+        serializedVersion: 2
+        x: 530
+        y: 23
+        width: 10
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 919e8bdff53103920800000000000000
+      internalID: 2967893457436731673
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      PoliceFurniture_0: 6075612727285882595
+      PoliceFurniture_1: 596186142262092997
+      PoliceFurniture_10: 2169980091381764301
+      PoliceFurniture_11: 4846962062745050262
+      PoliceFurniture_12: 4631234375001972682
+      PoliceFurniture_13: 7335430314506689822
+      PoliceFurniture_14: -6578770234303575111
+      PoliceFurniture_15: 161983504210545420
+      PoliceFurniture_16: -5017126527155680055
+      PoliceFurniture_17: 4820146697935262921
+      PoliceFurniture_18: 2666334036607759499
+      PoliceFurniture_19: -4776127797376206186
+      PoliceFurniture_2: -4630180631823536572
+      PoliceFurniture_20: 4165882373814316455
+      PoliceFurniture_21: -1331886687356988378
+      PoliceFurniture_22: -6134496003268231033
+      PoliceFurniture_23: 5510600721613951131
+      PoliceFurniture_24: -7310425714924139153
+      PoliceFurniture_25: -1713317415721232793
+      PoliceFurniture_26: 146547038681375966
+      PoliceFurniture_27: 8914136712680656390
+      PoliceFurniture_28: 3547064450298429731
+      PoliceFurniture_29: -2386271158173697845
+      PoliceFurniture_3: -1984959398561245258
+      PoliceFurniture_30: -285530842798536690
+      PoliceFurniture_31: -787316355600420952
+      PoliceFurniture_32: -2561211868432448895
+      PoliceFurniture_33: 8956905936393593713
+      PoliceFurniture_34: 2717095403974932438
+      PoliceFurniture_35: -6759016384645123783
+      PoliceFurniture_36: 1770113103248559367
+      PoliceFurniture_37: -1153026906095683876
+      PoliceFurniture_38: -1977440788902258135
+      PoliceFurniture_39: -289041677752685072
+      PoliceFurniture_4: -1522220576283866321
+      PoliceFurniture_40: 2280863897920839373
+      PoliceFurniture_41: 8387288153142362770
+      PoliceFurniture_42: 7966653009562996687
+      PoliceFurniture_43: -8480226554880113373
+      PoliceFurniture_44: 7667489566600343359
+      PoliceFurniture_45: -550439851357604715
+      PoliceFurniture_46: -8475751055036287132
+      PoliceFurniture_47: -5326460150228813079
+      PoliceFurniture_48: 3319193212103043909
+      PoliceFurniture_49: 3437168078509865787
+      PoliceFurniture_5: 1776293941308316294
+      PoliceFurniture_50: -2396467067966226478
+      PoliceFurniture_51: 7392000488140478552
+      PoliceFurniture_52: 8824014821425778427
+      PoliceFurniture_53: 2052525400164229553
+      PoliceFurniture_54: -8105937992698737849
+      PoliceFurniture_55: 1779818530256166031
+      PoliceFurniture_56: 2276301955467466519
+      PoliceFurniture_57: -4243942541417993834
+      PoliceFurniture_58: 860490519597919766
+      PoliceFurniture_59: 8764741093678464952
+      PoliceFurniture_6: -6503713276354631308
+      PoliceFurniture_60: -4229246188036108663
+      PoliceFurniture_61: 255158040324609760
+      PoliceFurniture_62: 728922993216900850
+      PoliceFurniture_63: 6717931938877951017
+      PoliceFurniture_64: -3959027634712070592
+      PoliceFurniture_65: -2286979295834058888
+      PoliceFurniture_66: 18803583279755384
+      PoliceFurniture_67: -8105238470013721024
+      PoliceFurniture_68: -6082549483244161769
+      PoliceFurniture_69: -8621242060928114728
+      PoliceFurniture_7: 7436191208342896149
+      PoliceFurniture_70: -3576071306305215713
+      PoliceFurniture_71: 5516565597651867952
+      PoliceFurniture_72: 1135595349782558996
+      PoliceFurniture_73: -4436821844097008236
+      PoliceFurniture_74: 2183156336864614350
+      PoliceFurniture_75: -2255635951730675872
+      PoliceFurniture_76: -4836594720361306626
+      PoliceFurniture_77: 2157471193639015422
+      PoliceFurniture_78: 2967893457436731673
+      PoliceFurniture_8: -6869041793282058278
+      PoliceFurniture_9: -7703330011417824603
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

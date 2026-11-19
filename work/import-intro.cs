@@ -1,0 +1,11 @@
+var path = "Assets/Golovomka/Resources/Art/LaboratoryIntroduction.png";
+UnityEditor.AssetDatabase.Refresh();
+var importer = (UnityEditor.TextureImporter)UnityEditor.AssetImporter.GetAtPath(path);
+importer.textureType = UnityEditor.TextureImporterType.Default;
+importer.filterMode = UnityEngine.FilterMode.Point;
+importer.mipmapEnabled = false;
+importer.textureCompression = UnityEditor.TextureImporterCompression.Uncompressed;
+importer.npotScale = UnityEditor.TextureImporterNPOTScale.None;
+importer.maxTextureSize = 4096;
+importer.SaveAndReimport();
+return new { scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().path, dirty = UnityEngine.SceneManagement.SceneManager.GetActiveScene().isDirty, texture = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Texture2D>(path).width };

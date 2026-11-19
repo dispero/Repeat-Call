@@ -1,0 +1,112 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using UnityEngine;
+
+namespace Golovomka
+{
+    [Serializable] public struct EchoFrame
+    {
+        public float t, x, y;
+        public int zone, facing;
+        public EchoFrame(float time, Vector2 pos, int room, int direction)
+        { t = time; x = pos.x; y = pos.y; zone = room; facing = direction; }
+    }
+    [Serializable] public class EchoTape
+    {
+        public int room; // 0 — прежняя общая запись; 1–4 — локальная попытка.
+        public List<EchoFrame> frames = new List<EchoFrame>();
+        public float duration;
+        public bool Sample(float time, out EchoFrame value)
+        {
+            value = default;
+            if (frames.Count == 0 || time < 0 || time >= duration) return false;
+            int low = 0, high = frames.Count - 1;
+            while (low < high) { int mid = (low + high + 1) / 2; if (frames[mid].t <= time) low = mid; else high = mid - 1; }
+            value = frames[low];
+            if (low + 1 < frames.Count && value.zone == frames[low + 1].zone)
+            {
+                var next = frames[low + 1];
+                float k = Mathf.InverseLerp(value.t, next.t, time);
+                value.x = Mathf.Lerp(value.x, next.x, k); value.y = Mathf.Lerp(value.y, next.y, k);
+            }
+            return true;
+        }
+    }
+    [Serializable] public class EchoHistory
+    {
+        public int version = 3, cycle = 1;
+        public int clearedRooms;
+        public int copySlots = 1;
+        public bool manualRecording;
+        public bool completed;
+        public bool firstReturnSeen, remoteObtained;
+        public List<EchoTape> tapes = new List<EchoTape>(); // Oldest first.
+        public List<EchoTape> ForRoom(int room)
+        {
+            var result = new List<EchoTape>();
+            foreach (var tape in tapes)
+                if (tape.room == room || (tape.room == 0 && tape.frames.Exists(f => f.zone == room))) result.Add(tape);
+            return result;
+        }
+        public void Push(EchoTape tape)
+        {
+            tapes.Add(tape);
+            if (tape.room == 0)
+                while (tapes.Count > copySlots) tapes.RemoveAt(0);
+            else
+            {
+                int limit = tape.room < 3 ? 1 : copySlots;
+                // Старый общий маршрут для этой комнаты заменяет новая локальная попытка.
+                tapes.RemoveAll(t => t != tape && t.room == 0 && t.frames.Exists(f => f.zone == tape.room));
+                while (ForRoom(tape.room).Count > limit)
+                    tapes.Remove(tapes.Find(t => t.room == tape.room));
+            }
+            cycle++;
+        }
+        public static bool OnPlate(EchoFrame actor, Vector2 plate)
+        { return actor.zone > 0 && Vector2.Distance(new Vector2(actor.x, actor.y), plate) < .65f; }
+        public static string SavePath => Path.Combine(Application.persistentDataPath, "echoes-mvp-v3.json");
+        public void Save(string path = null)
+        {
+            path = path ?? SavePath;
+            Directory.CreateDirectory(Path.GetDirectoryName(path));
+            File.WriteAllText(path + ".tmp", JsonUtility.ToJson(this));
+            if (File.Exists(path)) File.Replace(path + ".tmp", path, path + ".bak");
+            else File.Move(path + ".tmp", path);
+        }
+        public static EchoHistory Load(string path = null)
+        {
+            path = path ?? SavePath;
+            foreach (string file in new[] { path, path + ".bak" })
+            {
+                try
+                {
+                    if (!File.Exists(file)) continue;
+                    var data = JsonUtility.FromJson<EchoHistory>(File.ReadAllText(file));
+                    if (data == null || data.version != 3 || data.cycle < 1 || data.tapes == null || data.copySlots < 1 || data.copySlots > 2 || data.tapes.Count > 8 || (data.manualRecording && data.copySlots != 2) || data.clearedRooms < 0 || data.clearedRooms > 3) continue;
+                    bool valid = true;
+                    foreach (var tape in data.tapes)
+                    {
+                        if (tape == null || tape.frames == null || tape.room < 0 || tape.room > 4 || tape.duration < 0 || float.IsNaN(tape.duration) || float.IsInfinity(tape.duration)) { valid = false; break; }
+                        float previous = -1;
+                        foreach (var f in tape.frames)
+                        {
+                            if (f.t < previous || float.IsNaN(f.t) || float.IsInfinity(f.t) || float.IsNaN(f.x) || float.IsNaN(f.y) || float.IsInfinity(f.x) || float.IsInfinity(f.y) || f.zone < 0 || f.zone > 4 || f.facing < 0 || f.facing > 3) { valid = false; break; }
+                            previous = f.t;
+                        }
+                    }
+                    for (int room = 1; room <= 4; room++)
+                        if (data.tapes.FindAll(t => t.room == room).Count > (room < 3 ? 1 : data.copySlots)) valid = false;
+                    // Совместимость: прежние сохранения с пройденными комнатами
+                    // уже предполагают свободное использование возврата.
+                    if (data.clearedRooms > 0) data.firstReturnSeen = data.remoteObtained = true;
+                    if (data.remoteObtained && !data.firstReturnSeen) valid = false;
+                    if (valid) return data;
+                }
+                catch (Exception) { /* Try the backup, retaining the invalid file. */ }
+            }
+            return null;
+        }
+    }
+}

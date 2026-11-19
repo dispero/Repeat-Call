@@ -1,0 +1,10 @@
+using UnityEngine;
+var texture = UnityEditor.AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Golovomka/Resources/Art/PoliceStationLayout.png");
+var previous = RenderTexture.active;
+var rt = RenderTexture.GetTemporary(texture.width, texture.height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB);
+Graphics.Blit(texture, rt); RenderTexture.active = rt;
+var crop = new Texture2D(180, 130, TextureFormat.RGBA32, false);
+crop.ReadPixels(new Rect(890, texture.height - 510 - 130, 180, 130), 0, 0); crop.Apply();
+System.IO.File.WriteAllBytes("work/lamp-inspection.png", crop.EncodeToPNG());
+RenderTexture.active = previous; RenderTexture.ReleaseTemporary(rt); UnityEngine.Object.DestroyImmediate(crop);
+return "work/lamp-inspection.png";

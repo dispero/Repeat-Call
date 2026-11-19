@@ -1,0 +1,23 @@
+using System;
+using System.Reflection;
+using Golovomka;
+using UnityEngine;
+var game=UnityEngine.Object.FindAnyObjectByType<EchoMvp>();
+game.BeginCycle();
+var flags=BindingFlags.NonPublic|BindingFlags.Instance;
+var canMove=typeof(EchoMvp).GetMethod("CanMove",flags);
+Vector2 P(float x,float y)=>new Vector2((x-793)*13.2f/992,(496-y)*13.2f/992);
+bool Can(float x,float y)=>(bool)canMove.Invoke(game,new object[]{P(x,y)});
+if(!Can(850,625))throw new Exception("Cannot approach behind rear lip");
+if(Can(850,700))throw new Exception("Can walk through middle of desk");
+if(Can(850,850))throw new Exception("Can walk through front of desk");
+game.position=P(850,580);
+for(int y=581;y<700;y++){var next=P(850,y);if(!(bool)canMove.Invoke(game,new object[]{next}))break;game.position=next;}
+float sourceY=496-game.position.y/(13.2f/992);
+if(sourceY<625||sourceY>=660)throw new Exception("Wrong stopping edge "+sourceY);
+var hero=(SpriteRenderer)typeof(EchoMvp).GetField("hero",flags).GetValue(game);
+var top=GameObject.Find("DutyDeskTop").GetComponent<SpriteRenderer>();
+typeof(EchoMvp).GetMethod("Place",flags).Invoke(game,new object[]{hero,game.position});
+if(hero.sortingOrder>=top.sortingOrder)throw new Exception("Desk is not in front of legs");
+if((string)typeof(EchoMvp).GetMethod("Nearby",flags).Invoke(game,null)!="Телефон дежурного")throw new Exception("Phone inaccessible at rear lip");
+return new { result="PASS: approach into rear lip; desk center/front blocked; desk occludes legs; phone reachable",sourceY };

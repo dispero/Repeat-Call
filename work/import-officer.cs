@@ -1,0 +1,17 @@
+using UnityEditor;
+using UnityEngine;
+AssetDatabase.Refresh();
+string path = "Assets/Golovomka/Resources/Art/IvanOfficerWalk.png";
+var importer = AssetImporter.GetAtPath(path) as TextureImporter;
+if (importer == null) throw new System.InvalidOperationException("Нет импортера Ивана");
+importer.textureType = TextureImporterType.Default;
+importer.filterMode = FilterMode.Point;
+importer.mipmapEnabled = false;
+importer.textureCompression = TextureImporterCompression.Uncompressed;
+importer.npotScale = TextureImporterNPOTScale.None;
+importer.maxTextureSize = 2048;
+importer.alphaIsTransparency = true;
+importer.isReadable = true;
+importer.SaveAndReimport();
+var texture = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+return new { texture.width, texture.height, texture.isReadable, importer.filterMode };
