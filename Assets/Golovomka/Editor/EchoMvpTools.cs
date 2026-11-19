@@ -34,7 +34,11 @@ public static class EchoMvpTools
         var root = new GameObject("EchoMVP", typeof(EchoMvp), typeof(FurnitureLayout));
         root.GetComponent<FurnitureLayout>().InitializeDefaults();
         EditorSceneManager.SaveScene(scene, ScenePath);
-        EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(ScenePath, true) };
+        var scenes = new System.Collections.Generic.List<EditorBuildSettingsScene> { new EditorBuildSettingsScene(ScenePath, true) };
+        foreach (string roomPath in new[] { PoliceStationLayout.ScenePath, Room01Layout.ScenePath, Room02Layout.ScenePath })
+            if (AssetDatabase.LoadAssetAtPath<SceneAsset>(roomPath))
+                scenes.Add(new EditorBuildSettingsScene(roomPath, true));
+        EditorBuildSettings.scenes = scenes.ToArray();
         PlayerSettings.companyName = "Golovomka"; PlayerSettings.productName = "Golovomka — Echo MVP";
         PlayerSettings.defaultScreenWidth = 1280; PlayerSettings.defaultScreenHeight = 720;
         PlayerSettings.fullScreenMode = FullScreenMode.Windowed;

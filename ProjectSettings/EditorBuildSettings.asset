@@ -8,5 +8,14 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Golovomka/Scenes/EchoMVP.unity
     guid: 945b09272358b41498f74dfb1cdae5e9
+  - enabled: 1
+    path: Assets/Golovomka/Scenes/Room02.unity
+    guid: 18fdc9ba19ad99848887816860239f2c
+  - enabled: 1
+    path: Assets/Golovomka/Scenes/Room01.unity
+    guid: 43bf9ad150432354f8fec2b0053aea6e
+  - enabled: 1
+    path: Assets/Golovomka/Scenes/PoliceStation.unity
+    guid: 4249721863b81014b8e833c937a63619
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}

@@ -1,7 +1,9 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace Golovomka
@@ -19,7 +21,7 @@ namespace Golovomka
         [NonSerialized] public string saveFileOverride;
         public static readonly Vector2 PlateA = new Vector2(-6, -2.5f), PlateB = new Vector2(-5, 2.6f);
         SpriteRenderer hero, gate, secondGate, padA, padB;
-        public Vector2 CurrentPlateB => zone == 2 || zone == 3 || zone == 4 ? new Vector2(6, -2.5f) : PlateB;
+        public Vector2 CurrentPlateB => zone == 2 && room02 ? (Vector2)room02.plateB.transform.position : zone >= 2 ? new Vector2(6, -2.5f) : PlateB;
         public int RoomCopies => zone < 3 ? 1 : history.copySlots;
         bool GateOpen => history.clearedRooms >= zone || (zone < 3 ? plateA : plateA && plateB);
         readonly SpriteRenderer[] ghosts = new SpriteRenderer[2];
@@ -38,10 +40,17 @@ namespace Golovomka
         int selection;
         bool phoneRead;
         float nextSample;
+        PoliceStationLayout station;
+        Room01Layout room01;
+        Room02Layout room02;
         Color cyan = new Color(.32f, .88f, 1), amber = new Color(1, .74f, .36f);
 
-        void Start()
+        IEnumerator Start()
         {
+            yield return LoadRoomLayout<PoliceStationLayout>(PoliceStationLayout.ScenePath, layout => station = layout);
+            yield return LoadRoomLayout<Room01Layout>(Room01Layout.ScenePath, layout => room01 = layout);
+            yield return LoadRoomLayout<Room02Layout>(Room02Layout.ScenePath, layout => room02 = layout);
+
             Application.targetFrameRate = 60;
             material = new Material(Resources.Load<Material>("Art/MvpSprite"));
             font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
@@ -62,12 +71,31 @@ namespace Golovomka
             // масштаба. Point и привязка движения к сетке остаются прежними.
             pixel.enabled = false;
             UI(); history = EchoHistory.Load() ?? new EchoHistory();
-            zone = 0; position = StationSpawn; BuildRoom(); ShowMenu();
+            zone = 0; position = StationEntry; BuildRoom(); ShowMenu();
+        }
+
+        static IEnumerator LoadRoomLayout<T>(string path, Action<T> assign) where T : MonoBehaviour
+        {
+            var scene = SceneManager.GetSceneByPath(path);
+            int buildIndex = SceneUtility.GetBuildIndexByScenePath(path);
+            if (!scene.isLoaded && buildIndex >= 0)
+            {
+                yield return SceneManager.LoadSceneAsync(buildIndex, LoadSceneMode.Additive);
+                scene = SceneManager.GetSceneByPath(path);
+            }
+            if (!scene.isLoaded) yield break;
+            foreach (var root in scene.GetRootGameObjects())
+            {
+                if (!root.TryGetComponent<T>(out var layout)) continue;
+                root.SetActive(false);
+                assign(layout);
+                yield break;
+            }
         }
         void OnDestroy() { foreach (var s in createdSprites) if (s) Destroy(s); if (material) Destroy(material); }
         public void BeginCycle()
         {
-            elapsed = 0; nextSample = 0; zone = 0; facing = 3; position = StationSpawn;
+            elapsed = 0; nextSample = 0; zone = 0; facing = 3; position = StationEntry;
             recording = new EchoTape(); recordingActive = false; phoneRead = false; mode = "play";
             BuildRoom(); panel.gameObject.SetActive(false);
         }
@@ -90,6 +118,7 @@ namespace Golovomka
         }
         void Update()
         {
+            if (!canvas) return;
             var k = Keyboard.current; if (k == null) return;
             bool enter = k.enterKey.wasPressedThisFrame || k.numpadEnterKey.wasPressedThisFrame;
             if (mode == "menu" || mode == "pause" || mode == "confirm")
@@ -120,7 +149,7 @@ namespace Golovomka
             }
             hero.sprite = OfficerFrame(facing, move != Vector2.zero, Time.time);
             Place(hero, position); UpdateGhosts();
-            if (zone == 1 && position.x > IntroPoint(1440, 0).x && position.y > IntroPoint(0, 725).y)
+            if (zone == 1 && AtIntroductionExit())
             { EnterSecondRoom(); return; }
             if (recordingActive && elapsed >= nextSample) { Record(); nextSample = elapsed + .05f; }
             string target = Nearby(); prompt.text = target == "" ? (history.manualRecording && zone == 4 && !recordingActive ? "T — начать запись и воспроизведение    E — осмотр    ESC — пауза" : history.remoteObtained && zone > 0 ? "WASD — идти    E — осмотр    R — к входу комнаты    ESC — пауза" : "WASD / СТРЕЛКИ — идти    E — осмотр    ESC — пауза") : "[ E ]  " + target;
@@ -169,6 +198,11 @@ namespace Golovomka
             if (zone == 1) return CanMoveInIntroduction(p);
             if (p.x < -10.3f || p.x > 10.3f || p.y < -4.6f || p.y > 3.8f) return false;
             foreach (var rect in furniture) if (rect.Overlaps(new Rect(p.x - .22f, p.y - .1f, .44f, .28f))) return false;
+            if (zone == 2 && room02)
+            {
+                return CanCrossPartition(Room02Layout.ToRect(room02.doorA.bounds), p, GateOpen)
+                    && CanCrossPartition(Room02Layout.ToRect(room02.doorB.bounds), p, plateB || history.clearedRooms >= 2);
+            }
             if (zone > 0 && Mathf.Abs(p.y) < .65f)
             {
                 if (Mathf.Abs(p.x) > 1.2f) return false;
@@ -183,16 +217,29 @@ namespace Golovomka
             }
             return true;
         }
+        bool CanCrossPartition(Rect gap, Vector2 destination, bool open)
+        {
+            if (destination.y <= gap.yMin || destination.y >= gap.yMax) return true;
+            return destination.x >= gap.xMin && destination.x <= gap.xMax
+                && (open || gap.Contains(position));
+        }
         string Nearby()
         {
             if (zone == 1) return IntroNearby();
             if (zone == 0)
             {
-                if (Vector2.Distance(position, StationPhone) < 1.6f) return "Телефон дежурного";
-                if (Vector2.Distance(position, StationExit) < 1.5f) return "Отправиться в лабораторию";
+                if (Vector2.Distance(position, station ? (Vector2)station.phone.position : StationPhone) < 1.6f) return "Телефон дежурного";
+                if (Vector2.Distance(position, station ? (Vector2)station.exit.position : StationExit) < 1.5f) return "Отправиться в лабораторию";
             }
             else
             {
+                if (zone == 2 && room02)
+                {
+                    if (Vector2.Distance(position, room02.entrance.position) < 1.4f) return "Предыдущая комната";
+                    if (Vector2.Distance(position, room02.note.position) < 1.4f) return "Запись Фёдора";
+                    if (Vector2.Distance(position, room02.exit.position) < 1.2f) return "Пульт аварийного прохода";
+                    return "";
+                }
                 if (Vector2.Distance(position, new Vector2(-9, -3.5f)) < 1.4f) return zone == 1 ? "Выйти / завершить цикл" : "Предыдущая комната";
                 if (Vector2.Distance(position, new Vector2(0, -2.5f)) < 1.4f) return zone == 4 ? "Пульт записи" : "Запись Фёдора";
                 if (Vector2.Distance(position, zone == 2 ? new Vector2(0, 3.7f) : new Vector2(6, 2)) < 1.2f) return "Пульт аварийного прохода";
@@ -209,10 +256,13 @@ namespace Golovomka
                 case "Телефон дежурного": phoneRead = true; Dialog("АВТОМАТИЧЕСКИЙ ВЫЗОВ", "Лаборатория в подвале предприятия. Сработала система безопасности. Автоматический вызов полиции.\n\nИван узнаёт адрес: здесь работают его отец и брат. Выход из участка справа у дальней стены."); break;
                 case "Отправиться в лабораторию":
                     if (!phoneRead) { Dialog("ДЕЖУРНЫЙ", "Сначала ответьте на телефон. Поступил вызов."); break; }
-                    zone = 1; position = IntroSpawn; ResetRoomRecording(); BuildRoom();
+                    zone = 1; position = RoomSpawn(zone); ResetRoomRecording(); BuildRoom();
                     break;
                 case "Выйти / завершить цикл": RestartCycle(); break;
-                case "Предыдущая комната": zone--; position = zone == 1 ? IntroPoint(1340, 670) : zone == 2 ? new Vector2(0, 3.6f) : new Vector2(6, 1.5f); ResetRoomRecording(); BuildRoom(); break;
+                case "Предыдущая комната":
+                    zone--;
+                    position = ReturnFromNextRoom();
+                    ResetRoomRecording(); BuildRoom(); break;
                 case "Запись Фёдора": Dialog("КОМНАТА " + zone, zone == 1 ? "Одна копия. Запишите ожидание на плите А и нажмите R.\nВ следующем цикле копия удержит дверь, а вы пройдёте к выходу справа сверху." : zone == 2 ? "Одна копия должна по очереди открыть две двери.\nЗапишите: ожидание на А → переход на Б → ожидание.\nВ следующем цикле пройдите первую дверь, дождитесь второго сигнала и идите через верхнюю дверь. Обе плиты доступны снизу." : "Теперь доступны две копии.\nЗапишите ожидание на А, затем в следующем цикле — ожидание на Б.\nКогда обе копии займут плиты, пройдите к выходу.\nR — вернуться к входу комнаты."); break;
                 case "Пульт записи":
                     if (!history.manualRecording) ActivateManualRoom();
@@ -222,7 +272,8 @@ namespace Golovomka
                     if (zone < 4)
                     {
                         // Сигнал нужен для пересечения двери, а не для выхода из уже пройденной комнаты.
-                        if (position.y < (zone == 2 ? 2.95f : .65f)) { Dialog("ПРОХОД ЗАКРЫТ", "Сначала пройдите двери с помощью записанных действий."); break; }
+                        float requiredY = zone == 2 ? (room02 ? room02.doorB.bounds.max.y : 2.95f) : .65f;
+                        if (position.y < requiredY) { Dialog("ПРОХОД ЗАКРЫТ", "Сначала пройдите двери с помощью записанных действий."); break; }
                         history.clearedRooms = Mathf.Max(history.clearedRooms, zone);
                         zone++; if (zone == 3) history.copySlots = 2;
                         position = RoomSpawn(zone);
@@ -271,9 +322,25 @@ namespace Golovomka
             if (world) { world.gameObject.SetActive(false); Destroy(world.gameObject); }
             foreach (var label in worldLabels) if (label) Destroy(label.gameObject); worldLabels.Clear(); worldLabelPoints.Clear(); furniture.Clear(); secondGate = null;
             world = new GameObject(zone == 0 ? "PoliceStation" : "Laboratory").transform;
+            if (station) station.gameObject.SetActive(zone == 0);
+            if (room01) room01.gameObject.SetActive(zone == 1);
+            if (room02) room02.gameObject.SetActive(zone == 2);
             FitRoomCamera();
             if (zone == 0) BuildPoliceStation();
             else if (zone == 1) BuildIntroduction();
+            else if (zone == 2 && room02)
+            {
+                gate = room02.doorA.GetComponent<SpriteRenderer>();
+                secondGate = room02.doorB.GetComponent<SpriteRenderer>();
+                padA = room02.plateA;
+                padB = room02.plateB;
+                WorldLabel("А", CurrentPlateA + new Vector2(0, -.9f), cyan);
+                WorldLabel("Б", CurrentPlateB + new Vector2(0, -.9f), amber);
+                WorldLabel("НАЗАД", (Vector2)room02.entrance.position + new Vector2(0, -.8f), amber);
+                WorldLabel("ЗАПИСЬ ФЁДОРА", (Vector2)room02.note.position + new Vector2(0, -.9f), amber);
+                WorldLabel("ПРОХОД В КОМНАТУ 3", (Vector2)room02.exit.position + new Vector2(0, .3f), amber);
+                room02.CopyFurniture(furniture);
+            }
             else
             {
             for (int x = -11; x <= 11; x++) for (int y = -5; y <= 4; y++) SpriteObject("Floor", floor, new Vector2(x, y), -100, new Color(.66f, .79f, .77f));
@@ -304,7 +371,8 @@ namespace Golovomka
                 if (zone != 2) WorldLabel(zone < 4 ? "В СЛЕДУЮЩУЮ КОМНАТУ" : "А + Б → ВЫХОД", new Vector2(6, 4.2f), amber);
             }
             var furnitureLayout = GetComponent<FurnitureLayout>();
-            if (furnitureLayout && furnitureLayout.enabled) furnitureLayout.CopyRoom(zone, furniture);
+            bool hasAuthoredLayout = (zone == 0 && station) || (zone == 1 && room01) || (zone == 2 && room02);
+            if (!hasAuthoredLayout && furnitureLayout && furnitureLayout.enabled) furnitureLayout.CopyRoom(zone, furniture);
             hero = SpriteObject("Ivan", OfficerFrame(facing, false, 0), position, 100, Color.white); Place(hero, position);
             for (int i = 0; i < 2; i++) ghosts[i] = SpriteObject("Echo" + i, OfficerFrame(facing, false, 0), Vector2.zero, 100, i == 0 ? new Color(.3f, .85f, 1, .55f) : new Color(1, .65f, .25f, .55f));
             if (zone == 1)

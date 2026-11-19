@@ -12,6 +12,7 @@ namespace Golovomka
         static readonly Vector2 StationExit = StationPoint(1240, 450);
         static readonly Vector2 StationSpawn = StationPoint(850, 500);
         static readonly Vector2 StationPhone = StationPoint(850, 535);
+        Vector2 StationEntry => station ? (Vector2)station.entrance.position : StationSpawn;
         Sprite stationLayout;
         readonly Dictionary<string, Sprite> stationForeground = new Dictionary<string, Sprite>();
         readonly List<(SpriteRenderer renderer, float left, float right)> stationDepthLayers = new List<(SpriteRenderer, float, float)>();
@@ -118,7 +119,8 @@ namespace Golovomka
 
         bool CanMoveInStation(Vector2 p)
         {
-            if (!StationRect(65, 410, 1440, 525).Contains(p)) return false;
+            var walkable = station ? Room02Layout.ToRect(station.walkArea.bounds) : StationRect(65, 410, 1440, 525);
+            if (!walkable.Contains(p)) return false;
             foreach (var rect in furniture)
                 if (rect.Overlaps(new Rect(p.x - .22f, p.y - .1f, .44f, .28f))) return false;
             return true;
@@ -127,6 +129,21 @@ namespace Golovomka
         void BuildPoliceStation()
         {
             stationDepthLayers.Clear();
+            if (station)
+            {
+                foreach (var box in station.furniture.GetComponentsInChildren<BoxCollider2D>())
+                {
+                    var bounds = box.bounds;
+                    if (box.enabled) furniture.Add(Room02Layout.ToRect(bounds));
+                    var sprite = box.GetComponentInChildren<SpriteRenderer>();
+                    if (sprite) sprite.sortingOrder = 100 - Mathf.RoundToInt(bounds.min.y * 10);
+                }
+                var phoneDesk = station.phoneSprite.GetComponentInParent<BoxCollider2D>();
+                if (phoneDesk && phoneDesk.TryGetComponent<SpriteRenderer>(out var deskSprite))
+                    station.phoneSprite.sortingOrder = deskSprite.sortingOrder + 1;
+                WorldLabel("В ЛАБОРАТОРИЮ / E", station.exitLabel.position, amber);
+                return;
+            }
             if (!stationLayout)
             {
                 var texture = Resources.Load<Texture2D>("Art/PoliceStationLayout");

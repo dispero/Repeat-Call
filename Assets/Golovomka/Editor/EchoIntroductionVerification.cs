@@ -35,7 +35,7 @@ public static class EchoIntroductionVerification
         m.RestartCycle(); Check(m.history.cycle==1 && m.position==EchoMvp.IntroSpawn,"R locked before obtaining remote");
         Walk(EchoMvp.IntroPlate); Check(m.plateA,"First approach presses panel");
         float onPlateTime=m.elapsed;
-        Walk(Pt(1190,650)); Check(!m.plateA,"Leaving panel removes signal");
+        Walk(Pt(890,665)); Walk(Pt(1190,650)); Check(!m.plateA,"Leaving panel removes signal");
         Check((string)Call("Nearby")=="Осмотреть пульт","Remote reachable from floor");
         m.Interact("Осмотреть пульт");
         Check(m.position==EchoMvp.IntroSpawn && m.history.firstReturnSeen && !m.history.remoteObtained && m.history.ForRoom(1).Count==1,"First return creates one recording at room entrance");
@@ -53,7 +53,9 @@ public static class EchoIntroductionVerification
         m.position=Pt(1350,670); Check(Can(Pt(1410,670)),"Open mechanical passage allows entry");
         m.elapsed=1000; m.UpdateGhosts(); Check(!Can(Pt(1410,670)),"Closed door blocks entry");
         m.position=Pt(1410,670); Check(Can(Pt(1350,670)),"Closing door allows escape from opening");
-        Check(!Can(Pt(500,530)),"Sofa collision"); Check(!Can(Pt(1240,550)),"Desk collision");
+        var intro = UnityEngine.Object.FindAnyObjectByType<Room01Layout>();
+        var sofa = intro ? intro.furniture.Find("Диван").GetComponent<BoxCollider2D>() : null;
+        Check(!Can(sofa ? (Vector2)sofa.bounds.center : Pt(500,530)),"Sofa collision"); Check(!Can(Pt(1240,550)),"Desk collision");
         m.position=Pt(1350,670); m.elapsed=holdStart+1; m.UpdateGhosts();
         Call("EnterSecondRoom"); Call("Close");
         Check(m.zone==2 && m.history.clearedRooms==1 && m.elapsed==0 && m.recording.room==2,"Transition and fresh room recording");

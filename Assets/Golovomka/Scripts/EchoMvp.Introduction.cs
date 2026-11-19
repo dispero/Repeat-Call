@@ -13,7 +13,14 @@ namespace Golovomka
         public static readonly Vector2 IntroPlate = IntroPoint(800, 768);
         static readonly Vector2 IntroRemote = IntroPoint(1190, 558);
         static readonly Vector2 IntroDoor = IntroPoint(1410, 675);
-        public Vector2 CurrentPlateA => zone == 1 ? IntroPlate : PlateA;
+        public Vector2 CurrentPlateA
+        {
+            get
+            {
+                if (zone == 1) return room01 ? (Vector2)room01.plateOverlay.transform.position : IntroPlate;
+                return zone == 2 && room02 ? (Vector2)room02.plateA.transform.position : PlateA;
+            }
+        }
         List<EchoTape> ActiveTapes => history.ForRoom(zone);
         Texture2D introTexture;
         readonly Dictionary<string, Sprite> introSprites = new Dictionary<string, Sprite>();
@@ -42,6 +49,24 @@ namespace Golovomka
         void BuildIntroduction()
         {
             introDepth.Clear();
+            if (room01)
+            {
+                gate = room01.door;
+                padA = room01.plateOverlay;
+                remoteCover = null;
+                foreach (var box in room01.furniture.GetComponentsInChildren<BoxCollider2D>())
+                {
+                    var bounds = box.bounds;
+                    if (box.enabled) furniture.Add(Room02Layout.ToRect(bounds));
+                    var sprite = box.GetComponentInChildren<SpriteRenderer>();
+                    if (sprite)
+                        sprite.sortingOrder = 100 - Mathf.RoundToInt(bounds.min.y * 10);
+                }
+                var remoteDesk = room01.remoteSprite.GetComponentInParent<BoxCollider2D>();
+                if (remoteDesk && remoteDesk.TryGetComponent<SpriteRenderer>(out var deskSprite))
+                    room01.remoteSprite.sortingOrder = deskSprite.sortingOrder + 1;
+                return;
+            }
             if (!introTexture) introTexture = Resources.Load<Texture2D>("Art/LaboratoryIntroduction");
             var bg = SpriteObject("LaboratoryIntroduction", IntroCrop("Background", 0, 0, 1599, 984), Vector2.zero, -100, Color.white);
             bg.transform.localScale = Vector3.one * (16 * IntroScale);
@@ -84,16 +109,18 @@ namespace Golovomka
         {
             gate.gameObject.SetActive(!GateOpen);
             padA.color = plateA ? new Color(0, 0, 0, .15f) : Color.clear;
-            if (remoteCover) remoteCover.enabled = history.remoteObtained;
+            if (room01) room01.remoteSprite.enabled = !history.remoteObtained;
+            else if (remoteCover) remoteCover.enabled = history.remoteObtained;
         }
 
         bool CanMoveInIntroduction(Vector2 p)
         {
-            if (!IntroRect(145, 595, 1315, 305).Contains(p)) return false;
+            var walkable = room01 ? Room02Layout.ToRect(room01.walkArea.bounds) : IntroRect(145, 595, 1315, 305);
+            if (!walkable.Contains(p)) return false;
             var feet = new Rect(p.x - .22f, p.y - .1f, .44f, .28f);
             foreach (var rect in furniture) if (rect.Overlaps(feet)) return false;
-            var doorway = IntroRect(1375, 590, 85, 135);
-            if (p.x > IntroPoint(1375, 0).x)
+            var doorway = room01 ? Room02Layout.ToRect(room01.doorway.bounds) : IntroRect(1375, 590, 85, 135);
+            if (p.x > doorway.xMin)
             {
                 if (!doorway.Contains(p)) return false;
                 // Не пускаем к закрытой створке, но позволяем покинуть проём.
@@ -104,9 +131,10 @@ namespace Golovomka
 
         string IntroNearby()
         {
-            if (!history.remoteObtained && Vector2.Distance(position, IntroRemote) < 1.65f)
+            var remote = room01 ? (Vector2)room01.remote.position : IntroRemote;
+            if (!history.remoteObtained && Vector2.Distance(position, remote) < 1.65f)
                 return history.firstReturnSeen ? "Взять пульт" : "Осмотреть пульт";
-            if (Vector2.Distance(position, IntroSpawn) < .95f) return "Вернуться в участок";
+            if (Vector2.Distance(position, RoomSpawn(1)) < .95f) return "Вернуться в участок";
             return "";
         }
 
@@ -124,7 +152,24 @@ namespace Golovomka
             }
         }
 
-        Vector2 RoomSpawn(int room) => room == 1 ? IntroSpawn : new Vector2(-9, -3.5f);
+        bool AtIntroductionExit()
+        {
+            var exit = room01 ? (Vector2)room01.exit.position : IntroPoint(1440, 725);
+            return position.x > exit.x && position.y > exit.y;
+        }
+
+        Vector2 RoomSpawn(int room)
+        {
+            if (room == 1) return room01 ? (Vector2)room01.entrance.position : IntroSpawn;
+            return room == 2 && room02 ? (Vector2)room02.entrance.position : new Vector2(-9, -3.5f);
+        }
+
+        Vector2 ReturnFromNextRoom()
+        {
+            if (zone == 1) return room01 ? (Vector2)room01.returnFromNext.position : IntroPoint(1340, 670);
+            if (zone == 2) return room02 ? (Vector2)room02.returnFromNext.position : new Vector2(0, 3.6f);
+            return new Vector2(6, 1.5f);
+        }
 
         void ResetRoomRecording()
         {

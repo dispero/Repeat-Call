@@ -39,8 +39,20 @@ public sealed class FurnitureLayoutEditor : Editor
     {
         var root = new VisualElement();
         root.Add(new HelpBox("Вне Play Mode выберите комнату и нажмите «Показать в Scene». Центр прямоугольника перемещает область, крайние ручки меняют размер. Ctrl+Z — отмена, Ctrl+S — сохранить сцену. Координаты Areas — мировые. Двери и стены здесь не редактируются.", HelpBoxMessageType.Info));
-        var choice = new PopupField<string>("Комната", new System.Collections.Generic.List<string>(rooms), room);
-        choice.RegisterValueChangedCallback(_ => { room = choice.index; FrameRoom(); });
+        var availableRooms = new System.Collections.Generic.List<string>(rooms);
+        void AddRoomLink(int index, string path)
+        {
+            var scene = AssetDatabase.LoadAssetAtPath<SceneAsset>(path);
+            if (!scene) return;
+            availableRooms.Remove(rooms[index]);
+            root.Add(new Button(() => Selection.activeObject = scene) { text = "Найти сцену " + scene.name + " в Project" });
+        }
+        AddRoomLink(0, PoliceStationLayout.ScenePath);
+        AddRoomLink(1, Room01Layout.ScenePath);
+        AddRoomLink(2, Room02Layout.ScenePath);
+        if (!availableRooms.Contains(rooms[room])) room = System.Array.IndexOf(rooms, availableRooms[0]);
+        var choice = new PopupField<string>("Комната", availableRooms, rooms[room]);
+        choice.RegisterValueChangedCallback(_ => { room = System.Array.IndexOf(rooms, choice.value); FrameRoom(); });
         root.Add(choice);
         root.Add(new Button(FrameRoom) { text = "Показать в Scene" });
         root.Add(new PropertyField(serializedObject.FindProperty("areas"), "Области мебели"));
