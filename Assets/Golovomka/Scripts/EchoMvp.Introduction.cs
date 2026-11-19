@@ -51,7 +51,7 @@ namespace Golovomka
             introDepth.Clear();
             if (room01)
             {
-                gate = room01.door;
+                room01.door.SetOpen(GateOpen, immediate: true);
                 padA = room01.plateOverlay;
                 remoteCover = null;
                 foreach (var box in room01.furniture.GetComponentsInChildren<BoxCollider2D>())
@@ -107,7 +107,8 @@ namespace Golovomka
 
         void UpdateIntroductionVisuals()
         {
-            gate.gameObject.SetActive(!GateOpen);
+            if (room01) room01.door.SetOpen(GateOpen);
+            else gate.gameObject.SetActive(!GateOpen);
             padA.color = plateA ? new Color(0, 0, 0, .15f) : Color.clear;
             if (room01) room01.remoteSprite.enabled = !history.remoteObtained;
             else if (remoteCover) remoteCover.enabled = history.remoteObtained;
@@ -129,13 +130,13 @@ namespace Golovomka
             return true;
         }
 
-        string IntroNearby()
+        Interaction IntroNearby()
         {
             var remote = room01 ? (Vector2)room01.remote.position : IntroRemote;
             if (!history.remoteObtained && Vector2.Distance(position, remote) < 1.65f)
-                return history.firstReturnSeen ? "Взять пульт" : "Осмотреть пульт";
-            if (Vector2.Distance(position, RoomSpawn(1)) < .95f) return "Вернуться в участок";
-            return "";
+                return history.firstReturnSeen ? Interaction.PickUpRemote : Interaction.InspectRemote;
+            if (Vector2.Distance(position, RoomSpawn(1)) < .95f) return Interaction.ReturnToStation;
+            return Interaction.None;
         }
 
         void UseIntroRemote()

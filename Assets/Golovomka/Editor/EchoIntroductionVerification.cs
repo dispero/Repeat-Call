@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 using Golovomka;
+using Interaction = Golovomka.EchoMvp.Interaction;
 
 // Сценарная проверка на тестовых состояниях. Запускать только в отдельной
 // Play Mode-сессии: оставляет тестовую комнату для снимка и пишет лишь в work.
@@ -29,21 +30,24 @@ public static class EchoIntroductionVerification
         m.saveFileOverride=System.IO.Path.Combine(Application.dataPath, "../work/intro-verification-save.json");
         m.history=new EchoHistory(); m.BeginCycle();
         m.RestartCycle(); Check(m.zone==0 && !m.recordingActive && m.history.tapes.Count==0,"No recording or R in police station");
-        m.Interact("Отправиться в лабораторию"); Check(m.zone==0,"Phone required");
-        Call("Close"); m.Interact("Телефон дежурного"); Call("Close"); m.Interact("Отправиться в лабораторию");
+        m.Interact(Interaction.EnterLaboratory); Check(m.zone==0,"Phone required");
+        Call("Close"); m.Interact(Interaction.AnswerPhone); Call("Close"); m.Interact(Interaction.EnterLaboratory);
         Check(m.zone==1 && m.position==EchoMvp.IntroSpawn && m.recordingActive,"Basement start");
         m.RestartCycle(); Check(m.history.cycle==1 && m.position==EchoMvp.IntroSpawn,"R locked before obtaining remote");
         Walk(EchoMvp.IntroPlate); Check(m.plateA,"First approach presses panel");
         float onPlateTime=m.elapsed;
         Walk(Pt(890,665)); Walk(Pt(1190,650)); Check(!m.plateA,"Leaving panel removes signal");
-        Check((string)Call("Nearby")=="Осмотреть пульт","Remote reachable from floor");
-        m.Interact("Осмотреть пульт");
+        var nearby = (Interaction)Call("Nearby");
+        Check(nearby == Interaction.InspectRemote,"Remote reachable from floor");
+        m.Interact(nearby);
         Check(m.position==EchoMvp.IntroSpawn && m.history.firstReturnSeen && !m.history.remoteObtained && m.history.ForRoom(1).Count==1,"First return creates one recording at room entrance");
         Check(m.history.ForRoom(1)[0].Sample(onPlateTime,out var f) && Vector2.Distance(new Vector2(f.x,f.y),EchoMvp.IntroPlate)<.1f,"First copy repeats panel approach");
         m.elapsed=onPlateTime; m.UpdateGhosts(); Check(m.plateA,"First copy opens door");
         m.elapsed=m.history.ForRoom(1)[0].duration+.1f; m.UpdateGhosts(); Check(!m.plateA,"Copy ends and releases panel");
-        m.position=Pt(1190,650); Check((string)Call("Nearby")=="Взять пульт","Second interaction offers pickup");
-        m.Interact("Взять пульт"); Check(m.history.remoteObtained,"Remote pickup");
+        m.position=Pt(1190,650);
+        nearby = (Interaction)Call("Nearby");
+        Check(nearby == Interaction.PickUpRemote,"Second interaction offers pickup");
+        m.Interact(nearby); Check(m.history.remoteObtained,"Remote pickup");
         // Новая попытка: реальный маршрут через CanMove, затем ожидание на панели.
         m.RestartCycle(); Walk(EchoMvp.IntroPlate); float holdStart=m.elapsed;
         for(int i=0;i<600;i++){m.elapsed+=.02f;m.Record();}
@@ -61,7 +65,7 @@ public static class EchoIntroductionVerification
         Check(m.zone==2 && m.history.clearedRooms==1 && m.elapsed==0 && m.recording.room==2,"Transition and fresh room recording");
         Check(m.history.ForRoom(1).Count==1 && m.history.ForRoom(2).Count==0,"Recordings isolated between rooms");
         m.elapsed=2; m.position=EchoMvp.PlateA;m.Record();m.RestartCycle();Check(m.zone==2 && m.position==new Vector2(-9,-3.5f),"R returns to second room entrance");
-        m.Interact("Предыдущая комната");Check(m.zone==1 && m.history.remoteObtained,"Backtracking retains remote");
+        m.Interact(Interaction.PreviousRoom);Check(m.zone==1 && m.history.remoteObtained,"Backtracking retains remote");
         var h=new EchoHistory {copySlots=2,firstReturnSeen=true,remoteObtained=true};
         EchoTape T(int z,float duration)=>new EchoTape {room=z,duration=duration,frames=new List<EchoFrame>{new EchoFrame(0,Vector2.zero,z,0)}};
         h.Push(T(1,1));h.Push(T(1,2));h.Push(T(3,3));h.Push(T(3,4));h.Push(T(3,5));

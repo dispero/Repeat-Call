@@ -5,7 +5,7 @@ Unity 2D top-down pixel-art игра для Windows. Лаборатория за
 ## Текущий MVP
 Участок и четыре комнаты лаборатории в подвале действующего предприятия. Запись начинается только в подвале: одна копия в комнатах 1–2, две — в 3, управление записью — в 4. Иван начинает у телефона. Бой и таймер не включены. Графика черновая.
 
-Откройте Assets/Golovomka/Scenes/EchoMVP.unity в Unity 6000.6.8f1 и включите Play Mode. Windows-сборка: outputs/Golovomka-Echo-MVP/Golovomka.exe; для передачи нужна вся папка. Инструкция находится рядом с exe. Архив не создаётся.
+Текущая версия запускается из `Assets/Golovomka/Scenes/EchoMVP.unity` в Unity 6000.6.8f1 через Play Mode. Готовая Windows-сборка в `outputs/Golovomka-Echo-MVP` относится к более ранней версии. Для передачи нужна вся папка. [Инструкция к сборке](outputs/Golovomka-Echo-MVP/README.md).
 
 ## Документы
 - [Правила работы](AGENTS.md).

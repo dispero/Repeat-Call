@@ -10,6 +10,20 @@ namespace Golovomka
 {
     public partial class EchoMvp : MonoBehaviour
     {
+        public enum Interaction
+        {
+            None,
+            AnswerPhone,
+            EnterLaboratory,
+            InspectRemote,
+            PickUpRemote,
+            ReturnToStation,
+            PreviousRoom,
+            ReadNote,
+            RecordingConsole,
+            EmergencyExit
+        }
+
         public EchoHistory history;
         public EchoTape recording;
         public float elapsed;
@@ -152,8 +166,9 @@ namespace Golovomka
             if (zone == 1 && AtIntroductionExit())
             { EnterSecondRoom(); return; }
             if (recordingActive && elapsed >= nextSample) { Record(); nextSample = elapsed + .05f; }
-            string target = Nearby(); prompt.text = target == "" ? (history.manualRecording && zone == 4 && !recordingActive ? "T — начать запись и воспроизведение    E — осмотр    ESC — пауза" : history.remoteObtained && zone > 0 ? "WASD — идти    E — осмотр    R — к входу комнаты    ESC — пауза" : "WASD / СТРЕЛКИ — идти    E — осмотр    ESC — пауза") : "[ E ]  " + target;
-            if (k.eKey.wasPressedThisFrame && target != "") Interact(target);
+            var target = Nearby();
+            prompt.text = target == Interaction.None ? (history.manualRecording && zone == 4 && !recordingActive ? "T — начать запись и воспроизведение    E — осмотр    ESC — пауза" : history.remoteObtained && zone > 0 ? "WASD — идти    E — осмотр    R — к входу комнаты    ESC — пауза" : "WASD / СТРЕЛКИ — идти    E — осмотр    ESC — пауза") : "[ E ]  " + InteractionLabel(target);
+            if (k.eKey.wasPressedThisFrame && target != Interaction.None) Interact(target);
             HUD();
         }
         public void Record() { if (recordingActive && zone > 0) recording.frames.Add(new EchoFrame(elapsed, position, zone, facing)); }
@@ -223,52 +238,66 @@ namespace Golovomka
             return destination.x >= gap.xMin && destination.x <= gap.xMax
                 && (open || gap.Contains(position));
         }
-        string Nearby()
+        Interaction Nearby()
         {
             if (zone == 1) return IntroNearby();
             if (zone == 0)
             {
-                if (Vector2.Distance(position, station ? (Vector2)station.phone.position : StationPhone) < 1.6f) return "Телефон дежурного";
-                if (Vector2.Distance(position, station ? (Vector2)station.exit.position : StationExit) < 1.5f) return "Отправиться в лабораторию";
+                if (Vector2.Distance(position, station ? (Vector2)station.phone.position : StationPhone) < 1.6f) return Interaction.AnswerPhone;
+                if (Vector2.Distance(position, station ? (Vector2)station.exit.position : StationExit) < 1.5f) return Interaction.EnterLaboratory;
             }
             else
             {
                 if (zone == 2 && room02)
                 {
-                    if (Vector2.Distance(position, room02.entrance.position) < 1.4f) return "Предыдущая комната";
-                    if (Vector2.Distance(position, room02.note.position) < 1.4f) return "Запись Фёдора";
-                    if (Vector2.Distance(position, room02.exit.position) < 1.2f) return "Пульт аварийного прохода";
-                    return "";
+                    if (Vector2.Distance(position, room02.entrance.position) < 1.4f) return Interaction.PreviousRoom;
+                    if (Vector2.Distance(position, room02.note.position) < 1.4f) return Interaction.ReadNote;
+                    if (Vector2.Distance(position, room02.exit.position) < 1.2f) return Interaction.EmergencyExit;
+                    return Interaction.None;
                 }
-                if (Vector2.Distance(position, new Vector2(-9, -3.5f)) < 1.4f) return zone == 1 ? "Выйти / завершить цикл" : "Предыдущая комната";
-                if (Vector2.Distance(position, new Vector2(0, -2.5f)) < 1.4f) return zone == 4 ? "Пульт записи" : "Запись Фёдора";
-                if (Vector2.Distance(position, zone == 2 ? new Vector2(0, 3.7f) : new Vector2(6, 2)) < 1.2f) return "Пульт аварийного прохода";
+                if (Vector2.Distance(position, new Vector2(-9, -3.5f)) < 1.4f) return Interaction.PreviousRoom;
+                if (Vector2.Distance(position, new Vector2(0, -2.5f)) < 1.4f) return zone == 4 ? Interaction.RecordingConsole : Interaction.ReadNote;
+                if (Vector2.Distance(position, zone == 2 ? new Vector2(0, 3.7f) : new Vector2(6, 2)) < 1.2f) return Interaction.EmergencyExit;
             }
-            return "";
+            return Interaction.None;
         }
-        public void Interact(string target)
+
+        static string InteractionLabel(Interaction target) => target switch
+        {
+            Interaction.AnswerPhone => "Телефон дежурного",
+            Interaction.EnterLaboratory => "Отправиться в лабораторию",
+            Interaction.InspectRemote => "Осмотреть пульт",
+            Interaction.PickUpRemote => "Взять пульт",
+            Interaction.ReturnToStation => "Вернуться в участок",
+            Interaction.PreviousRoom => "Предыдущая комната",
+            Interaction.ReadNote => "Запись Фёдора",
+            Interaction.RecordingConsole => "Пульт записи",
+            Interaction.EmergencyExit => "Пульт аварийного прохода",
+            _ => ""
+        };
+
+        public void Interact(Interaction target)
         {
             switch (target)
             {
-                case "Осмотреть пульт":
-                case "Взять пульт": UseIntroRemote(); break;
-                case "Вернуться в участок": Save(); BeginCycle(); break;
-                case "Телефон дежурного": phoneRead = true; Dialog("АВТОМАТИЧЕСКИЙ ВЫЗОВ", "Лаборатория в подвале предприятия. Сработала система безопасности. Автоматический вызов полиции.\n\nИван узнаёт адрес: здесь работают его отец и брат. Выход из участка справа у дальней стены."); break;
-                case "Отправиться в лабораторию":
+                case Interaction.InspectRemote:
+                case Interaction.PickUpRemote: UseIntroRemote(); break;
+                case Interaction.ReturnToStation: Save(); BeginCycle(); break;
+                case Interaction.AnswerPhone: phoneRead = true; Dialog("АВТОМАТИЧЕСКИЙ ВЫЗОВ", "Лаборатория в подвале предприятия. Сработала система безопасности. Автоматический вызов полиции.\n\nИван узнаёт адрес: здесь работают его отец и брат. Выход из участка справа у дальней стены."); break;
+                case Interaction.EnterLaboratory:
                     if (!phoneRead) { Dialog("ДЕЖУРНЫЙ", "Сначала ответьте на телефон. Поступил вызов."); break; }
                     zone = 1; position = RoomSpawn(zone); ResetRoomRecording(); BuildRoom();
                     break;
-                case "Выйти / завершить цикл": RestartCycle(); break;
-                case "Предыдущая комната":
+                case Interaction.PreviousRoom:
                     zone--;
                     position = ReturnFromNextRoom();
                     ResetRoomRecording(); BuildRoom(); break;
-                case "Запись Фёдора": Dialog("КОМНАТА " + zone, zone == 1 ? "Одна копия. Запишите ожидание на плите А и нажмите R.\nВ следующем цикле копия удержит дверь, а вы пройдёте к выходу справа сверху." : zone == 2 ? "Одна копия должна по очереди открыть две двери.\nЗапишите: ожидание на А → переход на Б → ожидание.\nВ следующем цикле пройдите первую дверь, дождитесь второго сигнала и идите через верхнюю дверь. Обе плиты доступны снизу." : "Теперь доступны две копии.\nЗапишите ожидание на А, затем в следующем цикле — ожидание на Б.\nКогда обе копии займут плиты, пройдите к выходу.\nR — вернуться к входу комнаты."); break;
-                case "Пульт записи":
+                case Interaction.ReadNote: Dialog("КОМНАТА " + zone, zone == 1 ? "Одна копия. Запишите ожидание на плите А и нажмите R.\nВ следующем цикле копия удержит дверь, а вы пройдёте к выходу справа сверху." : zone == 2 ? "Одна копия должна по очереди открыть две двери.\nЗапишите: ожидание на А → переход на Б → ожидание.\nВ следующем цикле пройдите первую дверь, дождитесь второго сигнала и идите через верхнюю дверь. Обе плиты доступны снизу." : "Теперь доступны две копии.\nЗапишите ожидание на А, затем в следующем цикле — ожидание на Б.\nКогда обе копии займут плиты, пройдите к выходу.\nR — вернуться к входу комнаты."); break;
+                case Interaction.RecordingConsole:
                     if (!history.manualRecording) ActivateManualRoom();
                     StartRecording();
                     Dialog("ПУЛЬТ ЗАПИСИ", "Начало записи и копий теперь под вашим контролем.\nE у пульта или T в этой комнате — запуск. R — сохранить запись и начать цикл.\n\nПодготовьте две записи ожидания на разных плитах. В последнем цикле можно занять удобную позицию и только затем запустить копии.\nЗа пределами этой комнаты T не действует."); break;
-                case "Пульт аварийного прохода":
+                case Interaction.EmergencyExit:
                     if (zone < 4)
                     {
                         // Сигнал нужен для пересечения двери, а не для выхода из уже пройденной комнаты.

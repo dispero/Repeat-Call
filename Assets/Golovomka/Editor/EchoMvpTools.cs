@@ -13,7 +13,7 @@ public static class EchoMvpTools
     public static void Prepare()
     {
         if (EditorApplication.isPlaying) throw new InvalidOperationException("Stop Play Mode first.");
-        foreach (string path in new[] { "Assets/Golovomka/Resources/Art/Interiors.png", "Assets/Golovomka/Resources/Art/Room.png", "Assets/Golovomka/Resources/Art/IvanWalk.png" })
+        foreach (string path in new[] { "Assets/Golovomka/Resources/Art/Interiors.png", "Assets/Golovomka/Resources/Art/Room.png" })
         {
             var importer = (TextureImporter)AssetImporter.GetAtPath(path);
             importer.textureType = TextureImporterType.Default;
