@@ -17,11 +17,7 @@ namespace Golovomka
             EnterLaboratory,
             InspectRemote,
             PickUpRemote,
-            ReturnToStation,
-            PreviousRoom,
-            ReadNote,
-            RecordingConsole,
-            EmergencyExit
+            ReturnToStation
         }
 
         public EchoHistory history;
@@ -29,66 +25,77 @@ namespace Golovomka
         public float elapsed;
         public int zone, facing = 3;
         public Vector2 position;
-        public bool plateA, plateB;
+        public bool plateA;
         public bool recordingActive;
         public string mode = "menu";
         [NonSerialized] public string saveFileOverride;
-        public static readonly Vector2 PlateA = new Vector2(-6, -2.5f), PlateB = new Vector2(-5, 2.6f);
-        SpriteRenderer hero, gate, secondGate, padA, padB;
-        public Vector2 CurrentPlateB => zone == 2 && room02 ? (Vector2)room02.plateB.transform.position : zone >= 2 ? new Vector2(6, -2.5f) : PlateB;
-        public int RoomCopies => zone < 3 ? 1 : history.copySlots;
-        bool GateOpen => history.clearedRooms >= zone || (zone < 3 ? plateA : plateA && plateB);
-        readonly SpriteRenderer[] ghosts = new SpriteRenderer[2];
-        readonly List<Rect> furniture = new List<Rect>();
+        [SerializeField] SpriteRenderer hero;
+        [SerializeField, Min(0)] float moveSpeed = 3.6f;
+        Vector3 heroBaseScale;
+        SpriteRenderer ghost;
+        bool GateOpen => history.clearedRooms >= 1 || plateA;
+        static readonly Vector2 FeetSize = new Vector2(.44f, .28f);
+        static readonly ContactFilter2D SolidContacts = new ContactFilter2D { useTriggers = false };
+        readonly List<Collider2D> overlapHits = new List<Collider2D>();
+        readonly List<RaycastHit2D> movementHits = new List<RaycastHit2D>();
         readonly List<Sprite> createdSprites = new List<Sprite>();
-        Material material;
-        Transform world;
-        Texture2D atlas, tiles, walk;
-        Sprite floor, white;
+        Texture2D walk;
         Sprite[] frames;
         Font font;
         Canvas canvas;
         RectTransform panel;
         Text heading, objective, status, prompt, dialogTitle, dialogBody, menu, caution;
-        readonly List<Text> worldLabels = new List<Text>();
+        Text stationExitLabel;
         int selection;
         bool phoneRead;
         float nextSample;
         PoliceStationLayout station;
         Room01Layout room01;
-        Room02Layout room02;
-        Color cyan = new Color(.32f, .88f, 1), amber = new Color(1, .74f, .36f);
+        GameObject[] stationRoots, laboratoryRoots;
+        Color amber = new Color(1, .74f, .36f);
 
         IEnumerator Start()
         {
-            yield return LoadRoomLayout<PoliceStationLayout>(PoliceStationLayout.ScenePath, layout => station = layout);
-            yield return LoadRoomLayout<Room01Layout>(Room01Layout.ScenePath, layout => room01 = layout);
-            yield return LoadRoomLayout<Room02Layout>(Room02Layout.ScenePath, layout => room02 = layout);
+            if (!roomCamera || !hero)
+            {
+                Debug.LogError("Назначьте камеру и SpriteRenderer Ивана в компоненте EchoMvp.", this);
+                yield break;
+            }
+            heroBaseScale = hero.transform.localScale;
+
+            yield return LoadRoomLayout<PoliceStationLayout>(PoliceStationLayout.ScenePath,
+                (layout, roots) => { station = layout; stationRoots = roots; });
+            yield return LoadRoomLayout<Room01Layout>(Room01Layout.ScenePath,
+                (layout, roots) => { room01 = layout; laboratoryRoots = roots; });
+            if (!station || !station.entrance || !station.phone || !station.exit || !station.exitLabel ||
+                !station.furniture || !station.phoneSprite)
+            {
+                Debug.LogError("В сцене PoliceStation заполните ссылки на объекты в PoliceStationLayout.", this);
+                yield break;
+            }
+            if (!room01 || !room01.entrance || !room01.remote || !room01.exit || !room01.furniture ||
+                !room01.door || !room01.plateOverlay || !room01.remoteSprite || !room01.doorway || !room01.doorBlocker)
+            {
+                Debug.LogError("В сцене Laboratory заполните ссылки на объекты в Room01Layout.", this);
+                yield break;
+            }
 
             Application.targetFrameRate = 60;
-            material = new Material(Resources.Load<Material>("Art/MvpSprite"));
             font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            atlas = Resources.Load<Texture2D>("Art/Interiors"); tiles = Resources.Load<Texture2D>("Art/Room"); walk = Resources.Load<Texture2D>("Art/IvanOfficerWalk");
-            floor = Crop(tiles, 224, 112, 16, 16);
-            white = Sprite.Create(Texture2D.whiteTexture, new Rect(0, 0, 1, 1), Vector2.one * .5f, 1); createdSprites.Add(white);
+            walk = Resources.Load<Texture2D>("Art/IvanOfficerWalk");
             frames = LoadOfficerFrames();
-            var cam = new GameObject("FixedRoomCamera", typeof(Camera)).GetComponent<Camera>(); cam.tag = "MainCamera";
-            roomCamera = cam;
-            cam.transform.position = new Vector3(0, 0, -10); cam.orthographic = true; cam.orthographicSize = 8.4375f;
-            cam.backgroundColor = new Color(.035f, .055f, .065f); cam.clearFlags = CameraClearFlags.SolidColor;
-            cam.allowHDR = cam.allowMSAA = false;
-            var pixel = cam.gameObject.AddComponent<UnityEngine.Rendering.Universal.PixelPerfectCamera>();
-            pixel.assetsPPU = 16; pixel.refResolutionX = 480; pixel.refResolutionY = 270;
-            pixel.gridSnapping = UnityEngine.Rendering.Universal.PixelPerfectCamera.GridSnapping.PixelSnapping;
-            pixel.cropFrame = UnityEngine.Rendering.Universal.PixelPerfectCamera.CropFrame.Windowbox;
-            // Заполнение окна по согласованному режиму требует свободного
-            // масштаба. Point и привязка движения к сетке остаются прежними.
-            pixel.enabled = false;
-            UI(); history = EchoHistory.Load() ?? new EchoHistory();
-            zone = 0; position = StationEntry; BuildRoom(); ShowMenu();
+            ghost = new GameObject("Echo0", typeof(SpriteRenderer)).GetComponent<SpriteRenderer>();
+            ghost.transform.SetParent(transform, false);
+            ghost.sharedMaterial = hero.sharedMaterial;
+            ghost.color = new Color(.3f, .85f, 1, .55f);
+            ghost.enabled = false;
+            UI();
+            history = EchoHistory.Load() ?? new EchoHistory();
+            BeginCycle();
+            ShowMenu();
         }
 
-        static IEnumerator LoadRoomLayout<T>(string path, Action<T> assign) where T : MonoBehaviour
+        static IEnumerator LoadRoomLayout<T>(string path, Action<T, GameObject[]> assign) where T : MonoBehaviour
         {
             var scene = SceneManager.GetSceneByPath(path);
             int buildIndex = SceneUtility.GetBuildIndexByScenePath(path);
@@ -98,26 +105,36 @@ namespace Golovomka
                 scene = SceneManager.GetSceneByPath(path);
             }
             if (!scene.isLoaded) yield break;
-            foreach (var root in scene.GetRootGameObjects())
+            var roots = scene.GetRootGameObjects();
+            foreach (var root in roots)
             {
-                if (!root.TryGetComponent<T>(out var layout)) continue;
-                root.SetActive(false);
-                assign(layout);
+                var layout = root.GetComponentInChildren<T>(includeInactive: true);
+                if (!layout) continue;
+                // Сохраняем авторскую видимость остальных корней сцены.
+                var roomRoots = Array.FindAll(roots, item => item == root || item.activeSelf);
+                SetRoomVisible(roomRoots, false);
+                assign(layout, roomRoots);
                 yield break;
             }
         }
-        void OnDestroy() { foreach (var s in createdSprites) if (s) Destroy(s); if (material) Destroy(material); }
+
+        static void SetRoomVisible(GameObject[] roots, bool visible)
+        {
+            foreach (var root in roots) root.SetActive(visible);
+        }
+
+        void OnDestroy() { foreach (var s in createdSprites) if (s) Destroy(s); }
+
         public void BeginCycle()
         {
-            elapsed = 0; nextSample = 0; zone = 0; facing = 3; position = StationEntry;
-            recording = new EchoTape(); recordingActive = false; phoneRead = false; mode = "play";
-            BuildRoom(); panel.gameObject.SetActive(false);
+            facing = 3; phoneRead = false; mode = "play";
+            ActivateRoom(0);
+            panel.gameObject.SetActive(false);
         }
-        public void StartRecording()
+        void ResetRoomRecording()
         {
-            if (zone == 0 || recordingActive) return;
             elapsed = 0; nextSample = .05f; recording = new EchoTape { room = zone }; recordingActive = true;
-            Record(); HUD();
+            Record();
         }
         public void RestartCycle()
         {
@@ -149,7 +166,6 @@ namespace Golovomka
             if (mode == "done") { if (enter) ShowMenu(); return; }
             if (k.escapeKey.wasPressedThisFrame) { mode = "pause"; selection = 0; Panel("ПАУЗА", "Запись и копии приостановлены."); MenuText(); return; }
             if (k.rKey.wasPressedThisFrame) { RestartCycle(); return; }
-            if (k.tKey.wasPressedThisFrame && history.manualRecording) StartRecording();
             float dt = Mathf.Min(Time.deltaTime, .05f); if (recordingActive) elapsed += dt;
             UpdateGhosts();
             Vector2 move = new Vector2((k.dKey.isPressed || k.rightArrowKey.isPressed ? 1 : 0) - (k.aKey.isPressed || k.leftArrowKey.isPressed ? 1 : 0),
@@ -157,17 +173,17 @@ namespace Golovomka
             if (move != Vector2.zero)
             {
                 facing = Mathf.Abs(move.x) > Mathf.Abs(move.y) ? (move.x > 0 ? 0 : 1) : (move.y > 0 ? 2 : 3);
-                var delta = move.normalized * 3.6f * dt;
+                var delta = move.normalized * moveSpeed * dt;
                 Vector2 step = position + new Vector2(delta.x, 0); if (CanMove(step)) position = step;
                 step = position + new Vector2(0, delta.y); if (CanMove(step)) position = step;
             }
             hero.sprite = OfficerFrame(facing, move != Vector2.zero, Time.time);
             Place(hero, position); UpdateGhosts();
             if (zone == 1 && AtIntroductionExit())
-            { EnterSecondRoom(); return; }
+            { FinishIntroduction(); return; }
             if (recordingActive && elapsed >= nextSample) { Record(); nextSample = elapsed + .05f; }
             var target = Nearby();
-            prompt.text = target == Interaction.None ? (history.manualRecording && zone == 4 && !recordingActive ? "T — начать запись и воспроизведение    E — осмотр    ESC — пауза" : history.remoteObtained && zone > 0 ? "WASD — идти    E — осмотр    R — к входу комнаты    ESC — пауза" : "WASD / СТРЕЛКИ — идти    E — осмотр    ESC — пауза") : "[ E ]  " + InteractionLabel(target);
+            prompt.text = target == Interaction.None ? (history.remoteObtained && zone > 0 ? "WASD — идти    E — осмотр    R — к входу комнаты    ESC — пауза" : "WASD / СТРЕЛКИ — идти    E — осмотр    ESC — пауза") : "[ E ]  " + InteractionLabel(target);
             if (k.eKey.wasPressedThisFrame && target != Interaction.None) Interact(target);
             HUD();
         }
@@ -176,91 +192,55 @@ namespace Golovomka
         {
             sprite.transform.position = new Vector3(Mathf.Round(p.x * 16) / 16, Mathf.Round(p.y * 16) / 16, 0);
             sprite.sortingOrder = 100 - Mathf.RoundToInt(p.y * 10);
-            if (zone == 0 && sprite == hero) UpdateStationDepth(p);
-            if (zone == 1 && sprite == hero)
-                foreach (var layer in introDepth)
-                    if (layer.renderer) layer.renderer.enabled = p.x >= layer.left && p.x <= layer.right;
         }
-        public void UpdateGhosts()
+        public void UpdateGhosts() => UpdateGhosts(false);
+
+        void UpdateGhosts(bool immediateDoor)
         {
-            plateA = EchoHistory.OnPlate(new EchoFrame(0, position, zone, facing), CurrentPlateA);
-            plateB = EchoHistory.OnPlate(new EchoFrame(0, position, zone, facing), CurrentPlateB);
+            plateA = zone == 1 && EchoHistory.OnPlate(new EchoFrame(0, position, zone, facing), CurrentPlateA);
             var tapes = ActiveTapes;
-            for (int i = 0; i < 2; i++)
+            EchoFrame frame = default;
+            bool playing = recordingActive && zone == 1 && tapes.Count > 0
+                && tapes[tapes.Count - 1].Sample(elapsed, out frame) && frame.zone == zone;
+            ghost.enabled = playing;
+            if (playing)
             {
-                EchoFrame f = default;
-                int tapeIndex = tapes.Count - RoomCopies + i;
-                bool active = recordingActive && zone > 0 && i < RoomCopies && tapeIndex >= 0 && tapeIndex < tapes.Count && tapes[tapeIndex].Sample(elapsed, out f);
-                ghosts[i].enabled = active && f.zone == zone;
-                if (!active) continue;
-                bool moving = tapes[tapeIndex].Sample(Mathf.Max(0, elapsed - .08f), out var previous)
-                    && previous.zone == f.zone && new Vector2(f.x - previous.x, f.y - previous.y).sqrMagnitude > .0001f;
-                Place(ghosts[i], new Vector2(f.x, f.y)); ghosts[i].sprite = OfficerFrame(f.facing, moving, elapsed);
-                if (f.zone == zone) { plateA |= EchoHistory.OnPlate(f, CurrentPlateA); plateB |= EchoHistory.OnPlate(f, CurrentPlateB); }
+                var tape = tapes[tapes.Count - 1];
+                bool moving = tape.Sample(Mathf.Max(0, elapsed - .08f), out var previous)
+                    && previous.zone == frame.zone
+                    && new Vector2(frame.x - previous.x, frame.y - previous.y).sqrMagnitude > .0001f;
+                Place(ghost, new Vector2(frame.x, frame.y));
+                ghost.sprite = OfficerFrame(frame.facing, moving, elapsed);
+                plateA |= EchoHistory.OnPlate(frame, CurrentPlateA);
             }
-            if (zone == 1) UpdateIntroductionVisuals();
-            else if (zone > 0)
-            {
-                gate.color = GateOpen ? new Color(.22f, .65f, .56f, .2f) : new Color(.35f, .5f, .53f);
-                if (secondGate) secondGate.color = plateB || history.clearedRooms >= zone ? new Color(.22f, .65f, .56f, .2f) : new Color(.6f, .4f, .2f);
-                padA.color = plateA ? cyan : new Color(.22f, .35f, .39f);
-                padB.color = plateB ? amber : new Color(.4f, .31f, .21f);
-            }
+            if (zone == 1) UpdateIntroductionVisuals(immediateDoor);
         }
-        bool CanMove(Vector2 p)
+
+        static Vector2 FeetCenter(Vector2 p) => p + new Vector2(0, .04f);
+
+        bool IsMovementObstacle(Collider2D obstacle) =>
+            obstacle.gameObject.scene == (zone == 0 ? station.gameObject.scene : room01.gameObject.scene);
+
+        bool CanStandAt(Vector2 destination)
         {
-            if (zone == 0) return CanMoveInStation(p);
-            if (zone == 1) return CanMoveInIntroduction(p);
-            if (p.x < -10.3f || p.x > 10.3f || p.y < -4.6f || p.y > 3.8f) return false;
-            foreach (var rect in furniture) if (rect.Overlaps(new Rect(p.x - .22f, p.y - .1f, .44f, .28f))) return false;
-            if (zone == 2 && room02)
-            {
-                return CanCrossPartition(Room02Layout.ToRect(room02.doorA.bounds), p, GateOpen)
-                    && CanCrossPartition(Room02Layout.ToRect(room02.doorB.bounds), p, plateB || history.clearedRooms >= 2);
-            }
-            if (zone > 0 && Mathf.Abs(p.y) < .65f)
-            {
-                if (Mathf.Abs(p.x) > 1.2f) return false;
-                bool alreadyInGap = Mathf.Abs(position.x) <= 1.2f && Mathf.Abs(position.y) < .65f;
-                if (!GateOpen && !alreadyInGap) return false;
-            }
-            if (zone == 2 && Mathf.Abs(p.y - 2.5f) < .45f)
-            {
-                if (Mathf.Abs(p.x) > 1.2f) return false;
-                bool inGap = Mathf.Abs(position.x) <= 1.2f && Mathf.Abs(position.y - 2.5f) < .45f;
-                if (!plateB && history.clearedRooms < 2 && !inGap) return false;
-            }
+            Physics2D.OverlapBox(FeetCenter(destination), FeetSize, 0, SolidContacts, overlapHits);
+            foreach (var obstacle in overlapHits)
+                if (IsMovementObstacle(obstacle)) return false;
             return true;
         }
-        bool CanCrossPartition(Rect gap, Vector2 destination, bool open)
+
+        bool CanMove(Vector2 destination)
         {
-            if (destination.y <= gap.yMin || destination.y >= gap.yMax) return true;
-            return destination.x >= gap.xMin && destination.x <= gap.xMax
-                && (open || gap.Contains(position));
+            if (!CanStandAt(destination)) return false;
+            Vector2 step = destination - position;
+            if (step == Vector2.zero) return true;
+            Physics2D.BoxCast(FeetCenter(position), FeetSize, 0, step.normalized, SolidContacts, movementHits, step.magnitude);
+            foreach (var hit in movementHits)
+                if (hit.distance > 0 && IsMovementObstacle(hit.collider)) return false;
+            return true;
         }
-        Interaction Nearby()
-        {
-            if (zone == 1) return IntroNearby();
-            if (zone == 0)
-            {
-                if (Vector2.Distance(position, station ? (Vector2)station.phone.position : StationPhone) < 1.6f) return Interaction.AnswerPhone;
-                if (Vector2.Distance(position, station ? (Vector2)station.exit.position : StationExit) < 1.5f) return Interaction.EnterLaboratory;
-            }
-            else
-            {
-                if (zone == 2 && room02)
-                {
-                    if (Vector2.Distance(position, room02.entrance.position) < 1.4f) return Interaction.PreviousRoom;
-                    if (Vector2.Distance(position, room02.note.position) < 1.4f) return Interaction.ReadNote;
-                    if (Vector2.Distance(position, room02.exit.position) < 1.2f) return Interaction.EmergencyExit;
-                    return Interaction.None;
-                }
-                if (Vector2.Distance(position, new Vector2(-9, -3.5f)) < 1.4f) return Interaction.PreviousRoom;
-                if (Vector2.Distance(position, new Vector2(0, -2.5f)) < 1.4f) return zone == 4 ? Interaction.RecordingConsole : Interaction.ReadNote;
-                if (Vector2.Distance(position, zone == 2 ? new Vector2(0, 3.7f) : new Vector2(6, 2)) < 1.2f) return Interaction.EmergencyExit;
-            }
-            return Interaction.None;
-        }
+
+        Interaction Nearby() => zone == 0 ? StationNearby() : IntroNearby();
 
         static string InteractionLabel(Interaction target) => target switch
         {
@@ -269,10 +249,6 @@ namespace Golovomka
             Interaction.InspectRemote => "Осмотреть пульт",
             Interaction.PickUpRemote => "Взять пульт",
             Interaction.ReturnToStation => "Вернуться в участок",
-            Interaction.PreviousRoom => "Предыдущая комната",
-            Interaction.ReadNote => "Запись Фёдора",
-            Interaction.RecordingConsole => "Пульт записи",
-            Interaction.EmergencyExit => "Пульт аварийного прохода",
             _ => ""
         };
 
@@ -286,130 +262,67 @@ namespace Golovomka
                 case Interaction.AnswerPhone: phoneRead = true; Dialog("АВТОМАТИЧЕСКИЙ ВЫЗОВ", "Лаборатория в подвале предприятия. Сработала система безопасности. Автоматический вызов полиции.\n\nИван узнаёт адрес: здесь работают его отец и брат. Выход из участка справа у дальней стены."); break;
                 case Interaction.EnterLaboratory:
                     if (!phoneRead) { Dialog("ДЕЖУРНЫЙ", "Сначала ответьте на телефон. Поступил вызов."); break; }
-                    zone = 1; position = RoomSpawn(zone); ResetRoomRecording(); BuildRoom();
+                    ActivateRoom(1);
                     break;
-                case Interaction.PreviousRoom:
-                    zone--;
-                    position = ReturnFromNextRoom();
-                    ResetRoomRecording(); BuildRoom(); break;
-                case Interaction.ReadNote: Dialog("КОМНАТА " + zone, zone == 1 ? "Одна копия. Запишите ожидание на плите А и нажмите R.\nВ следующем цикле копия удержит дверь, а вы пройдёте к выходу справа сверху." : zone == 2 ? "Одна копия должна по очереди открыть две двери.\nЗапишите: ожидание на А → переход на Б → ожидание.\nВ следующем цикле пройдите первую дверь, дождитесь второго сигнала и идите через верхнюю дверь. Обе плиты доступны снизу." : "Теперь доступны две копии.\nЗапишите ожидание на А, затем в следующем цикле — ожидание на Б.\nКогда обе копии займут плиты, пройдите к выходу.\nR — вернуться к входу комнаты."); break;
-                case Interaction.RecordingConsole:
-                    if (!history.manualRecording) ActivateManualRoom();
-                    StartRecording();
-                    Dialog("ПУЛЬТ ЗАПИСИ", "Начало записи и копий теперь под вашим контролем.\nE у пульта или T в этой комнате — запуск. R — сохранить запись и начать цикл.\n\nПодготовьте две записи ожидания на разных плитах. В последнем цикле можно занять удобную позицию и только затем запустить копии.\nЗа пределами этой комнаты T не действует."); break;
-                case Interaction.EmergencyExit:
-                    if (zone < 4)
-                    {
-                        // Сигнал нужен для пересечения двери, а не для выхода из уже пройденной комнаты.
-                        float requiredY = zone == 2 ? (room02 ? room02.doorB.bounds.max.y : 2.95f) : .65f;
-                        if (position.y < requiredY) { Dialog("ПРОХОД ЗАКРЫТ", "Сначала пройдите двери с помощью записанных действий."); break; }
-                        history.clearedRooms = Mathf.Max(history.clearedRooms, zone);
-                        zone++; if (zone == 3) history.copySlots = 2;
-                        position = RoomSpawn(zone);
-                        if (zone == 4) ActivateManualRoom(); else ResetRoomRecording();
-                        Save(); BuildRoom();
-                        Dialog("КОМНАТА " + zone, zone == 2 ? "Вторая комната: один клон и две последовательные двери. Прочитайте запись у стола." : zone == 3 ? "Открыт второй слот. В третьей комнате нужны две копии одновременно." : "Новый этап: записи этой комнаты запускаются вручную.\nВ четвёртой комнате находится пульт записи. Подойдите к нему. Здесь запись не начинается автоматически. Прежние комнаты остаются пройденными."); break;
-                    }
-                    if (!plateA || !plateB) { Dialog("НЕ ХВАТАЕТ СИГНАЛОВ", "Нужны сигналы с обеих плит: А и Б.\n\nПока вы у пульта, их должны удерживать две копии. Подготовьте два последовательных цикла, оставив достаточно времени на ожидание."); break; }
-                    history.completed = true; Save(); mode = "done";
-                    Panel("ПУТЬ ОТКРЫТ", "Иван и две его копии активировали аварийный проход.\n\nЗа следующей дверью — Фёдор, Алексей и трое захватчиков.\n\nКонец MVP. Финальный бой пока не входит в эту версию.\n\nENTER — главное меню"); break;
             }
-        }
-        void ActivateManualRoom()
-        {
-            if (!history.manualRecording) { history.manualRecording = true; }
-            recordingActive = false; elapsed = 0; recording = new EchoTape();
-            Save();
         }
         void HUD()
         {
             var tapes = ActiveTapes;
             heading.text = zone == 0 ? "ПОЛИЦЕЙСКИЙ УЧАСТОК" : "ПОДВАЛ / КОМНАТА " + zone;
-            objective.text = zone == 0 ? "Ответить на вызов и отправиться к отцу" : zone == 1 ? (history.remoteObtained ? "Оставьте копию на панели и пройдите дверь справа" : history.firstReturnSeen ? "Копия повторяет ваш путь. Заберите пульт у стола" : "Осмотрите комнату и пульт, появившийся из-под стола") : zone == 2 ? "Один клон: А → Б, две двери по очереди" : zone == 3 ? "Две копии: А и Б одновременно" : "Пульт записи: подготовьте пути и выберите момент старта";
-            status.text = "ЦИКЛ " + history.cycle.ToString("00") + "   •   " + (recordingActive ? "ЗАПИСЬ " + elapsed.ToString("0.0") + " с" : "ЗАПИСЬ НЕ НАЧАТА") + "   /   КОПИЙ: " + RoomCopies + "\n";
-            for (int i = Mathf.Max(0, tapes.Count - RoomCopies); i < tapes.Count; i++) status.text += "КОПИЯ " + (i + 1) + ": " + Mathf.Max(0, tapes[i].duration - elapsed).ToString("0.0") + " с   ";
-            if (zone > 0) status.text += "\nПЛИТА А: " + (plateA ? "АКТИВНА" : "—") + (zone == 1 ? "" : "    ПЛИТА Б: " + (plateB ? "АКТИВНА" : "—"));
+            objective.text = zone == 0 ? "Ответить на вызов и отправиться к отцу" : (history.remoteObtained ? "Оставьте копию на панели и пройдите дверь справа" : history.firstReturnSeen ? "Копия повторяет ваш путь. Заберите пульт у стола" : "Осмотрите комнату и пульт, появившийся из-под стола");
+            status.text = "ЦИКЛ " + history.cycle.ToString("00") + "   •   " + (recordingActive ? "ЗАПИСЬ " + elapsed.ToString("0.0") + " с" : "ЗАПИСЬ НЕ АКТИВНА");
+            if (zone == 1) status.text += "   /   КОПИЙ: 1";
+            status.text += "\n";
+            if (tapes.Count > 0) status.text += "КОПИЯ: " + Mathf.Max(0, tapes[tapes.Count - 1].duration - elapsed).ToString("0.0") + " с";
+            if (zone > 0) status.text += "\nПЛИТА А: " + (plateA ? "АКТИВНА" : "—");
         }
-        Sprite Crop(Texture2D t, int x, int top, int w, int h, Vector2? pivot = null)
+
+        void ActivateRoom(int targetZone)
         {
-            var s = Sprite.Create(t, new Rect(x, t.height - top - h, w, h), pivot ?? Vector2.one * .5f, 16); createdSprites.Add(s); return s;
-        }
-        SpriteRenderer SpriteObject(string name, Sprite sprite, Vector2 p, int order, Color color)
-        {
-            var go = new GameObject(name); go.transform.SetParent(world); go.transform.position = p;
-            var sr = go.AddComponent<SpriteRenderer>(); sr.sprite = sprite; sr.sharedMaterial = material; sr.sortingOrder = order; sr.color = color; return sr;
-        }
-        SpriteRenderer Block(string name, Vector2 p, Vector2 size, Color c, int order = 0)
-        { var sr = SpriteObject(name, white, p, order, c); sr.transform.localScale = size; return sr; }
-        void Furnish(string name, int x, int top, int w, int h, Vector2 p)
-        {
-            SpriteObject(name, Crop(atlas, x, top, w, h), p, 100 - Mathf.RoundToInt((p.y - h / 32f) * 10), new Color(.8f, .88f, .88f));
-            furniture.Add(new Rect(p.x - w / 32f + .2f, p.y - h / 32f, w / 16f - .4f, h / 32f));
-        }
-        public void BuildRoom()
-        {
-            if (world) { world.gameObject.SetActive(false); Destroy(world.gameObject); }
-            foreach (var label in worldLabels) if (label) Destroy(label.gameObject); worldLabels.Clear(); worldLabelPoints.Clear(); furniture.Clear(); secondGate = null;
-            world = new GameObject(zone == 0 ? "PoliceStation" : "Laboratory").transform;
-            if (station) station.gameObject.SetActive(zone == 0);
-            if (room01) room01.gameObject.SetActive(zone == 1);
-            if (room02) room02.gameObject.SetActive(zone == 2);
+            zone = targetZone;
+            bool inStation = zone == 0;
+            SetRoomVisible(inStation ? laboratoryRoots : stationRoots, false);
+            SetRoomVisible(inStation ? stationRoots : laboratoryRoots, true);
+            UpdateFurnitureSorting(inStation ? station.furniture : room01.furniture,
+                inStation ? station.phoneSprite : room01.remoteSprite);
+            position = inStation ? station.entrance.position : room01.entrance.position;
+            if (inStation)
+            {
+                elapsed = 0;
+                nextSample = 0;
+                recording = new EchoTape();
+                recordingActive = false;
+            }
+            else ResetRoomRecording();
+
+            stationExitLabel.enabled = inStation;
             FitRoomCamera();
-            if (zone == 0) BuildPoliceStation();
-            else if (zone == 1) BuildIntroduction();
-            else if (zone == 2 && room02)
+            PositionStationExitLabel();
+            RefreshActors();
+        }
+
+        void UpdateFurnitureSorting(Transform group, SpriteRenderer interactiveSprite)
+        {
+            foreach (var box in group.GetComponentsInChildren<BoxCollider2D>())
             {
-                gate = room02.doorA.GetComponent<SpriteRenderer>();
-                secondGate = room02.doorB.GetComponent<SpriteRenderer>();
-                padA = room02.plateA;
-                padB = room02.plateB;
-                WorldLabel("А", CurrentPlateA + new Vector2(0, -.9f), cyan);
-                WorldLabel("Б", CurrentPlateB + new Vector2(0, -.9f), amber);
-                WorldLabel("НАЗАД", (Vector2)room02.entrance.position + new Vector2(0, -.8f), amber);
-                WorldLabel("ЗАПИСЬ ФЁДОРА", (Vector2)room02.note.position + new Vector2(0, -.9f), amber);
-                WorldLabel("ПРОХОД В КОМНАТУ 3", (Vector2)room02.exit.position + new Vector2(0, .3f), amber);
-                room02.CopyFurniture(furniture);
+                var bounds = box.bounds;
+                var sprite = box.GetComponentInChildren<SpriteRenderer>();
+                if (sprite) sprite.sortingOrder = 100 - Mathf.RoundToInt(bounds.min.y * 10);
             }
-            else
-            {
-            for (int x = -11; x <= 11; x++) for (int y = -5; y <= 4; y++) SpriteObject("Floor", floor, new Vector2(x, y), -100, new Color(.66f, .79f, .77f));
-            Block("BackWall", new Vector2(0, 4.7f), new Vector2(24, 1), new Color(.25f, .37f, .37f), -50);
-            Block("LeftWall", new Vector2(-11.3f, 0), new Vector2(.4f, 10), new Color(.12f, .21f, .24f));
-            Block("RightWall", new Vector2(11.3f, 0), new Vector2(.4f, 10), new Color(.12f, .21f, .24f));
-                Block("PartitionLeft", new Vector2(-6.25f, 0), new Vector2(10, 1), new Color(.23f, .34f, .37f), 130);
-                Block("PartitionRight", new Vector2(6.25f, 0), new Vector2(10, 1), new Color(.23f, .34f, .37f), 130);
-                gate = Block("GateA", Vector2.zero, new Vector2(2.5f, 1), new Color(.4f, .5f, .53f), 130);
-                padA = Block("PlateA", PlateA, new Vector2(1.5f, 1), new Color(.22f, .35f, .39f), -60);
-                padB = Block("PlateB", CurrentPlateB, new Vector2(1.5f, 1), new Color(.4f, .31f, .21f), -60); padB.enabled = zone > 1;
-                Block("PlateAInset", PlateA, new Vector2(1.2f, .7f), new Color(.15f, .23f, .27f), -59);
-                if (zone > 1) Block("PlateBInset", CurrentPlateB, new Vector2(1.2f, .7f), new Color(.25f, .2f, .13f), -59);
-                if (zone == 2)
-                {
-                    Block("SecondPartitionLeft", new Vector2(-6.25f, 2.5f), new Vector2(10, .7f), new Color(.27f, .31f, .34f), 140);
-                    Block("SecondPartitionRight", new Vector2(6.25f, 2.5f), new Vector2(10, .7f), new Color(.27f, .31f, .34f), 140);
-                    secondGate = Block("GateB", new Vector2(0, 2.5f), new Vector2(2.5f, .7f), amber, 140);
-                    WorldLabel("ПРОХОД В КОМНАТУ 3", new Vector2(0, 4), amber);
-                }
-                Furnish("Desk", 0, 144, 48, 48, new Vector2(0, -1.3f));
-                Furnish("ControlDesk", 0, 144, 48, 48, new Vector2(6, 3.3f));
-                Block("ConsoleScreen", new Vector2(6, 3.5f), new Vector2(1.3f, .7f), new Color(.2f, .6f, .52f), 230);
-                Block("ExitMat", new Vector2(-9, -3.5f), new Vector2(1.5f, 1), new Color(.3f, .34f, .28f), -70);
-                WorldLabel("А", PlateA + new Vector2(0, -.9f), cyan); if (zone > 1) WorldLabel("Б", CurrentPlateB + new Vector2(0, -1), amber);
-                WorldLabel(zone == 1 ? "ВЫХОД / R" : "НАЗАД", new Vector2(-9, -4.3f), amber);
-                WorldLabel(zone == 4 ? "ПУЛЬТ ЗАПИСИ / E" : "ЗАПИСЬ ФЁДОРА", new Vector2(0, -3.4f), amber);
-                if (zone != 2) WorldLabel(zone < 4 ? "В СЛЕДУЮЩУЮ КОМНАТУ" : "А + Б → ВЫХОД", new Vector2(6, 4.2f), amber);
-            }
-            var furnitureLayout = GetComponent<FurnitureLayout>();
-            bool hasAuthoredLayout = (zone == 0 && station) || (zone == 1 && room01) || (zone == 2 && room02);
-            if (!hasAuthoredLayout && furnitureLayout && furnitureLayout.enabled) furnitureLayout.CopyRoom(zone, furniture);
-            hero = SpriteObject("Ivan", OfficerFrame(facing, false, 0), position, 100, Color.white); Place(hero, position);
-            for (int i = 0; i < 2; i++) ghosts[i] = SpriteObject("Echo" + i, OfficerFrame(facing, false, 0), Vector2.zero, 100, i == 0 ? new Color(.3f, .85f, 1, .55f) : new Color(1, .65f, .25f, .55f));
-            if (zone == 1)
-            {
-                hero.transform.localScale = Vector3.one * .65f;
-                foreach (var ghost in ghosts) ghost.transform.localScale = Vector3.one * .65f;
-            }
-            UpdateGhosts(); HUD();
+            var desk = interactiveSprite.GetComponentInParent<BoxCollider2D>();
+            if (desk && desk.TryGetComponent<SpriteRenderer>(out var deskSprite))
+                interactiveSprite.sortingOrder = deskSprite.sortingOrder + 1;
+        }
+
+        void RefreshActors()
+        {
+            hero.sprite = OfficerFrame(facing, false, 0);
+            hero.transform.localScale = heroBaseScale * (zone == 1 ? .65f : 1f);
+            Place(hero, position);
+            ghost.transform.localScale = hero.transform.localScale;
+            UpdateGhosts(immediateDoor: true);
+            HUD();
         }
         Text Text(string name, Transform parent, Vector2 size, Vector2 p, int fontSize, Color color, TextAnchor align = TextAnchor.UpperLeft)
         {
@@ -417,23 +330,19 @@ namespace Golovomka
             var rect = go.GetComponent<RectTransform>(); rect.anchorMin = rect.anchorMax = rect.pivot = Vector2.one * .5f; rect.sizeDelta = size; rect.anchoredPosition = p;
             var text = go.AddComponent<Text>(); text.font = font; text.fontSize = fontSize; text.color = color; text.alignment = align; text.supportRichText = false; text.raycastTarget = false; return text;
         }
-        void WorldLabel(string text, Vector2 p, Color color)
-        {
-            Vector3 screen = Camera.main.WorldToViewportPoint(p);
-            var label = Text("WorldLabel", canvas.transform, new Vector2(280, 34), new Vector2((screen.x - .5f) * 1280, (screen.y - .5f) * 720), 17, color, TextAnchor.MiddleCenter);
-            label.text = text; worldLabels.Add(label);
-            worldLabelPoints.Add(p); PositionWorldLabels();
-        }
         void UI()
         {
             var go = new GameObject("EchoUI", typeof(Canvas), typeof(CanvasScaler)); canvas = go.GetComponent<Canvas>(); canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            SceneManager.MoveGameObjectToScene(go, gameObject.scene);
             var scaler = go.GetComponent<CanvasScaler>(); scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize; scaler.referenceResolution = new Vector2(1280, 720); scaler.matchWidthOrHeight = .5f;
+            stationExitLabel = Text("WorldLabel", go.transform, new Vector2(280, 34), Vector2.zero, 17, amber, TextAnchor.MiddleCenter);
+            stationExitLabel.text = "В ЛАБОРАТОРИЮ / E";
             heading = Text("Location", go.transform, new Vector2(700, 40), new Vector2(-230, 320), 25, new Color(.87f, .91f, .9f));
             objective = Text("Objective", go.transform, new Vector2(700, 38), new Vector2(-225, 260), 19, new Color(.58f, .73f, .73f));
             status = Text("Status", go.transform, new Vector2(520, 80), new Vector2(330, 300), 17, amber, TextAnchor.UpperRight);
             prompt = Text("Prompt", go.transform, new Vector2(1220, 42), new Vector2(0, -292), 20, Color.white, TextAnchor.MiddleCenter);
             caution = Text("SaveStatus", go.transform, new Vector2(1180, 30), new Vector2(0, -250), 15, amber, TextAnchor.MiddleCenter);
-            Text("Credits", go.transform, new Vector2(1200, 30), new Vector2(0, -318), 14, new Color(.45f, .57f, .58f), TextAnchor.MiddleCenter).text = "GOLOVOMKA • MVP КОПИЙ   /   Участок, комната 1 и Иван: собственная графика с AI • Остальной подвал: LimeZu • Некоммерческий прототип";
+            Text("Credits", go.transform, new Vector2(1200, 30), new Vector2(0, -318), 14, new Color(.45f, .57f, .58f), TextAnchor.MiddleCenter).text = "GOLOVOMKA • MVP КОПИЙ   /   Графика создана с помощью AI • Некоммерческий прототип";
             var panelGo = new GameObject("Dialog", typeof(RectTransform), typeof(UnityEngine.UI.Image)); panelGo.transform.SetParent(go.transform, false); panel = panelGo.GetComponent<RectTransform>(); panel.sizeDelta = new Vector2(920, 490); panelGo.GetComponent<UnityEngine.UI.Image>().color = new Color(.035f, .065f, .085f, .99f);
             dialogTitle = Text("Title", panel, new Vector2(820, 55), new Vector2(0, 180), 27, amber);
             dialogBody = Text("Body", panel, new Vector2(820, 340), new Vector2(0, -20), 21, new Color(.86f, .9f, .89f));

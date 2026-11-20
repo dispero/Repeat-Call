@@ -9,6 +9,7 @@ using Golovomka;
 public static class EchoMvpTools
 {
     public const string ScenePath = "Assets/Golovomka/Scenes/EchoMVP.unity";
+    const string IvanPreviewPath = "Assets/Golovomka/Resources/Art/IvanIdlePreview.png";
     [MenuItem("Golovomka/Prepare Echo MVP")]
     public static void Prepare()
     {
@@ -31,11 +32,11 @@ public static class EchoMvpTools
             AssetDatabase.CreateAsset(new Material(shader), materialPath);
         }
         var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
-        var root = new GameObject("EchoMVP", typeof(EchoMvp), typeof(FurnitureLayout));
-        root.GetComponent<FurnitureLayout>().InitializeDefaults();
+        var root = new GameObject("EchoMVP", typeof(EchoMvp));
+        CreateSceneActors(root.GetComponent<EchoMvp>());
         EditorSceneManager.SaveScene(scene, ScenePath);
         var scenes = new System.Collections.Generic.List<EditorBuildSettingsScene> { new EditorBuildSettingsScene(ScenePath, true) };
-        foreach (string roomPath in new[] { PoliceStationLayout.ScenePath, Room01Layout.ScenePath, Room02Layout.ScenePath })
+        foreach (string roomPath in new[] { PoliceStationLayout.ScenePath, Room01Layout.ScenePath })
             if (AssetDatabase.LoadAssetAtPath<SceneAsset>(roomPath))
                 scenes.Add(new EditorBuildSettingsScene(roomPath, true));
         EditorBuildSettings.scenes = scenes.ToArray();
@@ -46,6 +47,47 @@ public static class EchoMvpTools
         AssetDatabase.SaveAssets();
         Debug.Log("ECHO_MVP_PREPARED");
     }
+
+    public static void CreateSceneActors(EchoMvp mvp)
+    {
+        var settings = new SerializedObject(mvp);
+        var cameraField = settings.FindProperty("roomCamera");
+        var heroField = settings.FindProperty("hero");
+
+        if (!cameraField.objectReferenceValue)
+        {
+            var camera = new GameObject("Main Camera", typeof(Camera)).GetComponent<Camera>();
+            SceneManager.MoveGameObjectToScene(camera.gameObject, mvp.gameObject.scene);
+            camera.tag = "MainCamera";
+            camera.transform.position = new Vector3(0, 0, -10);
+            camera.orthographic = true;
+            camera.orthographicSize = 8.4375f;
+            camera.backgroundColor = new Color(.035f, .055f, .065f);
+            camera.clearFlags = CameraClearFlags.SolidColor;
+            camera.allowHDR = camera.allowMSAA = false;
+            var pixel = camera.gameObject.AddComponent<UnityEngine.Rendering.Universal.PixelPerfectCamera>();
+            pixel.assetsPPU = 16;
+            pixel.refResolutionX = 480;
+            pixel.refResolutionY = 270;
+            pixel.gridSnapping = UnityEngine.Rendering.Universal.PixelPerfectCamera.GridSnapping.PixelSnapping;
+            pixel.cropFrame = UnityEngine.Rendering.Universal.PixelPerfectCamera.CropFrame.Windowbox;
+            pixel.enabled = false;
+            cameraField.objectReferenceValue = camera;
+        }
+
+        if (!heroField.objectReferenceValue)
+        {
+            var hero = new GameObject("Ivan", typeof(SpriteRenderer)).GetComponent<SpriteRenderer>();
+            SceneManager.MoveGameObjectToScene(hero.gameObject, mvp.gameObject.scene);
+            hero.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(IvanPreviewPath);
+            hero.sharedMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/Golovomka/Resources/Art/MvpSprite.mat");
+            hero.sortingOrder = 100;
+            heroField.objectReferenceValue = hero;
+        }
+
+        settings.ApplyModifiedPropertiesWithoutUndo();
+    }
+
     [MenuItem("Golovomka/Verify Echo Model")]
     public static string Verify()
     {
@@ -65,8 +107,9 @@ public static class EchoMvpTools
         Check(firstStage.copySlots == 1 && firstStage.tapes.Count == 1 && firstStage.tapes[0] == b, "One copy initially");
         firstStage.copySlots = 2; firstStage.Push(c);
         Check(firstStage.tapes.Count == 2 && firstStage.tapes[0] == b, "Second slot preserves previous recording");
-        Check(EchoHistory.OnPlate(new EchoFrame(1, EchoMvp.PlateA, 1, 3), EchoMvp.PlateA), "Plate in lab");
-        Check(!EchoHistory.OnPlate(new EchoFrame(1, EchoMvp.PlateA, 0, 3), EchoMvp.PlateA), "Room isolation");
+        var plate = new Vector2(1, 2);
+        Check(EchoHistory.OnPlate(new EchoFrame(1, plate, 1, 3), plate), "Plate in lab");
+        Check(!EchoHistory.OnPlate(new EchoFrame(1, plate, 0, 3), plate), "Room isolation");
         string path = Path.Combine(Path.GetTempPath(), "echo-test-" + Guid.NewGuid() + ".json");
         try
         {

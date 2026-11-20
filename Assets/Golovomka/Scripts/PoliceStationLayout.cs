@@ -8,6 +8,5 @@ namespace Golovomka
 
         public Transform entrance, phone, exit, exitLabel, furniture;
         public SpriteRenderer phoneSprite;
-        public BoxCollider2D walkArea;
     }
 }

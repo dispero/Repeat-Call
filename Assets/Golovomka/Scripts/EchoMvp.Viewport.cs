@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,41 +5,38 @@ namespace Golovomka
 {
     public partial class EchoMvp
     {
-        Camera roomCamera;
-        readonly List<Vector2> worldLabelPoints = new List<Vector2>();
+        [SerializeField] Camera roomCamera;
+        [SerializeField] bool autoFitRoom = true;
 
-        // Максимальный равномерный масштаб, при котором вся комната видна.
-        // Лаборатория учитывает запас над дальней стеной для головы героя.
+        // В лаборатории расширяем кадр вправо, сохраняя левую границу комнаты.
         void FitRoomCamera()
         {
-            if (!roomCamera) return;
-            Vector2 size = zone == 0 ? new Vector2(1586 * StationScale, 992 * StationScale) : zone == 1 ? new Vector2(1599 * IntroScale, 984 * IntroScale) : new Vector2(24, 12.7f);
-            float centerY = zone <= 1 ? 0 : .85f;
+            if (!canvas || !autoFitRoom) return;
+            Vector2 size = zone == 0 ? new Vector2(1586, 992) * (13.2f / 992f) : new Vector2(1599, 984) * .0145f;
+            Vector3 center = zone == 0 ? station.transform.position : room01.transform.position;
+            float previewWidth = zone == 0 ? 0 : room01.nextRoomPreviewWidth;
+            float aspect = Mathf.Max(.1f, roomCamera.aspect);
+            float roomHalfHeight = Mathf.Max(size.y * .5f, size.x * .5f / aspect);
             roomCamera.rect = new Rect(0, 0, 1, 1);
-            roomCamera.transform.position = new Vector3(0, centerY, -10);
-            roomCamera.orthographicSize = Mathf.Max(size.y * .5f, size.x * .5f / Mathf.Max(.1f, roomCamera.aspect)) * 1.005f;
+            roomCamera.transform.position = center + Vector3.right * (previewWidth * .5f) + Vector3.back * 10;
+            roomCamera.orthographicSize = (roomHalfHeight + previewWidth * .5f / aspect) * 1.005f;
         }
 
         void LateUpdate()
         {
             FitRoomCamera();
-            PositionWorldLabels();
+            PositionStationExitLabel();
         }
 
-        void PositionWorldLabels()
+        void PositionStationExitLabel()
         {
-            if (!roomCamera) return;
-            for (int i = 0; i < worldLabels.Count; i++)
-            {
-                if (!worldLabels[i]) continue;
-                Vector3 viewport = roomCamera.WorldToViewportPoint(worldLabelPoints[i]);
-                // Подписи предметов не пересекают верхние строки HUD и
-                // нижнюю подсказку, которые теперь лежат поверх комнаты.
-                viewport.y = Mathf.Clamp(viewport.y, .14f, .82f);
-                var rect = worldLabels[i].rectTransform;
-                rect.anchorMin = rect.anchorMax = new Vector2(viewport.x, viewport.y);
-                rect.anchoredPosition = Vector2.zero;
-            }
+            if (!stationExitLabel || !stationExitLabel.enabled) return;
+            Vector3 viewport = roomCamera.WorldToViewportPoint(station.exitLabel.position);
+            // Подпись не пересекает строки HUD.
+            viewport.y = Mathf.Clamp(viewport.y, .14f, .82f);
+            var rect = stationExitLabel.rectTransform;
+            rect.anchorMin = rect.anchorMax = new Vector2(viewport.x, viewport.y);
+            rect.anchoredPosition = Vector2.zero;
         }
 
         void TopHUD(Text text, float left, float right, float y, float height)

@@ -6,13 +6,10 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Golovomka/Scenes/EchoMVP.unity
+    path: Assets/Golovomka/Scenes/Game.unity
     guid: 945b09272358b41498f74dfb1cdae5e9
   - enabled: 1
-    path: Assets/Golovomka/Scenes/Room02.unity
-    guid: 18fdc9ba19ad99848887816860239f2c
-  - enabled: 1
-    path: Assets/Golovomka/Scenes/Room01.unity
+    path: Assets/Golovomka/Scenes/Laboratory.unity
     guid: 43bf9ad150432354f8fec2b0053aea6e
   - enabled: 1
     path: Assets/Golovomka/Scenes/PoliceStation.unity
