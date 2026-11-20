@@ -41,7 +41,7 @@ public static class EchoIntroductionVerification
         m.history=new EchoHistory(); m.BeginCycle();
         var station = UnityEngine.Object.FindAnyObjectByType<PoliceStationLayout>();
         var stationRoots = SceneManager.GetSceneByPath(PoliceStationLayout.ScenePath).GetRootGameObjects();
-        var labRoots = SceneManager.GetSceneByPath(Room01Layout.ScenePath).GetRootGameObjects();
+        var labRoots = SceneManager.GetSceneByPath(LaboratoryRoom.ScenePath).GetRootGameObjects();
         Check(station && m.position == (Vector2)station.entrance.position, "Station spawn comes from the scene");
         var chair = station.furniture.Find("Стул дежурного").GetComponent<BoxCollider2D>();
         Check(!chair.isTrigger && !CanStand(chair.bounds.center), "Station furniture has solid collision");
@@ -74,15 +74,17 @@ public static class EchoIntroductionVerification
         Call("Close"); m.Interact(Interaction.AnswerPhone); Call("Close"); m.Interact(Interaction.EnterLaboratory);
         var intro = UnityEngine.Object.FindAnyObjectByType<Room01Layout>();
         Check(intro && Array.TrueForAll(stationRoots, root => !root.activeSelf), "Laboratory scene active and station roots hidden");
-        var preview = UnityEngine.Object.FindAnyObjectByType<Room02Layout>();
-        Check(preview && preview.gameObject.scene == intro.gameObject.scene &&
-            preview.transform.parent == intro.transform.parent, "Room 2 preview shares the laboratory scene");
-        Check(preview.entrance.position.x > intro.doorway.bounds.max.x, "Room 2 preview lies beyond the demo exit");
-        Vector2 spawn = intro.entrance.position;
+        var sequence = UnityEngine.Object.FindAnyObjectByType<SequenceRoomLayout>();
+        Check(sequence && sequence.gameObject.scene == intro.gameObject.scene &&
+            sequence.IsConfigured, "Both authored rooms share the laboratory scene");
+        var room1 = intro.GetComponent<LaboratoryRoom>();
+        var room2 = sequence.GetComponent<LaboratoryRoom>();
+        Check(room2.entrance.position.x > intro.door.Passage.bounds.max.x, "Room 2 entry is beyond the first doorway");
+        Vector2 spawn = room1.entrance.position;
         Check(m.zone==1 && m.position==spawn && m.recordingActive && m.recording.frames[0].zone==1, "Basement starts recording at its scene marker");
         var wallColliders = intro.transform.parent.GetComponentsInChildren<UnityEngine.Tilemaps.TilemapCollider2D>();
         Check(Array.Exists(wallColliders, wall => wall.name == "Стены" && wall.shapeCount > 0), "Laboratory wall tiles generate solid shapes");
-        m.Interact(Interaction.ReturnToStation);
+        m.Interact(Interaction.UseRoomPassage);
         Check(station.gameObject.activeInHierarchy && Array.TrueForAll(labRoots, root => !root.activeSelf) &&
             m.position == (Vector2)station.entrance.position && !m.recordingActive && m.history.tapes.Count == 0,
             "Returning to the station discards the unfinished attempt and restores its scene");
@@ -110,31 +112,100 @@ public static class EchoIntroductionVerification
         m.RestartCycle(); Check(m.zone==1 && m.position==spawn && m.elapsed==0 && m.recordingActive,"R resets current room and common clock");
         Check(m.history.ForRoom(1).Count==1,"One recording limit in first room");
         m.elapsed=holdStart+1; m.UpdateGhosts(); Check(m.plateA,"Prepared copy holds panel");
-        Vector2 inside = intro.doorway.bounds.center;
-        var approach = new Vector2(intro.doorway.bounds.min.x - .27f, inside.y);
+        Vector2 inside = intro.door.Passage.bounds.center;
+        var approach = new Vector2(intro.door.Passage.bounds.min.x - .27f, inside.y);
         m.position=approach; Check(Can(inside),"Open mechanical passage allows entry");
-        m.elapsed=1000; m.UpdateGhosts(); Check(intro.doorBlocker.enabled && !Can(inside),"Closed door blocks entry");
+        m.elapsed=1000; m.UpdateGhosts(); Check(!intro.door.Passage.isTrigger && !Can(inside),"Closed door blocks entry");
         m.elapsed=holdStart+1; m.UpdateGhosts();
         m.position=inside; m.elapsed=1000; m.UpdateGhosts();
-        Check(!intro.doorBlocker.enabled && Can(approach),"Closing door allows escape from opening");
+        Check(intro.door.Passage.isTrigger && Can(approach),"Closing door allows escape from opening");
         var sofa = intro.furniture.Find("Диван").GetComponent<BoxCollider2D>();
         var desk = intro.remoteSprite.GetComponentInParent<BoxCollider2D>();
         Check(!CanStand(sofa.bounds.center),"Sofa collision");
         Check(!CanStand(desk.bounds.center),"Desk collision");
         m.position=approach; m.elapsed=holdStart+1; m.UpdateGhosts();
-        Vector2 exit = intro.exit.position;
+        var crossing = Array.Find(room1.passages, passage => passage.IsAutomatic);
+        Vector2 exit = crossing.marker.position;
         var beyondExit = new Vector2(exit.x + .03f, Mathf.Max(exit.y + .03f, inside.y));
         Check(Can(beyondExit),"Prepared copy allows reaching the demo exit");
         m.position=beyondExit;
-        Check((bool)Call("AtIntroductionExit"),"Crossing the right exit triggers completion");
+        Check(crossing.Matches(m.position, m.history.remoteObtained),"Crossing the right exit triggers completion");
         Call("Update");
-        Check(m.zone==1 && m.mode=="done" && m.history.clearedRooms==1 && !m.recordingActive,"Demo ends in room 1");
-        Check(m.history.ForRoom(1).Count==1 && m.recording.frames.Count==0,"Completion preserves the last recording and discards the current attempt");
+        Check(m.zone==2 && m.position==(Vector2)room2.entrance.position && m.history.clearedRooms==1 && m.recordingActive,
+            "First exit saves progress and starts room 2 at its entrance");
+        Check(m.history.ForRoom(1).Count==1 && m.recording.frames.Count==1 && m.recording.frames[0].zone==2,
+            "Changing rooms preserves the last tape and starts a fresh local attempt");
         var finished=EchoHistory.Load(m.saveFileOverride);
         Check(finished!=null && finished.clearedRooms==1 && finished.remoteObtained,"Room 1 completion survives save/load");
+        Vector2 a = sequence.first.plate.transform.position;
+        Vector2 b = sequence.second.plate.transform.position;
+        Vector2 doorA = sequence.first.door.Passage.bounds.center;
+        Vector2 doorB = sequence.second.door.Passage.bounds.center;
+        var between = Vector2.Lerp(doorA, doorB, .5f);
+        Check(!Can(doorA),"First sequence door is initially closed");
+        Check(Can(a),"Ivan can reach A before the first door");
+        Move(a);
+        float timeA = m.elapsed;
+        m.elapsed += 6;
+        m.Record();
+        Check(Can(b),"Ivan can record A then B without crossing the first door");
+        Move(b);
+        float timeB = m.elapsed;
+        m.elapsed += 6;
+        m.RestartCycle();
+        Check(m.position==(Vector2)room2.entrance.position && m.elapsed==0 && m.history.ForRoom(2).Count==1,
+            "Room 2 has a local reset and keeps one tape");
+        m.elapsed=timeA; m.UpdateGhosts();
+        Check(m.plateA && !m.plateB && Can(doorA) && Can(between) && !Can(doorB),
+            "Copy opens A only and Ivan can reach the waiting area");
+        Move(between);
+        m.elapsed=timeB; m.UpdateGhosts();
+        Vector2 sequenceExit = Array.Find(room2.passages, passage => passage.completesRoom).marker.position;
+        Check(!m.plateA && m.plateB && Can(doorB) && Can(sequenceExit),
+            "Copy opens B only and Ivan can reach the right exit");
+        Move(sequenceExit);
+        m.Interact(Interaction.UseRoomPassage);
+        Check(m.zone==2 && m.history.clearedRooms==2 && m.mode=="dialog" &&
+            sequence.first.door.Passage.isTrigger && sequence.second.door.Passage.isTrigger &&
+            EchoHistory.Load(m.saveFileOverride)?.clearedRooms==2,
+            "Right exit saves room 2 and leaves both gates open");
+        m.elapsed=1000; m.UpdateGhosts();
+        Check(!m.plateA && !m.plateB,"The sequence copy stops holding plates when its tape ends");
+        Call("Close");
+        m.position=room2.entrance.position;
+        var singleCopyHistory = m.history;
+        int originalLimit = room2.copyLimit;
+        try
+        {
+            room2.copyLimit = 2;
+            m.history = new EchoHistory { remoteObtained = true, firstReturnSeen = true };
+            EchoTape Hold(Vector2 plate, float duration) => new EchoTape
+            {
+                room = room2.roomNumber, duration = duration,
+                frames = new List<EchoFrame> { new EchoFrame(0, plate, room2.roomNumber, 3) }
+            };
+            m.history.Push(Hold(a, 2), room2.copyLimit);
+            m.history.Push(Hold(b, 4), room2.copyLimit);
+            m.elapsed = 1;
+            m.UpdateGhosts();
+            Check(m.plateA && m.plateB, "A room configured for two copies plays both tapes");
+            m.elapsed = 2;
+            m.UpdateGhosts();
+            Check(!m.plateA && m.plateB, "Each copy releases its plate independently");
+            m.history.Save(m.saveFileOverride);
+            Check(EchoHistory.Load(m.saveFileOverride)?.ForRoom(room2.roomNumber).Count == 2,
+                "A configured two-copy room can reload both tapes");
+        }
+        finally
+        {
+            room2.copyLimit = originalLimit;
+            m.history = singleCopyHistory;
+        }
+        m.Interact(Interaction.UseRoomPassage);
+        Check(m.zone==1 && m.history.ForRoom(2).Count==1,"Backtracking preserves the recorded room 2 route");
         var h=new EchoHistory {copySlots=2,firstReturnSeen=true,remoteObtained=true};
         EchoTape T(int z,float duration)=>new EchoTape {room=z,duration=duration,frames=new List<EchoFrame>{new EchoFrame(0,Vector2.zero,z,0)}};
-        h.Push(T(1,1));h.Push(T(1,2));h.Push(T(3,3));h.Push(T(3,4));h.Push(T(3,5));
+        h.Push(T(1,1),1);h.Push(T(1,2),1);h.Push(T(3,3),2);h.Push(T(3,4),2);h.Push(T(3,5),2);
         Check(h.ForRoom(1).Count==1 && h.ForRoom(3).Count==2 && h.ForRoom(3)[0].duration==4,"Per-room limits and oldest replacement");
         h.Save(m.saveFileOverride);var loaded=EchoHistory.Load(m.saveFileOverride);
         Check(loaded!=null && loaded.remoteObtained && loaded.firstReturnSeen && loaded.ForRoom(3).Count==2,"Pickup, first return and room recordings survive save/load");

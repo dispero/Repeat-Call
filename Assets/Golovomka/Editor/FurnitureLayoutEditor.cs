@@ -20,7 +20,7 @@ public sealed class FurnitureLayoutEditor : Editor
     {
         if (EditorApplication.isPlaying) { Debug.LogWarning("Остановите Play Mode перед редактированием хитбоксов."); return; }
         var game = Object.FindAnyObjectByType<EchoMvp>();
-        if (!game) { Debug.LogWarning("Откройте сцену EchoMVP."); return; }
+        if (!game) { Debug.LogWarning("Откройте сцену Game."); return; }
         var layout = game.GetComponent<FurnitureLayout>();
         if (!layout)
         {
@@ -48,7 +48,7 @@ public sealed class FurnitureLayoutEditor : Editor
             root.Add(new Button(() => Selection.activeObject = scene) { text = "Найти сцену " + scene.name + " в Project" });
         }
         AddRoomLink(0, PoliceStationLayout.ScenePath);
-        AddRoomLink(1, Room01Layout.ScenePath);
+        AddRoomLink(1, LaboratoryRoom.ScenePath);
         AddRoomLink(2, Room02Layout.ScenePath);
         if (!availableRooms.Contains(rooms[room])) room = System.Array.IndexOf(rooms, availableRooms[0]);
         var choice = new PopupField<string>("Комната", availableRooms, rooms[room]);

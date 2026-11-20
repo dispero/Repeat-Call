@@ -35,6 +35,7 @@ namespace Golovomka
     }
     [Serializable] public class EchoHistory
     {
+        public const int MaxRoomNumber = 4;
         public int version = 3, cycle = 1;
         public int clearedRooms;
         public int copySlots = 1;
@@ -49,17 +50,18 @@ namespace Golovomka
                 if (tape.room == room || (tape.room == 0 && tape.frames.Exists(f => f.zone == room))) result.Add(tape);
             return result;
         }
-        public void Push(EchoTape tape)
+        public void Push(EchoTape tape, int roomLimit)
         {
+            roomLimit = Mathf.Clamp(roomLimit, 1, LaboratoryRoom.MaxCopies);
+            copySlots = Mathf.Max(copySlots, roomLimit);
             tapes.Add(tape);
             if (tape.room == 0)
                 while (tapes.Count > copySlots) tapes.RemoveAt(0);
             else
             {
-                int limit = tape.room < 3 ? 1 : copySlots;
                 // Старый общий маршрут для этой комнаты заменяет новая локальная попытка.
                 tapes.RemoveAll(t => t != tape && t.room == 0 && t.frames.Exists(f => f.zone == tape.room));
-                while (ForRoom(tape.room).Count > limit)
+                while (ForRoom(tape.room).Count > roomLimit)
                     tapes.Remove(tapes.Find(t => t.room == tape.room));
             }
             cycle++;
@@ -84,20 +86,20 @@ namespace Golovomka
                 {
                     if (!File.Exists(file)) continue;
                     var data = JsonUtility.FromJson<EchoHistory>(File.ReadAllText(file));
-                    if (data == null || data.version != 3 || data.cycle < 1 || data.tapes == null || data.copySlots < 1 || data.copySlots > 2 || data.tapes.Count > 8 || (data.manualRecording && data.copySlots != 2) || data.clearedRooms < 0 || data.clearedRooms > 3) continue;
+                    if (data == null || data.version != 3 || data.cycle < 1 || data.tapes == null || data.copySlots < 1 || data.copySlots > LaboratoryRoom.MaxCopies || data.tapes.Count > MaxRoomNumber * LaboratoryRoom.MaxCopies || (data.manualRecording && data.copySlots != 2) || data.clearedRooms < 0 || data.clearedRooms > MaxRoomNumber) continue;
                     bool valid = true;
                     foreach (var tape in data.tapes)
                     {
-                        if (tape == null || tape.frames == null || tape.room < 0 || tape.room > 4 || tape.duration < 0 || float.IsNaN(tape.duration) || float.IsInfinity(tape.duration)) { valid = false; break; }
+                        if (tape == null || tape.frames == null || tape.room < 0 || tape.room > MaxRoomNumber || tape.duration < 0 || float.IsNaN(tape.duration) || float.IsInfinity(tape.duration)) { valid = false; break; }
                         float previous = -1;
                         foreach (var f in tape.frames)
                         {
-                            if (f.t < previous || float.IsNaN(f.t) || float.IsInfinity(f.t) || float.IsNaN(f.x) || float.IsNaN(f.y) || float.IsInfinity(f.x) || float.IsInfinity(f.y) || f.zone < 0 || f.zone > 4 || f.facing < 0 || f.facing > 3) { valid = false; break; }
+                            if (f.t < previous || float.IsNaN(f.t) || float.IsInfinity(f.t) || float.IsNaN(f.x) || float.IsNaN(f.y) || float.IsInfinity(f.x) || float.IsInfinity(f.y) || f.zone < 0 || f.zone > MaxRoomNumber || f.facing < 0 || f.facing > 3) { valid = false; break; }
                             previous = f.t;
                         }
                     }
-                    for (int room = 1; room <= 4; room++)
-                        if (data.tapes.FindAll(t => t.room == room).Count > (room < 3 ? 1 : data.copySlots)) valid = false;
+                    for (int room = 1; room <= MaxRoomNumber; room++)
+                        if (data.tapes.FindAll(t => t.room == room).Count > data.copySlots) valid = false;
                     // Совместимость: прежние сохранения с пройденными комнатами
                     // уже предполагают свободное использование возврата.
                     if (data.clearedRooms > 0) data.firstReturnSeen = data.remoteObtained = true;

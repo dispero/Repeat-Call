@@ -7,19 +7,61 @@ namespace Golovomka
     {
         [SerializeField] Camera roomCamera;
         [SerializeField] bool autoFitRoom = true;
+        [SerializeField, Range(.1f, .8f)] float laboratoryDeadZoneWidth = .4f;
+        [SerializeField, Min(.01f)] float laboratoryCameraSmoothTime = .22f;
+        Bounds laboratoryCameraBounds;
+        float laboratoryCameraVelocity;
 
-        // В лаборатории расширяем кадр вправо, сохраняя левую границу комнаты.
-        void FitRoomCamera()
+        void CacheLaboratoryCameraBounds()
+        {
+            laboratoryCameraBounds = currentRoom.CameraBounds;
+            foreach (var root in laboratoryRoots)
+            foreach (var room in root.GetComponentsInChildren<LaboratoryRoom>())
+            {
+                if (!room.isActiveAndEnabled) continue;
+                var bounds = room.CameraBounds;
+                laboratoryCameraBounds.Encapsulate(bounds.min);
+                laboratoryCameraBounds.Encapsulate(bounds.max + Vector3.right * room.previewWidth);
+            }
+        }
+
+        void FitRoomCamera(bool snap = false)
         {
             if (!canvas || !autoFitRoom) return;
-            Vector2 size = zone == 0 ? new Vector2(1586, 992) * (13.2f / 992f) : new Vector2(1599, 984) * .0145f;
-            Vector3 center = zone == 0 ? station.transform.position : room01.transform.position;
-            float previewWidth = zone == 0 ? 0 : room01.nextRoomPreviewWidth;
             float aspect = Mathf.Max(.1f, roomCamera.aspect);
-            float roomHalfHeight = Mathf.Max(size.y * .5f, size.x * .5f / aspect);
             roomCamera.rect = new Rect(0, 0, 1, 1);
-            roomCamera.transform.position = center + Vector3.right * (previewWidth * .5f) + Vector3.back * 10;
-            roomCamera.orthographicSize = (roomHalfHeight + previewWidth * .5f / aspect) * 1.005f;
+            if (!currentRoom)
+            {
+                var size = new Vector2(1586, 992) * (13.2f / 992f);
+                roomCamera.orthographicSize = Mathf.Max(size.y * .5f, size.x * .5f / aspect) * 1.005f;
+                roomCamera.transform.position = station.transform.position + Vector3.back * 10;
+                laboratoryCameraVelocity = 0;
+                return;
+            }
+
+            var bounds = laboratoryCameraBounds;
+            roomCamera.orthographicSize = Mathf.Max(.01f, bounds.extents.y) * 1.005f;
+            float halfWidth = roomCamera.orthographicSize * aspect;
+            float minX = Mathf.Min(bounds.center.x, bounds.min.x + halfWidth);
+            float maxX = Mathf.Max(bounds.center.x, bounds.max.x - halfWidth);
+            float cameraX = Mathf.Clamp(roomCamera.transform.position.x, minX, maxX);
+            if (snap)
+            {
+                laboratoryCameraVelocity = 0;
+                cameraX = Mathf.Clamp(position.x, minX, maxX);
+            }
+            else
+            {
+                float deadZone = halfWidth * laboratoryDeadZoneWidth;
+                float target = Mathf.Clamp(cameraX, position.x - deadZone, position.x + deadZone);
+                target = Mathf.Clamp(target, minX, maxX);
+                if (Mathf.Approximately(cameraX, target))
+                    laboratoryCameraVelocity = 0;
+                else
+                    cameraX = Mathf.Clamp(Mathf.SmoothDamp(cameraX, target, ref laboratoryCameraVelocity,
+                        laboratoryCameraSmoothTime), minX, maxX);
+            }
+            roomCamera.transform.position = new Vector3(cameraX, bounds.center.y, bounds.center.z - 10);
         }
 
         void LateUpdate()

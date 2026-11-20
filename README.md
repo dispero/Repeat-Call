@@ -5,7 +5,7 @@ Unity 2D top-down pixel-art игра для Windows. Лаборатория за
 ## Текущий MVP
 Иван начинает у телефона в полицейском участке. Запись начинается в первой комнате лаборатории, где доступна одна копия. Демо заканчивается у правого прохода. Геймплей комнат 2–4 описан для будущей реализации в сценах Unity. [Текущий MVP](docs/mvp-echoes.md)
 
-Текущая версия запускается из `Assets/Golovomka/Scenes/EchoMVP.unity` в Unity 6000.6.8f1 через Play Mode. Готовая Windows-сборка в `outputs/Golovomka-Echo-MVP` относится к более ранней версии. Для передачи нужна вся папка. [Инструкция к сборке](outputs/Golovomka-Echo-MVP/README.md).
+Текущая версия запускается из `Assets/Golovomka/Scenes/Game.unity` в Unity 6000.6.8f1 через Play Mode. Готовая Windows-сборка в `outputs/Golovomka-Echo-MVP` относится к более ранней версии. Для передачи нужна вся папка. [Инструкция к сборке](outputs/Golovomka-Echo-MVP/README.md).
 
 ## Документы
 - [Правила работы](AGENTS.md).
