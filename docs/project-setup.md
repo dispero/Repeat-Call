@@ -4,7 +4,7 @@ Unity 6000.6.8f1, Universal 2D / URP, Input System, uGUI. Цель сборки 
 
 ## Запуск и сборка
 
-Открыть `Assets/Golovomka/Scenes/Game.unity` и включить Play Mode. Основная сцена дополнительно загружает `PoliceStation.unity` и `Laboratory.unity`. Эти три сцены входят в список сборки. В `Laboratory` находятся играбельная комната 1, стык 01 → 02 и прототип комнаты 2 с `SequenceRoomLayout`. Отдельная `Room02.unity` хранит исходную раскладку.
+Открыть `Assets/Golovomka/Scenes/Game.unity` и включить Play Mode. Основная сцена дополнительно загружает `PoliceStation.unity` и `Laboratory.unity`. Эти три сцены входят в список сборки. В `Laboratory` находятся комната 1, «Эстафета», испытание с двумя копиями и пустая комната за его дверью. Отдельная `Room02.unity` хранит исходную раскладку.
 
 `EchoMvp` подключает готовые сцены и переключает видимость их корневых объектов. Точка появления читается из `PoliceStationLayout` для участка и из `LaboratoryRoom` для комнат лаборатории. При входе в лабораторию начинается запись, при возвращении в участок текущая попытка сбрасывается. В `Room01Layout` поля `Door` и `Plate Overlay` связывают дверь и положение плиты со сценой. При отсутствующей сцене или обязательной ссылке Unity пишет ошибку в Console.
 
@@ -63,4 +63,4 @@ unity command build status --project-path <полный путь проекта>
 
 `EchoMvpTools.Verify()` проверяет интерполяцию, конец записи, лимиты, сохранение и резервную копию.
 
-`EchoIntroductionVerification.VerifyPlay()` запускать в отдельном сеансе Play Mode. Сценарий подставляет тестовые состояния, оставляет первую комнату для снимка и пишет в `work/intro-verification-save.json`.
+`EchoIntroductionVerification.VerifyPlay()` запускать в отдельном сеансе Play Mode. Сценарий подставляет тестовые состояния, проверяет открытие общей двери двумя копиями и переход в пустую комнату. Сохранение пишет в `work/intro-verification-save.json`.

@@ -52,7 +52,8 @@ namespace Golovomka
         float nextSample;
         PoliceStationLayout station;
         Room01Layout room01;
-        SequenceRoomLayout sequence, currentSequence;
+        readonly List<SequenceRoomLayout> sequences = new List<SequenceRoomLayout>();
+        SequenceRoomLayout currentSequence;
         LaboratoryRoom introductionRoom, currentRoom;
         GameObject[] stationRoots, laboratoryRoots;
         Color amber = new Color(1, .74f, .36f);
@@ -70,15 +71,6 @@ namespace Golovomka
                 (layout, roots) => { station = layout; stationRoots = roots; });
             yield return LoadRoomLayout<Room01Layout>(LaboratoryRoom.ScenePath,
                 (layout, roots) => { room01 = layout; laboratoryRoots = roots; });
-            if (laboratoryRoots != null)
-                foreach (var root in laboratoryRoots)
-                    if (root.TryGetComponent<SequenceRoomLayout>(out sequence) ||
-                        (sequence = root.GetComponentInChildren<SequenceRoomLayout>(true))) break;
-            if (sequence && (!sequence.IsConfigured || !sequence.GetComponent<LaboratoryRoom>()))
-            {
-                Debug.LogError("Заполните ссылки второй комнаты в SequenceRoomLayout.", this);
-                yield break;
-            }
             if (!station || !station.entrance || !station.phone || !station.exit || !station.exitLabel ||
                 !station.furniture || !station.phoneSprite)
             {
@@ -95,6 +87,15 @@ namespace Golovomka
             foreach (var root in laboratoryRoots)
             foreach (var room in root.GetComponentsInChildren<LaboratoryRoom>(true))
             {
+                if (room.TryGetComponent<SequenceRoomLayout>(out var puzzle))
+                {
+                    if (!puzzle.IsConfigured || (puzzle.requireBothCopies && room.copyLimit != LaboratoryRoom.MaxCopies))
+                    {
+                        Debug.LogError("Проверьте ссылки плит, дверей и лимит копий комнаты.", puzzle);
+                        yield break;
+                    }
+                    sequences.Add(puzzle);
+                }
                 if (!room.entrance || room.roomNumber < 1 || room.roomNumber > EchoHistory.MaxRoomNumber ||
                     !roomNumbers.Add(room.roomNumber))
                 {
@@ -170,7 +171,7 @@ namespace Golovomka
         }
         public void RestartCycle()
         {
-            if (zone == 0 || !history.remoteObtained) return;
+            if (!currentRoom || currentRoom.disableRecording || !history.remoteObtained) return;
             ReturnToRoom();
         }
 
@@ -215,7 +216,7 @@ namespace Golovomka
             if (crossing != null) { UsePassage(crossing); return; }
             if (recordingActive && elapsed >= nextSample) { Record(); nextSample = elapsed + .05f; }
             var target = Nearby();
-            prompt.text = target == Interaction.None ? (history.remoteObtained && zone > 0 ? "WASD — идти    E — осмотр    R — к входу комнаты    ESC — пауза" : "WASD / СТРЕЛКИ — идти    E — осмотр    ESC — пауза") : "[ E ]  " +
+            prompt.text = target == Interaction.None ? (history.remoteObtained && recordingActive ? "WASD — идти    E — осмотр    R — к входу комнаты    ESC — пауза" : "WASD / СТРЕЛКИ — идти    E — осмотр    ESC — пауза") : "[ E ]  " +
                 (target == Interaction.UseRoomPassage ? FindPassage(automatic: false).label : InteractionLabel(target));
             if (k.eKey.wasPressedThisFrame && target != Interaction.None) Interact(target);
             HUD();
@@ -232,8 +233,10 @@ namespace Golovomka
         {
             var actor = new EchoFrame(0, position, zone, facing);
             bool hasPlateA = currentRoom && (currentRoom == introductionRoom || currentSequence);
-            plateA = hasPlateA && EchoHistory.OnPlate(actor, CurrentPlateA);
-            plateB = currentSequence && EchoHistory.OnPlate(actor, currentSequence.second.plate.transform.position);
+            bool playerPressesPlates = !currentSequence || !currentSequence.requireBothCopies;
+            plateA = playerPressesPlates && hasPlateA && EchoHistory.OnPlate(actor, CurrentPlateA);
+            plateB = playerPressesPlates && currentSequence &&
+                EchoHistory.OnPlate(actor, currentSequence.second.plate.transform.position);
             var tapes = ActiveTapes;
             for (int i = 0; i < ghosts.Length; i++)
             {
@@ -256,8 +259,7 @@ namespace Golovomka
             {
                 var feet = new Bounds(FeetCenter(position), FeetSize);
                 bool cleared = history.clearedRooms >= zone;
-                currentSequence.first.Apply(plateA, cleared, feet, immediateDoor);
-                currentSequence.second.Apply(plateB, cleared, feet, immediateDoor);
+                currentSequence.Apply(plateA, plateB, cleared, feet, immediateDoor);
             }
         }
 
@@ -328,7 +330,7 @@ namespace Golovomka
                 : history.remoteObtained ? "Оставьте копию на панели и пройдите дверь справа"
                 : history.firstReturnSeen ? "Копия повторяет ваш путь. Заберите пульт у стола" : "Осмотрите комнату и пульт, появившийся из-под стола";
             status.text = "ЦИКЛ " + history.cycle.ToString("00") + "   •   " + (recordingActive ? "ЗАПИСЬ " + elapsed.ToString("0.0") + " с" : "ЗАПИСЬ НЕ АКТИВНА");
-            if (currentRoom) status.text += "   /   КОПИЙ: " + currentRoom.copyLimit;
+            if (currentRoom && !currentRoom.disableRecording) status.text += "   /   КОПИЙ: " + currentRoom.copyLimit;
             status.text += "\n";
             for (int i = 0; currentRoom && i < currentRoom.copyLimit && i < tapes.Count; i++)
             {
@@ -352,7 +354,7 @@ namespace Golovomka
             UpdateFurnitureSorting(inStation ? station.furniture : room01.furniture,
                 inStation ? station.phoneSprite : room01.remoteSprite);
             position = arrival ? arrival.position : (inStation ? station.entrance.position : targetRoom.entrance.position);
-            if (inStation)
+            if (inStation || targetRoom.disableRecording)
             {
                 elapsed = 0;
                 nextSample = 0;
@@ -361,12 +363,11 @@ namespace Golovomka
             }
             else ResetRoomRecording();
 
-            if (!inStation && sequence && sequence.gameObject != targetRoom.gameObject)
+            foreach (var sequence in sequences)
             {
-                var feet = new Bounds(FeetCenter(position), FeetSize);
+                if (inStation || sequence == currentSequence || !sequence.isActiveAndEnabled) continue;
                 bool cleared = history.clearedRooms >= sequence.GetComponent<LaboratoryRoom>().roomNumber;
-                sequence.first.Apply(false, cleared, feet, true);
-                sequence.second.Apply(false, cleared, feet, true);
+                sequence.Apply(false, false, cleared, new Bounds(FeetCenter(position), FeetSize), true);
             }
 
             stationExitLabel.enabled = inStation;

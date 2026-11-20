@@ -15,6 +15,7 @@ namespace Golovomka
         public Vector2 cameraSize;
         [Min(0)] public float previewWidth;
         [Range(1, MaxCopies)] public int copyLimit = 1;
+        public bool disableRecording;
         [TextArea] public string objective;
         public Passage[] passages = Array.Empty<Passage>();
 
@@ -32,6 +33,7 @@ namespace Golovomka
             public bool approachFromRight;
             public float minimumXOffset;
             public SlidingDoor crossingDoor;
+            public bool crossToRight;
             public bool requiresRemote;
             public bool completesRoom;
             public Destination destination;
@@ -49,8 +51,16 @@ namespace Golovomka
                 if (!marker || (requiresRemote && !hasRemote)) return false;
                 Vector2 point = marker.position;
                 if (crossingDoor)
+                {
+                    if (crossToRight)
+                    {
+                        var doorway = crossingDoor.Passage;
+                        return doorway.isTrigger && position.x > doorway.bounds.center.x &&
+                            doorway.OverlapPoint(position);
+                    }
                     return position.x > point.x && position.y > point.y &&
                         crossingDoor.Passage.OverlapPoint(position);
+                }
                 return (!approachFromRight || position.x >= point.x + minimumXOffset) &&
                     Vector2.Distance(position, point) < interactionRadius;
             }

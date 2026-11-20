@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -74,7 +75,8 @@ public static class EchoIntroductionVerification
         Call("Close"); m.Interact(Interaction.AnswerPhone); Call("Close"); m.Interact(Interaction.EnterLaboratory);
         var intro = UnityEngine.Object.FindAnyObjectByType<Room01Layout>();
         Check(intro && Array.TrueForAll(stationRoots, root => !root.activeSelf), "Laboratory scene active and station roots hidden");
-        var sequence = UnityEngine.Object.FindAnyObjectByType<SequenceRoomLayout>();
+        var rooms = UnityEngine.Object.FindObjectsByType<LaboratoryRoom>(FindObjectsSortMode.None);
+        var sequence = rooms.Single(room => room.roomNumber == 2).GetComponent<SequenceRoomLayout>();
         Check(sequence && sequence.gameObject.scene == intro.gameObject.scene &&
             sequence.IsConfigured, "Both authored rooms share the laboratory scene");
         var room1 = intro.GetComponent<LaboratoryRoom>();
@@ -165,44 +167,55 @@ public static class EchoIntroductionVerification
             "Copy opens B only and Ivan can reach the right exit");
         Move(sequenceExit);
         m.Interact(Interaction.UseRoomPassage);
-        Check(m.zone==2 && m.history.clearedRooms==2 && m.mode=="dialog" &&
+        var room3 = rooms.Single(room => room.roomNumber == 3);
+        var shared = room3.GetComponent<SequenceRoomLayout>();
+        Check(m.zone==3 && m.position==(Vector2)room3.entrance.position && m.history.clearedRooms==2 &&
             sequence.first.door.Passage.isTrigger && sequence.second.door.Passage.isTrigger &&
             EchoHistory.Load(m.saveFileOverride)?.clearedRooms==2,
-            "Right exit saves room 2 and leaves both gates open");
-        m.elapsed=1000; m.UpdateGhosts();
-        Check(!m.plateA && !m.plateB,"The sequence copy stops holding plates when its tape ends");
-        Call("Close");
-        m.position=room2.entrance.position;
-        var singleCopyHistory = m.history;
-        int originalLimit = room2.copyLimit;
-        try
-        {
-            room2.copyLimit = 2;
-            m.history = new EchoHistory { remoteObtained = true, firstReturnSeen = true };
-            EchoTape Hold(Vector2 plate, float duration) => new EchoTape
-            {
-                room = room2.roomNumber, duration = duration,
-                frames = new List<EchoFrame> { new EchoFrame(0, plate, room2.roomNumber, 3) }
-            };
-            m.history.Push(Hold(a, 2), room2.copyLimit);
-            m.history.Push(Hold(b, 4), room2.copyLimit);
-            m.elapsed = 1;
-            m.UpdateGhosts();
-            Check(m.plateA && m.plateB, "A room configured for two copies plays both tapes");
-            m.elapsed = 2;
-            m.UpdateGhosts();
-            Check(!m.plateA && m.plateB, "Each copy releases its plate independently");
-            m.history.Save(m.saveFileOverride);
-            Check(EchoHistory.Load(m.saveFileOverride)?.ForRoom(room2.roomNumber).Count == 2,
-                "A configured two-copy room can reload both tapes");
-        }
-        finally
-        {
-            room2.copyLimit = originalLimit;
-            m.history = singleCopyHistory;
-        }
+            "Right exit saves room 2 and starts room 3");
+        Check(room3.copyLimit == 2 && shared.requireBothCopies && shared.IsConfigured,
+            "Room 3 uses two recordings and one shared door");
+        Vector2 sharedA = shared.first.plate.transform.position;
+        Vector2 sharedB = shared.second.plate.transform.position;
+        var sharedDoor = shared.first.door.Passage;
+        Vector2 sharedCenter = sharedDoor.bounds.center;
+        Check(Can(sharedA) && Can(sharedB) && !sharedDoor.isTrigger,
+            "Both plates are reachable before the closed door");
         m.Interact(Interaction.UseRoomPassage);
-        Check(m.zone==1 && m.history.ForRoom(2).Count==1,"Backtracking preserves the recorded room 2 route");
+        Check(m.zone == 2 && m.history.ForRoom(2).Count == 1,
+            "Returning to room 2 preserves its local history");
+        Move(sequenceExit);
+        m.Interact(Interaction.UseRoomPassage);
+        Check(m.zone == 3, "The unlocked transition can be used again");
+        Move(sharedA);
+        m.elapsed = 6;
+        m.RestartCycle();
+        Move(sharedB);
+        Check(m.plateA && !m.plateB && !sharedDoor.isTrigger,
+            "One copy and the player cannot open the door");
+        m.elapsed = 8;
+        m.RestartCycle();
+        Check(m.elapsed == 0 && m.position == (Vector2)room3.entrance.position &&
+            m.history.ForRoom(3).Count == 2, "R restarts both local recordings from a common zero");
+        m.elapsed = 1;
+        m.UpdateGhosts();
+        Check(m.plateA && m.plateB && sharedDoor.isTrigger, "Two simultaneous copies open the shared door");
+        m.elapsed = 7;
+        m.UpdateGhosts();
+        Check(!m.plateA && m.plateB && !sharedDoor.isTrigger, "The door closes when the first copy ends");
+        m.elapsed = 1;
+        m.UpdateGhosts();
+        var exit3 = Array.Find(room3.passages, p => p.completesRoom).marker.position;
+        m.position = new Vector2(sharedCenter.x - .7f, sharedCenter.y);
+        Check(Can(exit3), "The open doorway provides a route to the right exit");
+        Move(sharedCenter + Vector2.right * .05f);
+        Call("Update");
+        Check(m.zone == 4 && m.position == (Vector2)exit3 && !m.recordingActive && sharedDoor.isTrigger &&
+            EchoHistory.Load(m.saveFileOverride)?.clearedRooms == 3,
+            "Crossing the open door enters the empty room and saves room 3");
+        m.RestartCycle();
+        Check(m.zone == 4 && !m.recordingActive && m.history.ForRoom(3).Count == 2 &&
+            m.history.ForRoom(2).Count == 1, "The empty room keeps previous recordings without starting its own");
         var h=new EchoHistory {copySlots=2,firstReturnSeen=true,remoteObtained=true};
         EchoTape T(int z,float duration)=>new EchoTape {room=z,duration=duration,frames=new List<EchoFrame>{new EchoFrame(0,Vector2.zero,z,0)}};
         h.Push(T(1,1),1);h.Push(T(1,2),1);h.Push(T(3,3),2);h.Push(T(3,4),2);h.Push(T(3,5),2);
