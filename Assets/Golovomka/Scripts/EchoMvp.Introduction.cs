@@ -45,8 +45,14 @@ namespace Golovomka
         {
             if (recordingActive)
             {
+                // Последнее нажатие может иметь ту же метку времени, что и следующий кадр с R.
+                if (currentButtons && recording.buttonPresses.Count > 0 &&
+                    recording.buttonPresses[recording.buttonPresses.Count - 1].time >= elapsed)
+                    elapsed += .001f;
                 Record(); recording.duration = elapsed;
-                if (elapsed > 0) history.Push(recording, currentRoom.copyLimit); else history.cycle++;
+                if (elapsed > 0 && (!currentButtons || recording.buttonPresses.Count > 0))
+                    history.Push(recording, currentRoom.copyLimit);
+                else history.cycle++;
             }
             else history.cycle++;
             Save();

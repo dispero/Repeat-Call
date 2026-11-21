@@ -17,7 +17,8 @@ namespace Golovomka
             EnterLaboratory,
             InspectRemote,
             PickUpRemote,
-            UseRoomPassage
+            UseRoomPassage,
+            PressTimedButton
         }
 
         public EchoHistory history;
@@ -52,6 +53,7 @@ namespace Golovomka
         readonly Dictionary<int, LaboratoryRoom> rooms = new Dictionary<int, LaboratoryRoom>();
         readonly List<SequenceRoomLayout> sequences = new List<SequenceRoomLayout>();
         SequenceRoomLayout currentSequence;
+        TimedButtonsRoom currentButtons;
         LaboratoryRoom introductionRoom, currentRoom;
         GameObject[] stationRoots, laboratoryRoots;
         Color amber = new Color(1, .74f, .36f);
@@ -91,6 +93,11 @@ namespace Golovomka
             foreach (var root in laboratoryRoots)
             foreach (var room in root.GetComponentsInChildren<LaboratoryRoom>(true))
             {
+                if (room.TryGetComponent<TimedButtonsRoom>(out var buttons) && (!buttons.IsConfigured || room.copyLimit != 1))
+                {
+                    Debug.LogError("Проверьте кнопки, табло, дверь и лимит копий комнаты.", room);
+                    yield break;
+                }
                 if (room.TryGetComponent<SequenceRoomLayout>(out var puzzle))
                 {
                     if (!puzzle.IsConfigured || (puzzle.requireBothCopies && room.copyLimit != LaboratoryRoom.MaxCopies))
@@ -259,6 +266,13 @@ namespace Golovomka
             if (!currentRoom) return;
             UpdateIntroductionVisuals(immediateDoor);
             var feet = new Bounds(FeetCenter(position), FeetSize);
+            if (currentButtons)
+            {
+                if (recordingActive && tapes.Count > 0)
+                    currentButtons.Replay(tapes[tapes.Count - 1], elapsed);
+                currentButtons.Show(elapsed);
+                currentButtons.exitDoor.SetPassage(currentButtons.Solved, feet, immediateDoor);
+            }
             foreach (var sequence in sequences)
             {
                 if (!sequence.isActiveAndEnabled) continue;
@@ -296,6 +310,7 @@ namespace Golovomka
             if (zone == 0) return StationNearby();
             var local = currentRoom == introductionRoom ? IntroNearby() : Interaction.None;
             if (local != Interaction.None) return local;
+            if (currentButtons && currentButtons.NearbyButton(position) > 0) return Interaction.PressTimedButton;
             return FindPassage() != null ? Interaction.UseRoomPassage : Interaction.None;
         }
 
@@ -305,6 +320,7 @@ namespace Golovomka
             Interaction.EnterLaboratory => "Отправиться в лабораторию",
             Interaction.InspectRemote => "Осмотреть пульт",
             Interaction.PickUpRemote => "Взять пульт",
+            Interaction.PressTimedButton => "Нажать кнопку",
             _ => ""
         };
 
@@ -314,6 +330,13 @@ namespace Golovomka
             {
                 case Interaction.InspectRemote:
                 case Interaction.PickUpRemote: UseIntroRemote(); break;
+                case Interaction.PressTimedButton:
+                    if (currentButtons && recordingActive)
+                    {
+                        currentButtons.Press(currentButtons.NearbyButton(position), elapsed, recording);
+                        UpdateGhosts();
+                    }
+                    break;
                 case Interaction.UseRoomPassage:
                     var passage = FindPassage();
                     if (passage != null) UsePassage(passage);
@@ -344,6 +367,7 @@ namespace Golovomka
             if (currentRoom && (currentRoom == introductionRoom || currentSequence))
                 status.text += "\nПЛИТА А: " + (plateA ? "АКТИВНА" : "—");
             if (currentSequence) status.text += "   ПЛИТА Б: " + (plateB ? "АКТИВНА" : "—");
+            if (currentButtons) status.text += "\n" + currentButtons.Status(elapsed);
         }
 
         void ActivateRoom(LaboratoryRoom targetRoom, Transform arrival = null, bool keepPosition = false)
@@ -351,6 +375,7 @@ namespace Golovomka
             bool enteringLaboratory = targetRoom && !currentRoom;
             currentRoom = targetRoom;
             currentSequence = targetRoom ? targetRoom.GetComponent<SequenceRoomLayout>() : null;
+            currentButtons = targetRoom ? targetRoom.GetComponent<TimedButtonsRoom>() : null;
             zone = targetRoom ? targetRoom.roomNumber : 0;
             bool inStation = !targetRoom;
             SetRoomVisible(inStation ? laboratoryRoots : stationRoots, false);
@@ -367,6 +392,7 @@ namespace Golovomka
                 recordingActive = false;
             }
             else ResetRoomRecording();
+            if (currentButtons) currentButtons.ResetAttempt(history.returnRoom > zone);
 
             stationExitLabel.enabled = inStation;
             if (enteringLaboratory) CacheLaboratoryCameraBounds();
