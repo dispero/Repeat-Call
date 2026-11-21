@@ -37,7 +37,8 @@ namespace Golovomka
     {
         public const int MaxRoomNumber = 4;
         public int version = 3, cycle = 1;
-        public int clearedRooms;
+        public int returnRoom;
+        [Serializable] sealed class LegacyProgress { public int clearedRooms; }
         public int copySlots = 1;
         public bool manualRecording;
         public bool completed;
@@ -85,8 +86,9 @@ namespace Golovomka
                 try
                 {
                     if (!File.Exists(file)) continue;
-                    var data = JsonUtility.FromJson<EchoHistory>(File.ReadAllText(file));
-                    if (data == null || data.version != 3 || data.cycle < 1 || data.tapes == null || data.copySlots < 1 || data.copySlots > LaboratoryRoom.MaxCopies || data.tapes.Count > MaxRoomNumber * LaboratoryRoom.MaxCopies || (data.manualRecording && data.copySlots != 2) || data.clearedRooms < 0 || data.clearedRooms > MaxRoomNumber) continue;
+                    string json = File.ReadAllText(file);
+                    var data = JsonUtility.FromJson<EchoHistory>(json);
+                    if (data == null || data.version != 3 || data.cycle < 1 || data.tapes == null || data.copySlots < 1 || data.copySlots > LaboratoryRoom.MaxCopies || data.tapes.Count > MaxRoomNumber * LaboratoryRoom.MaxCopies || (data.manualRecording && data.copySlots != 2) || data.returnRoom < 0 || data.returnRoom > MaxRoomNumber) continue;
                     bool valid = true;
                     foreach (var tape in data.tapes)
                     {
@@ -100,9 +102,16 @@ namespace Golovomka
                     }
                     for (int room = 1; room <= MaxRoomNumber; room++)
                         if (data.tapes.FindAll(t => t.room == room).Count > data.copySlots) valid = false;
-                    // Совместимость: прежние сохранения с пройденными комнатами
-                    // уже предполагают свободное использование возврата.
-                    if (data.clearedRooms > 0) data.firstReturnSeen = data.remoteObtained = true;
+                    if (data.returnRoom == 0)
+                    {
+                        int cleared = JsonUtility.FromJson<LegacyProgress>(json).clearedRooms;
+                        if (cleared < 0 || cleared > MaxRoomNumber) continue;
+                        if (cleared > 0)
+                        {
+                            data.firstReturnSeen = data.remoteObtained = true;
+                            data.returnRoom = Mathf.Min(cleared + 1, MaxRoomNumber);
+                        }
+                    }
                     if (data.remoteObtained && !data.firstReturnSeen) valid = false;
                     if (valid) return data;
                 }

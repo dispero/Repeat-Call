@@ -12,9 +12,9 @@ namespace Golovomka
             public SlidingDoor door;
             public bool IsConfigured => plate && door && door.Passage;
 
-            public void Apply(bool pressed, bool cleared, Bounds feet, bool immediate)
+            public void Apply(bool pressed, Bounds feet, bool immediate)
             {
-                door.SetPassage(pressed || cleared, feet, immediate);
+                door.SetPassage(pressed, feet, immediate);
                 ShowSignal(pressed);
             }
 
@@ -29,18 +29,18 @@ namespace Golovomka
         public bool IsConfigured => first.IsConfigured && second.IsConfigured &&
             (requireBothCopies ? first.door == second.door : first.door != second.door);
 
-        public void Apply(bool plateA, bool plateB, bool cleared, Bounds feet, bool immediate)
+        public void Apply(bool plateA, bool plateB, Bounds feet, bool immediate)
         {
             if (requireBothCopies)
             {
                 first.ShowSignal(plateA);
                 second.ShowSignal(plateB);
-                first.door.SetPassage(cleared || (plateA && plateB), feet, immediate);
+                first.door.SetPassage(plateA && plateB, feet, immediate);
                 return;
             }
 
-            first.Apply(plateA, cleared, feet, immediate);
-            second.Apply(plateB, cleared, feet, immediate);
+            first.Apply(plateA, feet, immediate);
+            second.Apply(plateB, feet, immediate);
         }
     }
 }

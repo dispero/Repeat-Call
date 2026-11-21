@@ -126,19 +126,44 @@ public static class EchoIntroductionVerification
         Check(!CanStand(sofa.bounds.center),"Sofa collision");
         Check(!CanStand(desk.bounds.center),"Desk collision");
         m.position=approach; m.elapsed=holdStart+1; m.UpdateGhosts();
-        var crossing = Array.Find(room1.passages, passage => passage.IsAutomatic);
-        Vector2 exit = crossing.marker.position;
-        var beyondExit = new Vector2(exit.x + .03f, Mathf.Max(exit.y + .03f, inside.y));
-        Check(Can(beyondExit),"Prepared copy allows reaching the demo exit");
-        m.position=beyondExit;
-        Check(crossing.Matches(m.position, m.history.remoteObtained),"Crossing the right exit triggers completion");
-        Call("Update");
-        Check(m.zone==2 && m.position==(Vector2)room2.entrance.position && m.history.clearedRooms==1 && m.recordingActive,
-            "First exit saves progress and starts room 2 at its entrance");
-        Check(m.history.ForRoom(1).Count==1 && m.recording.frames.Count==1 && m.recording.frames[0].zone==2,
+        void CrossDoor(LaboratoryRoom room, SlidingDoor door)
+        {
+            var passage = Array.Find(room.passages, item => item.IsAutomatic);
+            var bounds = door.Passage.bounds;
+            Vector2 before = bounds.center - Vector3.right * .05f;
+            Vector2 after = bounds.center + Vector3.right * .05f;
+            Check(passage.crossingDoor == door && door.Passage.isTrigger &&
+                !passage.Crossed(before, after, false) && !passage.Crossed(after, after, true) &&
+                !passage.Crossed(after, before, true), "Crossing requires movement in the correct direction and the remote");
+            m.position = before;
+            Check(Can(after), "The open doorway can be crossed");
+            m.position = after;
+            var crossing = Call("FindCrossing", before);
+            Check(ReferenceEquals(crossing, passage), "Crossing picks the automatic exit for the active room");
+            Call("UsePassage", crossing);
+            Check(m.position == after, "The transition preserves the player's position");
+            while (m.position.x < bounds.max.x + .35f)
+            {
+                var step = m.position + Vector2.right * .1f;
+                if (!Can(step)) throw new Exception("Blocked after crossing " + door.name + " at " + step);
+                m.position = step;
+            }
+            m.UpdateGhosts();
+            Check(!door.Passage.isTrigger, "The old door becomes solid after the player clears the opening");
+        }
+
+        CrossDoor(room1, intro.door);
+        Check(m.zone == 2 && m.history.returnRoom == 2 && m.recordingActive,
+            "First exit saves the remote return point and starts recording in room 2");
+        Check(m.history.ForRoom(1).Count == 1 && m.recording.frames.Count == 1 && m.recording.frames[0].zone == 2,
             "Changing rooms preserves the last tape and starts a fresh local attempt");
-        var finished=EchoHistory.Load(m.saveFileOverride);
-        Check(finished!=null && finished.clearedRooms==1 && finished.remoteObtained,"Room 1 completion survives save/load");
+        var finished = EchoHistory.Load(m.saveFileOverride);
+        Check(finished != null && finished.returnRoom == 2 && finished.remoteObtained,
+            "The new return point survives save/load");
+        m.history = finished;
+        m.RestartCycle();
+        Check(m.position == (Vector2)room2.entrance.position && CanStand(m.position),
+            "The loaded return point is walkable");
         Vector2 a = sequence.first.plate.transform.position;
         Vector2 b = sequence.second.plate.transform.position;
         Vector2 doorA = sequence.first.door.Passage.bounds.center;
@@ -162,17 +187,17 @@ public static class EchoIntroductionVerification
             "Copy opens A only and Ivan can reach the waiting area");
         Move(between);
         m.elapsed=timeB; m.UpdateGhosts();
-        Vector2 sequenceExit = Array.Find(room2.passages, passage => passage.completesRoom).marker.position;
-        Check(!m.plateA && m.plateB && Can(doorB) && Can(sequenceExit),
-            "Copy opens B only and Ivan can reach the right exit");
-        Move(sequenceExit);
-        m.Interact(Interaction.UseRoomPassage);
+        Check(!m.plateA && m.plateB && Can(doorB), "Copy opens B only");
+        CrossDoor(room2, sequence.second.door);
         var room3 = rooms.Single(room => room.roomNumber == 3);
         var shared = room3.GetComponent<SequenceRoomLayout>();
-        Check(m.zone==3 && m.position==(Vector2)room3.entrance.position && m.history.clearedRooms==2 &&
-            sequence.first.door.Passage.isTrigger && sequence.second.door.Passage.isTrigger &&
-            EchoHistory.Load(m.saveFileOverride)?.clearedRooms==2,
-            "Right exit saves room 2 and starts room 3");
+        Check(m.zone == 3 && m.history.returnRoom == 3 &&
+            !sequence.first.door.Passage.isTrigger && !sequence.second.door.Passage.isTrigger &&
+            EchoHistory.Load(m.saveFileOverride)?.returnRoom == 3,
+            "Room 2 exit saves the next return point and releases both doors");
+        m.RestartCycle();
+        Check(m.position == (Vector2)room3.entrance.position && CanStand(m.position) &&
+            m.position.x > sequence.second.door.Passage.bounds.max.x, "R spawns beyond the closed B door");
         Check(room3.copyLimit == 2 && shared.requireBothCopies && shared.IsConfigured,
             "Room 3 uses two recordings and one shared door");
         Vector2 sharedA = shared.first.plate.transform.position;
@@ -182,11 +207,10 @@ public static class EchoIntroductionVerification
         Check(Can(sharedA) && Can(sharedB) && !sharedDoor.isTrigger,
             "Both plates are reachable before the closed door");
         m.Interact(Interaction.UseRoomPassage);
-        Check(m.zone == 2 && m.history.ForRoom(2).Count == 1,
-            "Returning to room 2 preserves its local history");
-        Move(sequenceExit);
-        m.Interact(Interaction.UseRoomPassage);
-        Check(m.zone == 3, "The unlocked transition can be used again");
+        Check(m.zone == 2 && m.history.ForRoom(2).Count == 1 && m.history.returnRoom == 3,
+            "Returning to room 2 preserves its history and the saved point");
+        m.RestartCycle();
+        Check(m.zone == 3 && m.position == (Vector2)room3.entrance.position, "R returns to the saved room");
         Move(sharedA);
         m.elapsed = 6;
         m.RestartCycle();
@@ -205,17 +229,16 @@ public static class EchoIntroductionVerification
         Check(!m.plateA && m.plateB && !sharedDoor.isTrigger, "The door closes when the first copy ends");
         m.elapsed = 1;
         m.UpdateGhosts();
-        var exit3 = Array.Find(room3.passages, p => p.completesRoom).marker.position;
-        m.position = new Vector2(sharedCenter.x - .7f, sharedCenter.y);
-        Check(Can(exit3), "The open doorway provides a route to the right exit");
-        Move(sharedCenter + Vector2.right * .05f);
-        Call("Update");
-        Check(m.zone == 4 && m.position == (Vector2)exit3 && !m.recordingActive && sharedDoor.isTrigger &&
-            EchoHistory.Load(m.saveFileOverride)?.clearedRooms == 3,
-            "Crossing the open door enters the empty room and saves room 3");
+        CrossDoor(room3, shared.first.door);
+        var room4 = rooms.Single(room => room.roomNumber == 4);
+        Check(m.zone == 4 && !m.recordingActive && !sharedDoor.isTrigger &&
+            EchoHistory.Load(m.saveFileOverride)?.returnRoom == 4,
+            "The last door saves the empty room as a return point");
         m.RestartCycle();
-        Check(m.zone == 4 && !m.recordingActive && m.history.ForRoom(3).Count == 2 &&
-            m.history.ForRoom(2).Count == 1, "The empty room keeps previous recordings without starting its own");
+        Check(m.zone == 4 && !m.recordingActive && m.position == (Vector2)room4.entrance.position &&
+            CanStand(m.position) && m.position.x > sharedDoor.bounds.max.x &&
+            m.history.ForRoom(3).Count == 2 && m.history.ForRoom(2).Count == 1,
+            "R returns to a walkable position without starting recording in the empty room");
         var h=new EchoHistory {copySlots=2,firstReturnSeen=true,remoteObtained=true};
         EchoTape T(int z,float duration)=>new EchoTape {room=z,duration=duration,frames=new List<EchoFrame>{new EchoFrame(0,Vector2.zero,z,0)}};
         h.Push(T(1,1),1);h.Push(T(1,2),1);h.Push(T(3,3),2);h.Push(T(3,4),2);h.Push(T(3,5),2);

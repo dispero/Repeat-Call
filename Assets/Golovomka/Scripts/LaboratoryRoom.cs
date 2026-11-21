@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Golovomka
 {
@@ -35,7 +36,7 @@ namespace Golovomka
             public SlidingDoor crossingDoor;
             public bool crossToRight;
             public bool requiresRemote;
-            public bool completesRoom;
+            [FormerlySerializedAs("completesRoom")] public bool setsReturnPoint;
             public Destination destination;
             public LaboratoryRoom targetRoom;
             public bool finishDemoWithoutTarget;
@@ -48,21 +49,22 @@ namespace Golovomka
 
             public bool Matches(Vector2 position, bool hasRemote)
             {
-                if (!marker || (requiresRemote && !hasRemote)) return false;
+                if (IsAutomatic || !marker || (requiresRemote && !hasRemote)) return false;
                 Vector2 point = marker.position;
-                if (crossingDoor)
-                {
-                    if (crossToRight)
-                    {
-                        var doorway = crossingDoor.Passage;
-                        return doorway.isTrigger && position.x > doorway.bounds.center.x &&
-                            doorway.OverlapPoint(position);
-                    }
-                    return position.x > point.x && position.y > point.y &&
-                        crossingDoor.Passage.OverlapPoint(position);
-                }
                 return (!approachFromRight || position.x >= point.x + minimumXOffset) &&
                     Vector2.Distance(position, point) < interactionRadius;
+            }
+
+            public bool Crossed(Vector2 from, Vector2 to, bool hasRemote)
+            {
+                if (!crossingDoor || ((requiresRemote || setsReturnPoint) && !hasRemote)) return false;
+                var doorway = crossingDoor.Passage;
+                if (!doorway || !doorway.isTrigger) return false;
+                float threshold = doorway.bounds.center.x;
+                bool crossed = crossToRight ? from.x <= threshold && to.x > threshold
+                    : from.x >= threshold && to.x < threshold;
+                // Горизонтальный шаг контроллера выполняется до вертикального.
+                return crossed && doorway.OverlapPoint(new Vector2(threshold, from.y));
             }
         }
     }

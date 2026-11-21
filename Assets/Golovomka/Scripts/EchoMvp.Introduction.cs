@@ -13,8 +13,9 @@ namespace Golovomka
         void UpdateIntroductionVisuals(bool immediate = false)
         {
             var feet = new Bounds(FeetCenter(position), FeetSize);
-            room01.door.SetPassage(GateOpen, feet, immediate);
-            room01.plateOverlay.color = plateA ? new Color(0, 0, 0, .15f) : Color.clear;
+            bool pressed = currentRoom == introductionRoom && plateA;
+            room01.door.SetPassage(pressed, feet, immediate);
+            room01.plateOverlay.color = pressed ? new Color(0, 0, 0, .15f) : Color.clear;
             room01.remoteSprite.enabled = !history.remoteObtained;
         }
 
@@ -48,11 +49,14 @@ namespace Golovomka
                 if (elapsed > 0) history.Push(recording, currentRoom.copyLimit); else history.cycle++;
             }
             else history.cycle++;
-            Save(); position = currentRoom.entrance.position; facing = 0; mode = "play";
+            Save();
+            facing = 0;
+            mode = "play";
             panel.gameObject.SetActive(false);
-            ResetRoomRecording();
+            var returnRoom = rooms.TryGetValue(history.returnRoom, out var savedRoom) && savedRoom.isActiveAndEnabled
+                ? savedRoom : introductionRoom;
+            ActivateRoom(returnRoom);
             FitRoomCamera(snap: true);
-            RefreshActors();
         }
 
     }

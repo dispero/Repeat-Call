@@ -4,11 +4,20 @@ namespace Golovomka
 {
     public partial class EchoMvp
     {
-        LaboratoryRoom.Passage FindPassage(bool automatic)
+        LaboratoryRoom.Passage FindPassage()
         {
             if (!currentRoom) return null;
             foreach (var passage in currentRoom.passages)
-                if (passage.IsAutomatic == automatic && passage.Matches(position, history.remoteObtained))
+                if (passage.Matches(position, history.remoteObtained))
+                    return passage;
+            return null;
+        }
+
+        LaboratoryRoom.Passage FindCrossing(Vector2 previousPosition)
+        {
+            if (!currentRoom) return null;
+            foreach (var passage in currentRoom.passages)
+                if (passage.Crossed(previousPosition, position, history.remoteObtained))
                     return passage;
             return null;
         }
@@ -22,19 +31,19 @@ namespace Golovomka
                 if (!passage.finishDemoWithoutTarget) return;
                 destination = LaboratoryRoom.Destination.DemoEnd;
             }
-            if (passage.completesRoom)
+            if (passage.IsAutomatic && passage.setsReturnPoint && destination == LaboratoryRoom.Destination.Room &&
+                passage.targetRoom.roomNumber > history.returnRoom)
             {
-                history.clearedRooms = Mathf.Max(history.clearedRooms, zone);
-                UpdateGhosts(immediateDoor: passage.IsAutomatic);
+                history.returnRoom = passage.targetRoom.roomNumber;
                 Save();
             }
             switch (destination)
             {
                 case LaboratoryRoom.Destination.Room:
-                    ActivateRoom(passage.targetRoom, passage.arrival);
+                    ActivateRoom(passage.targetRoom, passage.arrival, keepPosition: passage.IsAutomatic);
                     break;
                 case LaboratoryRoom.Destination.Station:
-                    if (!passage.completesRoom) Save();
+                    Save();
                     BeginCycle();
                     break;
                 case LaboratoryRoom.Destination.Message:
