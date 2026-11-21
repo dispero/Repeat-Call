@@ -9,7 +9,7 @@ using Golovomka;
 public static class EchoMvpTools
 {
     public const string ScenePath = "Assets/Golovomka/Scenes/Game.unity";
-    const string IvanPreviewPath = "Assets/Golovomka/Resources/Art/IvanIdlePreview.png";
+    const string IvanPrefabPath = "Assets/Golovomka/Characters/Prefabs/Ivan.prefab";
     [MenuItem("Golovomka/Prepare Echo MVP")]
     public static void Prepare()
     {
@@ -77,12 +77,10 @@ public static class EchoMvpTools
 
         if (!heroField.objectReferenceValue)
         {
-            var hero = new GameObject("Ivan", typeof(SpriteRenderer)).GetComponent<SpriteRenderer>();
-            SceneManager.MoveGameObjectToScene(hero.gameObject, mvp.gameObject.scene);
-            hero.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(IvanPreviewPath);
-            hero.sharedMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/Golovomka/Resources/Art/MvpSprite.mat");
-            hero.sortingOrder = 100;
-            heroField.objectReferenceValue = hero;
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(IvanPrefabPath);
+            if (!prefab) throw new InvalidOperationException("Префаб Ивана не найден: " + IvanPrefabPath);
+            var hero = (GameObject)PrefabUtility.InstantiatePrefab(prefab, mvp.gameObject.scene);
+            heroField.objectReferenceValue = hero.GetComponent<SpriteRenderer>();
         }
 
         settings.ApplyModifiedPropertiesWithoutUndo();

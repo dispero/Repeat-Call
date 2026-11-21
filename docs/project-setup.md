@@ -42,7 +42,7 @@ unity command build status --project-path <полный путь проекта>
 - В участке ортографическая камера в `EchoMvp.Viewport.cs` показывает помещение целиком. В лаборатории камера держит общую высоту и плавно следует за Иваном только по X при выходе из центральной области кадра. Границы вычисляются из активных `LaboratoryRoom`, включая правый запас `Preview Width`. При переходе между комнатами кадр сохраняет непрерывность. При возврате времени он сразу переносится к точке появления Ивана.
 - В Inspector у `EchoMvp` для примерки доступны `Laboratory Dead Zone Width` (0,4 ширины кадра) и `Laboratory Camera Smooth Time` (0,22 с). PixelPerfectCamera отключён. Его временные параметры — 16 PPU и 480×270. Спрайты используют Point, движение привязано к сетке 1/16.
 - HUD использует CanvasScaler 1280×720 и расположен поверх комнаты. Подписи мира ограничены по вертикали viewport 0,14–0,82.
-- Герой и копии используют `Resources/Art/IvanOfficerWalk.png`. Импорт Default, Point, Read/Write, без mipmaps и сжатия. Нарезка и выравнивание кадров по подошвам — в `EchoMvp.Officer.cs`.
+- `Game` использует `Assets/Golovomka/Characters/Prefabs/Ivan.prefab`. Спрайты `IvanIdlePreview.png` и `IvanOfficerWalk.png` находятся в `Assets/Golovomka/Characters/Sprites`. Лист разбит на 16 спрайтов с привязкой к подошвам. `EchoMvp` берёт эти кадры из `CharacterWalk` для Ивана и его копий.
 - В прототипе используется Modern Interiors Free v2.2 от LimeZu. Лицензия для некоммерческого использования лежит в `Assets/Golovomka/Resources/Art/LICENSE-LimeZu.txt`.
 
 ## Столкновения

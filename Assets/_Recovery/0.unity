@@ -322,10 +322,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de78dfff3bdfc6749a000d73b1d55dbf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Golovomka.EchoMvp
+  roomCamera: {fileID: 0}
+  autoFitRoom: 1
+  laboratoryDeadZoneWidth: 0.4
+  laboratoryCameraSmoothTime: 0.22
   history:
     version: 3
     cycle: 1
-    clearedRooms: 0
+    returnRoom: 0
     copySlots: 1
     manualRecording: 0
     completed: 0
@@ -344,6 +348,8 @@ MonoBehaviour:
   plateB: 0
   recordingActive: 0
   mode: menu
+  hero: {fileID: 0}
+  moveSpeed: 3.6
 --- !u!4 &513325556
 Transform:
   m_ObjectHideFlags: 0

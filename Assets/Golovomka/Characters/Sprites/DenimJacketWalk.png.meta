@@ -1,0 +1,561 @@
+fileFormatVersion: 2
+guid: e8c858fa61c3d94409e66cf62d87e23f
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 4106877831607051802
+    second: DenimJacketWalk_0
+  - first:
+      213: -3545179426075929549
+    second: DenimJacketWalk_1
+  - first:
+      213: 2903826014041353735
+    second: DenimJacketWalk_2
+  - first:
+      213: 6268637420451845523
+    second: DenimJacketWalk_3
+  - first:
+      213: -8861378016089950236
+    second: DenimJacketWalk_4
+  - first:
+      213: -2024318292513420576
+    second: DenimJacketWalk_5
+  - first:
+      213: -6116059818716773950
+    second: DenimJacketWalk_6
+  - first:
+      213: -1314064863546933227
+    second: DenimJacketWalk_7
+  - first:
+      213: 5631496121163570176
+    second: DenimJacketWalk_8
+  - first:
+      213: -1448871439839953186
+    second: DenimJacketWalk_9
+  - first:
+      213: -6070451143776389520
+    second: DenimJacketWalk_10
+  - first:
+      213: -1192731675290489990
+    second: DenimJacketWalk_11
+  - first:
+      213: 8205616752740105771
+    second: DenimJacketWalk_12
+  - first:
+      213: 7071623828748797662
+    second: DenimJacketWalk_13
+  - first:
+      213: 7800856873365141282
+    second: DenimJacketWalk_14
+  - first:
+      213: 2370680247409885782
+    second: DenimJacketWalk_15
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 0
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 78.375
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 0
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationMethod: 0
+  spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: DenimJacket_Right_Idle
+      rect:
+        serializedVersion: 2
+        x: 83
+        y: 878
+        width: 123
+        height: 249
+      alignment: 9
+      pivot: {x: 0.49593496, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 44e60e4381beeac418b2cf3116090653
+      internalID: -1494509512
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacket_Right_StepA
+      rect:
+        serializedVersion: 2
+        x: 371
+        y: 878
+        width: 123
+        height: 249
+      alignment: 9
+      pivot: {x: 0.49593496, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a106cb82754db564994a94ea1a324d70
+      internalID: 1907658969
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacket_Right_Pass
+      rect:
+        serializedVersion: 2
+        x: 658
+        y: 878
+        width: 124
+        height: 249
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c252017f805117b4484a76ad18b73650
+      internalID: -1422606815
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacket_Right_StepB
+      rect:
+        serializedVersion: 2
+        x: 947
+        y: 878
+        width: 123
+        height: 249
+      alignment: 9
+      pivot: {x: 0.49593496, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: afbf1c6039d754647bdec7c363722780
+      internalID: -566732060
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacket_Left_Idle
+      rect:
+        serializedVersion: 2
+        x: 82
+        y: 590
+        width: 124
+        height: 249
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 308c7e52b38538448be8ed4d6041a94c
+      internalID: -1984449214
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacket_Left_StepA
+      rect:
+        serializedVersion: 2
+        x: 370
+        y: 590
+        width: 125
+        height: 249
+      alignment: 9
+      pivot: {x: 0.496, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 614478ec0789f584bafbff9599d6687b
+      internalID: -1898292224
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacket_Left_Pass
+      rect:
+        serializedVersion: 2
+        x: 659
+        y: 590
+        width: 123
+        height: 249
+      alignment: 9
+      pivot: {x: 0.49593496, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b04f3e56d26299241839194b4a981b98
+      internalID: -721487141
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacket_Left_StepB
+      rect:
+        serializedVersion: 2
+        x: 946
+        y: 590
+        width: 124
+        height: 249
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d4a55287b9d957645b887b225bd2fe26
+      internalID: -1817718842
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacket_Up_Idle
+      rect:
+        serializedVersion: 2
+        x: 83
+        y: 302
+        width: 123
+        height: 249
+      alignment: 9
+      pivot: {x: 0.49593496, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bcc8d18b794f53143811322a00ee7df8
+      internalID: -1717743041
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacket_Up_StepA
+      rect:
+        serializedVersion: 2
+        x: 372
+        y: 302
+        width: 120
+        height: 249
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 67cccce93449ef044a2c88830fb01251
+      internalID: -489346583
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacket_Up_Pass
+      rect:
+        serializedVersion: 2
+        x: 662
+        y: 302
+        width: 116
+        height: 249
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 607440dad6176dd42a1f2eba5c893a6b
+      internalID: -836535836
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacket_Up_StepB
+      rect:
+        serializedVersion: 2
+        x: 950
+        y: 302
+        width: 116
+        height: 249
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 53b7eedc9cc25774d8bf24ffd6cadefb
+      internalID: 1540699900
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacket_Down_Idle
+      rect:
+        serializedVersion: 2
+        x: 83
+        y: 14
+        width: 123
+        height: 249
+      alignment: 9
+      pivot: {x: 0.49593496, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4453c98e9ed571b4cb8e6ff6aadf4580
+      internalID: -805330389
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacket_Down_StepA
+      rect:
+        serializedVersion: 2
+        x: 373
+        y: 14
+        width: 119
+        height: 249
+      alignment: 9
+      pivot: {x: 0.49579832, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2de0a1af2124aa041802b0166721c542
+      internalID: 1605310707
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacket_Down_Pass
+      rect:
+        serializedVersion: 2
+        x: 661
+        y: 14
+        width: 119
+        height: 249
+      alignment: 9
+      pivot: {x: 0.49579832, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1ba7d6f24106cbc42b6fb15a36e30e2f
+      internalID: -14474792
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacket_Down_StepB
+      rect:
+        serializedVersion: 2
+        x: 947
+        y: 14
+        width: 122
+        height: 249
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 68df2b0925ffdc94a83127ea4f058a0b
+      internalID: -1157533222
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: b2e20aed3093acd46ad3a344c902beed
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      DenimJacket_Down_Idle: -805330389
+      DenimJacket_Down_Pass: -14474792
+      DenimJacket_Down_StepA: 1605310707
+      DenimJacket_Down_StepB: -1157533222
+      DenimJacket_Left_Idle: -1984449214
+      DenimJacket_Left_Pass: -721487141
+      DenimJacket_Left_StepA: -1898292224
+      DenimJacket_Left_StepB: -1817718842
+      DenimJacket_Right_Idle: -1494509512
+      DenimJacket_Right_Pass: -1422606815
+      DenimJacket_Right_StepA: 1907658969
+      DenimJacket_Right_StepB: -566732060
+      DenimJacket_Up_Idle: -1717743041
+      DenimJacket_Up_Pass: -836535836
+      DenimJacket_Up_StepA: -489346583
+      DenimJacket_Up_StepB: 1540699900
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

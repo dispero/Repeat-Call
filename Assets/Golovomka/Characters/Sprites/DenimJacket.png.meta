@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 1fbeb764f5540d744a3dff9aa54fdb3f
+guid: 1078471eb5c978b40beec33839cc1569
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -7320569933338255031
-    second: IvanIdlePreview_0
+      213: -4120518340610361307
+    second: DenimJacket_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -48,12 +48,12 @@ TextureImporter:
   compressionQuality: 50
   spriteMode: 1
   spriteExtrude: 1
-  spriteMeshType: 1
-  alignment: 9
-  spritePivot: {x: 0.49390244, y: 0}
+  spriteMeshType: 0
+  alignment: 7
+  spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 78.375
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
-  spriteGenerateFallbackPhysicsShape: 1
+  spriteGenerateFallbackPhysicsShape: 0
   alphaUsage: 1
   alphaIsTransparency: 1
   spriteTessellationMethod: 0
@@ -98,16 +98,42 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: IvanIdlePreview_0
+      name: DenimJacket_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 123
+        width: 151
         height: 249
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -117,8 +143,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 941e7f18e6c186a90800000000000000
-      internalID: -7320569933338255031
+      spriteID: 528ff61966af0d6c0800000000000000
+      internalID: -4120518340610361307
       vertices: []
       indices: 
       edges: []
@@ -137,7 +163,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      IvanIdlePreview_0: -7320569933338255031
+      DenimJacket_0: -4120518340610361307
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

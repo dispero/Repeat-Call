@@ -1,0 +1,561 @@
+fileFormatVersion: 2
+guid: 81a7141ce56f0fa4380096b064bf8e8d
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 8613934170557136480
+    second: BrownJacketWalk_0
+  - first:
+      213: 4637513503889492884
+    second: BrownJacketWalk_1
+  - first:
+      213: -5550734726821326074
+    second: BrownJacketWalk_2
+  - first:
+      213: -3960296964351998807
+    second: BrownJacketWalk_3
+  - first:
+      213: -4336450856252630812
+    second: BrownJacketWalk_4
+  - first:
+      213: -7058403876582893331
+    second: BrownJacketWalk_5
+  - first:
+      213: 6125486518988428112
+    second: BrownJacketWalk_6
+  - first:
+      213: 4532577229212634860
+    second: BrownJacketWalk_7
+  - first:
+      213: -8882071589181108246
+    second: BrownJacketWalk_8
+  - first:
+      213: -7014580949067735478
+    second: BrownJacketWalk_9
+  - first:
+      213: 9101685380590279783
+    second: BrownJacketWalk_10
+  - first:
+      213: 6101282057047372692
+    second: BrownJacketWalk_11
+  - first:
+      213: -3433184107948336735
+    second: BrownJacketWalk_12
+  - first:
+      213: -7449934954273256799
+    second: BrownJacketWalk_13
+  - first:
+      213: 1315623063653242486
+    second: BrownJacketWalk_14
+  - first:
+      213: 1127577143413392202
+    second: BrownJacketWalk_15
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 0
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 78.375
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 0
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationMethod: 0
+  spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: BrownJacket_Right_Idle
+      rect:
+        serializedVersion: 2
+        x: 83
+        y: 878
+        width: 122
+        height: 249
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e4c44491629ab2442a2fa4856950c978
+      internalID: 1460872988
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BrownJacket_Right_StepA
+      rect:
+        serializedVersion: 2
+        x: 369
+        y: 878
+        width: 126
+        height: 249
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c3c2d802493549d42b895d3bff056ae3
+      internalID: 171741309
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BrownJacket_Right_Pass
+      rect:
+        serializedVersion: 2
+        x: 660
+        y: 878
+        width: 120
+        height: 249
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3678c8be65a8afa4b83153ec0e95faba
+      internalID: 387880062
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BrownJacket_Right_StepB
+      rect:
+        serializedVersion: 2
+        x: 948
+        y: 878
+        width: 121
+        height: 249
+      alignment: 9
+      pivot: {x: 0.49586776, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d5f97c1ef791d204ebf9bf708bb1c8c6
+      internalID: 1973783752
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BrownJacket_Left_Idle
+      rect:
+        serializedVersion: 2
+        x: 84
+        y: 590
+        width: 121
+        height: 249
+      alignment: 9
+      pivot: {x: 0.49586776, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 165456ec5e5b3e24a9ee2e08f8ebb4b5
+      internalID: 1187058757
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BrownJacket_Left_StepA
+      rect:
+        serializedVersion: 2
+        x: 371
+        y: 590
+        width: 123
+        height: 249
+      alignment: 9
+      pivot: {x: 0.49593496, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 459d5b230f7244b469ffef2c33eca435
+      internalID: 450654777
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BrownJacket_Left_Pass
+      rect:
+        serializedVersion: 2
+        x: 660
+        y: 590
+        width: 121
+        height: 249
+      alignment: 9
+      pivot: {x: 0.49586776, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a665f65f901e3e341b06efa532a07cae
+      internalID: 1555032037
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BrownJacket_Left_StepB
+      rect:
+        serializedVersion: 2
+        x: 948
+        y: 590
+        width: 121
+        height: 249
+      alignment: 9
+      pivot: {x: 0.49586776, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 23fb8460b78a02d478da85b505ab9df3
+      internalID: 424956834
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BrownJacket_Up_Idle
+      rect:
+        serializedVersion: 2
+        x: 85
+        y: 302
+        width: 119
+        height: 249
+      alignment: 9
+      pivot: {x: 0.49579832, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f36e75c11788238449aeb67743501368
+      internalID: 1016431810
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BrownJacket_Up_StepA
+      rect:
+        serializedVersion: 2
+        x: 374
+        y: 302
+        width: 117
+        height: 249
+      alignment: 9
+      pivot: {x: 0.4957265, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6d5d33969398b0d41a6fc309f64e9d75
+      internalID: 1016963005
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BrownJacket_Up_Pass
+      rect:
+        serializedVersion: 2
+        x: 661
+        y: 302
+        width: 119
+        height: 249
+      alignment: 9
+      pivot: {x: 0.49579832, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0bb7d80894e9e2d47a01330e4f93caa3
+      internalID: 1796254894
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BrownJacket_Up_StepB
+      rect:
+        serializedVersion: 2
+        x: 949
+        y: 302
+        width: 118
+        height: 249
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ec54ef83b1a2ba5479de26019203103f
+      internalID: 2112656175
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BrownJacket_Down_Idle
+      rect:
+        serializedVersion: 2
+        x: 84
+        y: 14
+        width: 120
+        height: 249
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7076be0ab82445946a1eb188677c1870
+      internalID: 636297032
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BrownJacket_Down_StepA
+      rect:
+        serializedVersion: 2
+        x: 373
+        y: 14
+        width: 119
+        height: 249
+      alignment: 9
+      pivot: {x: 0.49579832, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 73d6e6faf01b33344a5f6f2b8fafb5d6
+      internalID: -336355992
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BrownJacket_Down_Pass
+      rect:
+        serializedVersion: 2
+        x: 660
+        y: 14
+        width: 120
+        height: 249
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2e5d2c1136c3e97499d28324706c4a13
+      internalID: 1850554539
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BrownJacket_Down_StepB
+      rect:
+        serializedVersion: 2
+        x: 949
+        y: 14
+        width: 119
+        height: 249
+      alignment: 9
+      pivot: {x: 0.49579832, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dcf3cfb4c67c6ea4ca6dc001afdca7dd
+      internalID: -512311437
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: bbc463f2b48e6694a8cb9d9b414b7e0e
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      BrownJacket_Down_Idle: 636297032
+      BrownJacket_Down_Pass: 1850554539
+      BrownJacket_Down_StepA: -336355992
+      BrownJacket_Down_StepB: -512311437
+      BrownJacket_Left_Idle: 1187058757
+      BrownJacket_Left_Pass: 1555032037
+      BrownJacket_Left_StepA: 450654777
+      BrownJacket_Left_StepB: 424956834
+      BrownJacket_Right_Idle: 1460872988
+      BrownJacket_Right_Pass: 387880062
+      BrownJacket_Right_StepA: 171741309
+      BrownJacket_Right_StepB: 1973783752
+      BrownJacket_Up_Idle: 1016431810
+      BrownJacket_Up_Pass: 1796254894
+      BrownJacket_Up_StepA: 1016963005
+      BrownJacket_Up_StepB: 2112656175
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
