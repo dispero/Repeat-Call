@@ -1,0 +1,561 @@
+fileFormatVersion: 2
+guid: b8e6b25f2d908844aa1e31fb5665229b
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -5867284734888902179
+    second: KnitCapWalk_0
+  - first:
+      213: -5849532700529751094
+    second: KnitCapWalk_1
+  - first:
+      213: 9081401343362886873
+    second: KnitCapWalk_2
+  - first:
+      213: 3452748652873577670
+    second: KnitCapWalk_3
+  - first:
+      213: -5899100754710689669
+    second: KnitCapWalk_4
+  - first:
+      213: -2686854115652352222
+    second: KnitCapWalk_5
+  - first:
+      213: 455600923370981273
+    second: KnitCapWalk_6
+  - first:
+      213: -6199005933700213036
+    second: KnitCapWalk_7
+  - first:
+      213: -9017292388459138399
+    second: KnitCapWalk_8
+  - first:
+      213: 4450298983012352246
+    second: KnitCapWalk_9
+  - first:
+      213: 7916521807556825259
+    second: KnitCapWalk_10
+  - first:
+      213: 4886413544894321851
+    second: KnitCapWalk_11
+  - first:
+      213: -4634559216446336681
+    second: KnitCapWalk_12
+  - first:
+      213: 5787267000051220103
+    second: KnitCapWalk_13
+  - first:
+      213: 8119773931038938936
+    second: KnitCapWalk_14
+  - first:
+      213: 4935287790012627291
+    second: KnitCapWalk_15
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 0
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 78.375
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 0
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationMethod: 0
+  spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: KnitCap_Right_Idle
+      rect:
+        serializedVersion: 2
+        x: 77
+        y: 878
+        width: 135
+        height: 249
+      alignment: 9
+      pivot: {x: 0.4962963, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d12b1bb5ed80bae4cbbffbb156cf0484
+      internalID: -1053325826
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KnitCap_Right_StepA
+      rect:
+        serializedVersion: 2
+        x: 364
+        y: 878
+        width: 136
+        height: 249
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7618cdb6028cd014da654aae2afeb3fb
+      internalID: 219827944
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KnitCap_Right_Pass
+      rect:
+        serializedVersion: 2
+        x: 653
+        y: 878
+        width: 135
+        height: 249
+      alignment: 9
+      pivot: {x: 0.4962963, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c40701b7a3eebfa4eb0589f93ca589f5
+      internalID: -1910323949
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KnitCap_Right_StepB
+      rect:
+        serializedVersion: 2
+        x: 941
+        y: 878
+        width: 135
+        height: 249
+      alignment: 9
+      pivot: {x: 0.4962963, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9d2ba5b0e8241c9459c4ee3120057284
+      internalID: 201785296
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KnitCap_Left_Idle
+      rect:
+        serializedVersion: 2
+        x: 76
+        y: 590
+        width: 136
+        height: 249
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 70817d7e02fb2d2409f52287083b4795
+      internalID: 274903011
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KnitCap_Left_StepA
+      rect:
+        serializedVersion: 2
+        x: 365
+        y: 590
+        width: 134
+        height: 249
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 19ef94462fd04dd42bebefe9a8bbd5f6
+      internalID: 2123835671
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KnitCap_Left_Pass
+      rect:
+        serializedVersion: 2
+        x: 653
+        y: 590
+        width: 135
+        height: 249
+      alignment: 9
+      pivot: {x: 0.4962963, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 77f09068f614ac5498eaa46481418a34
+      internalID: 332075489
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KnitCap_Left_StepB
+      rect:
+        serializedVersion: 2
+        x: 941
+        y: 590
+        width: 135
+        height: 249
+      alignment: 9
+      pivot: {x: 0.4962963, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f0ff4d51ef0b49a40a1de0972a0f9574
+      internalID: -138290105
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KnitCap_Up_Idle
+      rect:
+        serializedVersion: 2
+        x: 80
+        y: 302
+        width: 129
+        height: 249
+      alignment: 9
+      pivot: {x: 0.49612403, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c211025c52f868149b7777a2f4748921
+      internalID: -1350727677
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KnitCap_Up_StepA
+      rect:
+        serializedVersion: 2
+        x: 369
+        y: 302
+        width: 127
+        height: 249
+      alignment: 9
+      pivot: {x: 0.496063, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9fbf23ecbfa4e16408f8239920ce4189
+      internalID: -533031156
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KnitCap_Up_Pass
+      rect:
+        serializedVersion: 2
+        x: 656
+        y: 302
+        width: 128
+        height: 249
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9380d7d562cf0bd47951d042c3c27eac
+      internalID: -285018228
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KnitCap_Up_StepB
+      rect:
+        serializedVersion: 2
+        x: 944
+        y: 302
+        width: 128
+        height: 249
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6f6e3d75331851a4fb00e227e9337b65
+      internalID: -1931926720
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KnitCap_Down_Idle
+      rect:
+        serializedVersion: 2
+        x: 78
+        y: 14
+        width: 133
+        height: 249
+      alignment: 9
+      pivot: {x: 0.49624062, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 835df1f1ab01b144887c566052e06b34
+      internalID: 1924505583
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KnitCap_Down_StepA
+      rect:
+        serializedVersion: 2
+        x: 367
+        y: 14
+        width: 131
+        height: 249
+      alignment: 9
+      pivot: {x: 0.49618322, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 06dbc2d7e5735604c8648c2af580fbe4
+      internalID: -567611523
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KnitCap_Down_Pass
+      rect:
+        serializedVersion: 2
+        x: 654
+        y: 14
+        width: 132
+        height: 249
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 39cfa99835a0c6740a8c4798f94efc8d
+      internalID: -940981765
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: KnitCap_Down_StepB
+      rect:
+        serializedVersion: 2
+        x: 942
+        y: 14
+        width: 132
+        height: 249
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6c6c15a0b6f03284a95eb3164d13b17e
+      internalID: 4970411
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: a18913e35d68b3b47b5ff2582eeaea45
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      KnitCap_Down_Idle: 1924505583
+      KnitCap_Down_Pass: -940981765
+      KnitCap_Down_StepA: -567611523
+      KnitCap_Down_StepB: 4970411
+      KnitCap_Left_Idle: 274903011
+      KnitCap_Left_Pass: 332075489
+      KnitCap_Left_StepA: 2123835671
+      KnitCap_Left_StepB: -138290105
+      KnitCap_Right_Idle: -1053325826
+      KnitCap_Right_Pass: -1910323949
+      KnitCap_Right_StepA: 219827944
+      KnitCap_Right_StepB: 201785296
+      KnitCap_Up_Idle: -1350727677
+      KnitCap_Up_Pass: -285018228
+      KnitCap_Up_StepA: -533031156
+      KnitCap_Up_StepB: -1931926720
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
