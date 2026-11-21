@@ -1,0 +1,561 @@
+fileFormatVersion: 2
+guid: 71332218b892ddb4281cb10c5e21e296
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -5364067706010927874
+    second: BlondScientistWalk_0
+  - first:
+      213: 8438602408111413477
+    second: BlondScientistWalk_1
+  - first:
+      213: 7867339676124017323
+    second: BlondScientistWalk_2
+  - first:
+      213: -6065938779645085921
+    second: BlondScientistWalk_3
+  - first:
+      213: -1489010303478405935
+    second: BlondScientistWalk_4
+  - first:
+      213: 8167974054857358275
+    second: BlondScientistWalk_5
+  - first:
+      213: 8293816580084845156
+    second: BlondScientistWalk_6
+  - first:
+      213: 8644334293758273223
+    second: BlondScientistWalk_7
+  - first:
+      213: -4429101214703735240
+    second: BlondScientistWalk_8
+  - first:
+      213: 1812945464066345361
+    second: BlondScientistWalk_9
+  - first:
+      213: 1379920018178172975
+    second: BlondScientistWalk_10
+  - first:
+      213: 1575312013748290937
+    second: BlondScientistWalk_11
+  - first:
+      213: 823101502077082390
+    second: BlondScientistWalk_12
+  - first:
+      213: 848169114576598578
+    second: BlondScientistWalk_13
+  - first:
+      213: 79828311462026457
+    second: BlondScientistWalk_14
+  - first:
+      213: 6162526553089923344
+    second: BlondScientistWalk_15
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 0
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 78.375
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 0
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationMethod: 0
+  spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: BlondScientist_Right_Idle
+      rect:
+        serializedVersion: 2
+        x: 79
+        y: 878
+        width: 130
+        height: 249
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4012ed024ed0fd149a8c6936ffc2de97
+      internalID: -1307552614
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BlondScientist_Right_StepA
+      rect:
+        serializedVersion: 2
+        x: 365
+        y: 878
+        width: 134
+        height: 249
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d8bd309724edfab4486f467318afb77b
+      internalID: -681200658
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BlondScientist_Right_Pass
+      rect:
+        serializedVersion: 2
+        x: 656
+        y: 878
+        width: 128
+        height: 249
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e6fb07b73fe0e354abb0c1d2369b6ee1
+      internalID: -1270703940
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BlondScientist_Right_StepB
+      rect:
+        serializedVersion: 2
+        x: 945
+        y: 878
+        width: 126
+        height: 249
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8a4858aa3438fc843ae566e00f3350e5
+      internalID: 376230284
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BlondScientist_Left_Idle
+      rect:
+        serializedVersion: 2
+        x: 78
+        y: 590
+        width: 133
+        height: 249
+      alignment: 9
+      pivot: {x: 0.49624062, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e47f788cd012b934bb750722009efe3d
+      internalID: -1146978892
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BlondScientist_Left_StepA
+      rect:
+        serializedVersion: 2
+        x: 363
+        y: 590
+        width: 139
+        height: 249
+      alignment: 9
+      pivot: {x: 0.4964029, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3bc6c54c3a7e619439ceac7494899098
+      internalID: -476899582
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BlondScientist_Left_Pass
+      rect:
+        serializedVersion: 2
+        x: 654
+        y: 590
+        width: 133
+        height: 249
+      alignment: 9
+      pivot: {x: 0.49624062, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a43e3bc9d8451d34b9bd78a9df4acda7
+      internalID: -94471739
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BlondScientist_Left_StepB
+      rect:
+        serializedVersion: 2
+        x: 942
+        y: 590
+        width: 132
+        height: 249
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 42d2748c2a5a3024ea4106cb8eb75d70
+      internalID: 1212733688
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BlondScientist_Up_Idle
+      rect:
+        serializedVersion: 2
+        x: 81
+        y: 302
+        width: 126
+        height: 249
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e88dda4439bb0224c896516ccba6eb30
+      internalID: 66753205
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BlondScientist_Up_StepA
+      rect:
+        serializedVersion: 2
+        x: 370
+        y: 302
+        width: 125
+        height: 249
+      alignment: 9
+      pivot: {x: 0.496, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4ddab9f485e0f9646ae179f76cb6e73d
+      internalID: 92942084
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BlondScientist_Up_Pass
+      rect:
+        serializedVersion: 2
+        x: 658
+        y: 302
+        width: 124
+        height: 249
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c369f970d1ec1354db716565878f8919
+      internalID: 527630104
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BlondScientist_Up_StepB
+      rect:
+        serializedVersion: 2
+        x: 946
+        y: 302
+        width: 125
+        height: 249
+      alignment: 9
+      pivot: {x: 0.496, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 23ac297829e425e48b8bb45d70ed9ac9
+      internalID: 1235801735
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BlondScientist_Down_Idle
+      rect:
+        serializedVersion: 2
+        x: 78
+        y: 14
+        width: 133
+        height: 249
+      alignment: 9
+      pivot: {x: 0.49624062, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9de2460a5f3cf654ca7cb261ef939981
+      internalID: 654219666
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BlondScientist_Down_StepA
+      rect:
+        serializedVersion: 2
+        x: 367
+        y: 14
+        width: 130
+        height: 249
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5baddbbc63c015a438702ed850c7a589
+      internalID: 1485232893
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BlondScientist_Down_Pass
+      rect:
+        serializedVersion: 2
+        x: 655
+        y: 14
+        width: 131
+        height: 249
+      alignment: 9
+      pivot: {x: 0.49618322, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4ba189ec0fc07ad4b996ff4db5a884f4
+      internalID: 1841535240
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BlondScientist_Down_StepB
+      rect:
+        serializedVersion: 2
+        x: 942
+        y: 14
+        width: 132
+        height: 249
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1025b2eb013485842b621af019d9d655
+      internalID: -1512657314
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: f36eac16fb4e3e04aad65d6cb33d7d3f
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      BlondScientist_Down_Idle: 654219666
+      BlondScientist_Down_Pass: 1841535240
+      BlondScientist_Down_StepA: 1485232893
+      BlondScientist_Down_StepB: -1512657314
+      BlondScientist_Left_Idle: -1146978892
+      BlondScientist_Left_Pass: -94471739
+      BlondScientist_Left_StepA: -476899582
+      BlondScientist_Left_StepB: 1212733688
+      BlondScientist_Right_Idle: -1307552614
+      BlondScientist_Right_Pass: -1270703940
+      BlondScientist_Right_StepA: -681200658
+      BlondScientist_Right_StepB: 376230284
+      BlondScientist_Up_Idle: 66753205
+      BlondScientist_Up_Pass: 527630104
+      BlondScientist_Up_StepA: 92942084
+      BlondScientist_Up_StepB: 1235801735
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

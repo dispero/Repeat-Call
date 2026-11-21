@@ -33,14 +33,12 @@ namespace Golovomka
         [SerializeField] SpriteRenderer hero;
         [SerializeField, Min(0)] float moveSpeed = 3.6f;
         Vector3 heroBaseScale;
+        CharacterWalk officerWalk;
         readonly SpriteRenderer[] ghosts = new SpriteRenderer[LaboratoryRoom.MaxCopies];
         static readonly Vector2 FeetSize = new Vector2(.44f, .28f);
         static readonly ContactFilter2D SolidContacts = new ContactFilter2D { useTriggers = false };
         readonly List<Collider2D> overlapHits = new List<Collider2D>();
         readonly List<RaycastHit2D> movementHits = new List<RaycastHit2D>();
-        readonly List<Sprite> createdSprites = new List<Sprite>();
-        Texture2D walk;
-        Sprite[] frames;
         Font font;
         Canvas canvas;
         RectTransform panel;
@@ -65,6 +63,13 @@ namespace Golovomka
                 Debug.LogError("Назначьте камеру и SpriteRenderer Ивана в компоненте EchoMvp.", this);
                 yield break;
             }
+            if (!hero.TryGetComponent(out officerWalk) || !officerWalk.IsConfigured)
+            {
+                Debug.LogError("Назначьте префаб Ивана с настроенной анимацией CharacterWalk.", this);
+                yield break;
+            }
+            // Герой и копии берут кадры префаба, а направление задаёт игра и запись.
+            officerWalk.enabled = false;
             heroBaseScale = hero.transform.localScale;
 
             yield return LoadRoomLayout<PoliceStationLayout>(PoliceStationLayout.ScenePath,
@@ -111,8 +116,6 @@ namespace Golovomka
 
             Application.targetFrameRate = 60;
             font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            walk = Resources.Load<Texture2D>("Art/IvanOfficerWalk");
-            frames = LoadOfficerFrames();
             for (int i = 0; i < ghosts.Length; i++)
             {
                 var ghost = new GameObject("Echo" + i, typeof(SpriteRenderer)).GetComponent<SpriteRenderer>();
@@ -155,8 +158,6 @@ namespace Golovomka
         {
             foreach (var root in roots) root.SetActive(visible);
         }
-
-        void OnDestroy() { foreach (var s in createdSprites) if (s) Destroy(s); }
 
         public void BeginCycle()
         {
@@ -206,12 +207,12 @@ namespace Golovomka
             Vector2 previousPosition = position;
             if (move != Vector2.zero)
             {
-                facing = Mathf.Abs(move.x) > Mathf.Abs(move.y) ? (move.x > 0 ? 0 : 1) : (move.y > 0 ? 2 : 3);
+                UpdateOfficerFacing(move, k);
                 var delta = move.normalized * moveSpeed * dt;
                 Vector2 step = position + new Vector2(delta.x, 0); if (CanMove(step)) position = step;
                 step = position + new Vector2(0, delta.y); if (CanMove(step)) position = step;
             }
-            hero.sprite = OfficerFrame(facing, move != Vector2.zero, Time.time);
+            hero.sprite = OfficerFrame(facing, position != previousPosition, Time.time);
             Place(hero, position); UpdateGhosts();
             var crossing = FindCrossing(previousPosition);
             if (crossing != null) { UsePassage(crossing); return; }
