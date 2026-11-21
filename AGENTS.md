@@ -8,7 +8,7 @@
 - [Сюжет и объём](docs/game-context.md).
 - [Копии действий](docs/puzzles/action-echoes.md).
 - [Текущий MVP](docs/mvp-echoes.md).
-- Перед изменением комнаты читать её спецификацию: [1 — знакомство](docs/rooms/01-introduction.md), [2 — последовательность](docs/rooms/02-sequence.md), [3 — две копии](docs/rooms/03-two-echoes.md), [4 — пульт](docs/rooms/04-recording-console.md). Детали комнат хранить в этих файлах, общие правила — в механике копий.
+- Перед изменением комнаты читать её спецификацию — [1 — знакомство](docs/rooms/01-introduction.md), [2 — последовательность](docs/rooms/02-sequence.md), [3 — цветные кнопки](docs/rooms/03-timed-buttons.md), [4 — две копии](docs/rooms/04-two-echoes.md). Детали комнат хранить в этих файлах, общие правила — в механике копий.
 - [Художественное направление](docs/art-direction.md) — перед графикой и окружением.
 - [Открытые вопросы](docs/open-questions.md).
 

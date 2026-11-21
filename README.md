@@ -11,7 +11,7 @@ Unity 2D top-down pixel-art игра для Windows. Лаборатория за
 - [Правила работы](AGENTS.md).
 - [Сюжет и объём](docs/game-context.md).
 - [Копии действий](docs/puzzles/action-echoes.md).
-- Комнаты: [1 — знакомство](docs/rooms/01-introduction.md), [2 — последовательность](docs/rooms/02-sequence.md), [3 — две копии](docs/rooms/03-two-echoes.md), [4 — пульт записи](docs/rooms/04-recording-console.md).
+- Комнаты — [1 — знакомство](docs/rooms/01-introduction.md), [2 — последовательность](docs/rooms/02-sequence.md), [3 — цветные кнопки](docs/rooms/03-timed-buttons.md), [4 — две копии](docs/rooms/04-two-echoes.md).
 - [Текущий MVP и результаты проверок](docs/mvp-echoes.md).
 - [Техническая основа](docs/project-setup.md).
 - [Художественное направление](docs/art-direction.md).
