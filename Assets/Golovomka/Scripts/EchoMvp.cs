@@ -44,6 +44,8 @@ namespace Golovomka
         Font font;
         Canvas canvas;
         RectTransform panel;
+        const int DialogFontSize = 21;
+        const float TitledDialogBodyY = -20f;
         Text heading, objective, status, prompt, dialogTitle, dialogBody, caution;
         Text stationExitLabel;
         static readonly string[] PauseOptions = { "Продолжить", "Вернуться к входу комнаты", "Главное меню", "Выход" };
@@ -511,7 +513,7 @@ namespace Golovomka
             Text("Credits", go.transform, new Vector2(1200, 30), new Vector2(0, -318), 14, new Color(.45f, .57f, .58f), TextAnchor.MiddleCenter).text = "GOLOVOMKA • MVP КОПИЙ   /   Графика создана с помощью AI • Некоммерческий прототип";
             var panelGo = new GameObject("Dialog", typeof(RectTransform), typeof(UnityEngine.UI.Image)); panelGo.transform.SetParent(go.transform, false); panel = panelGo.GetComponent<RectTransform>(); panel.sizeDelta = new Vector2(920, 490); panelGo.GetComponent<UnityEngine.UI.Image>().color = new Color(.035f, .065f, .085f, .99f);
             dialogTitle = Text("Title", panel, new Vector2(820, 55), new Vector2(0, 180), 27, amber);
-            dialogBody = Text("Body", panel, new Vector2(820, 340), new Vector2(0, -20), 21, new Color(.86f, .9f, .89f));
+            dialogBody = Text("Body", panel, new Vector2(820, 340), new Vector2(0, TitledDialogBodyY), DialogFontSize, new Color(.86f, .9f, .89f));
             CreatePauseMenu();
             ArrangeOverlayHUD();
             CreateTitleMenu();
@@ -532,6 +534,9 @@ namespace Golovomka
             panel.SetAsLastSibling();
             dialogTitle.text = title;
             dialogBody.text = body;
+            bool hasTitle = !string.IsNullOrEmpty(title);
+            dialogBody.rectTransform.anchoredPosition = new Vector2(0, hasTitle ? TitledDialogBodyY : 0f);
+            dialogBody.fontSize = hasTitle ? DialogFontSize : DialogFontSize + 1;
         }
         void Dialog(string title, string body) { mode = "dialog"; Panel(title, body + "\n\nE / ENTER — продолжить"); }
         void Close() { mode = "play"; panel.gameObject.SetActive(false); }

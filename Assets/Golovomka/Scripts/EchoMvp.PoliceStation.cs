@@ -16,10 +16,8 @@ namespace Golovomka
         void ReadNoticeBoard()
         {
             if (zone != 0 || !station.noticeBoard) return;
-            Dialog("ДОСКА ОБЪЯВЛЕНИЙ",
-                $"Большой листок слева\n{station.leftNotice}\n\n" +
-                $"Жёлтый листок справа\n{station.rightNotice}\n\n" +
-                $"Маленький листок снизу\n{station.lowerNotice}");
+            Dialog(string.Empty, string.Join("\n\n",
+                station.leftNotice, station.rightNotice, station.lowerNotice));
         }
     }
 }
