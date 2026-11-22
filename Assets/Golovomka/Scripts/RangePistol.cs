@@ -7,9 +7,6 @@ namespace Golovomka
     {
         internal const int DirectionCount = 8;
         const float FlashDuration = .06f;
-        const float ExtendedDuration = .045f;
-        const float RecoilDuration = .16f;
-        const float RecoveryDuration = .24f;
 
         readonly SpriteRenderer flash;
         readonly SortingGroup sorting;
@@ -20,7 +17,7 @@ namespace Golovomka
         Sprite walkingSprite, activePose;
         EchoShot shot;
         LineRenderer shotTrace;
-        float firedAt = float.NegativeInfinity;
+        Vector2? shotMuzzle;
 
         public RangePistol(Transform parent, bool echo, Sprite flashSprite,
             TargetRangeRoom.PistolPose[] poses)
@@ -43,14 +40,14 @@ namespace Golovomka
         {
             shot = firedShot;
             shotTrace = trace;
-            firedAt = shot.time;
+            shotMuzzle = null;
         }
 
         public void Hide()
         {
             RenderOff();
-            firedAt = float.NegativeInfinity;
             shotTrace = null;
+            shotMuzzle = null;
         }
 
         void RenderOff()
@@ -67,26 +64,28 @@ namespace Golovomka
                 return;
             }
 
-            float age = time - firedAt;
-            bool recovering = age >= 0 && age < RecoveryDuration;
-            if (recovering) direction = shot.direction;
             var pose = poses[CharacterWalkCycle.Octant(direction)];
-            bool walking = moving && !recovering;
-            bool extended = recovering && age < ExtendedDuration;
-            bool recoiling = recovering && age < RecoilDuration;
-            UseBody(actor, extended ? pose.firing : recoiling ? pose.recoil :
-                pose.GetBody(walking, time));
+            UseBody(actor, pose.GetBody(moving, time));
 
-            bool behindActor = direction.y > .1f || (direction.x < 0 && Mathf.Abs(direction.y) <= .1f);
+            float age = time - shot.time;
+            flash.enabled = shotTrace && age >= 0 && age < FlashDuration;
+            bodyMask.enabled = false;
+            if (!flash.enabled && (!shotTrace || !shotTrace.enabled)) return;
+
+            var muzzleOffset = poses[CharacterWalkCycle.Octant(shot.direction)].GetMuzzle(moving, time);
+            var feet = shot.origin - Vector2.up * TargetRangeRoom.MuzzleHeight;
+            shotMuzzle ??= feet + (Vector2)actor.transform.TransformVector(muzzleOffset);
+            Vector2 muzzle = direction == shot.direction
+                ? (Vector2)actor.transform.TransformPoint(muzzleOffset) : shotMuzzle.Value;
+
+            bool behindActor = shot.direction.y > 0 || shot.direction.x < 0;
             sorting.sortingLayerID = actor.sortingLayerID;
             sorting.sortingOrder = actor.sortingOrder + (behindActor ? -1 : 1);
-            var rotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg);
-            flash.enabled = recovering && age < FlashDuration;
             if (flash.enabled)
             {
-                Vector2 muzzle = extended ? pose.muzzle : pose.recoilMuzzle;
-                flash.transform.SetPositionAndRotation(actor.transform.TransformPoint(muzzle), rotation);
-                flash.transform.localScale = Vector3.one * (extended ? .72f : .46f);
+                float angle = Mathf.Atan2(shot.direction.y, shot.direction.x) * Mathf.Rad2Deg;
+                flash.transform.SetPositionAndRotation(muzzle, Quaternion.Euler(0f, 0f, angle));
+                flash.transform.localScale = Vector3.one * .72f;
                 flash.color = flashColor;
             }
 
@@ -102,12 +101,10 @@ namespace Golovomka
                     actor.flipY ? -scale.y : scale.y, scale.z);
             }
 
-            if (recovering && shotTrace && shotTrace.enabled)
+            if (shotTrace.enabled)
             {
                 Vector2 end = shotTrace.GetPosition(1);
-                Vector2 feet = shot.origin - Vector2.up * TargetRangeRoom.MuzzleHeight;
-                Vector2 muzzle = feet + (Vector2)actor.transform.TransformVector(extended ? pose.muzzle : pose.recoilMuzzle);
-                shotTrace.SetPosition(0, Vector2.Dot(end - muzzle, direction) > 0f ? muzzle : end);
+                shotTrace.SetPosition(0, Vector2.Dot(end - muzzle, shot.direction) > 0f ? muzzle : end);
             }
         }
 

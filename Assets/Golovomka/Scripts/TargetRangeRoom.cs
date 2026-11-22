@@ -8,12 +8,17 @@ namespace Golovomka
         [System.Serializable]
         public sealed class PistolPose
         {
-            public Sprite ready, firing, recoil;
+            public Sprite ready;
             public Sprite[] walk = new Sprite[CharacterWalkCycle.WalkingFrameCount];
-            public Vector2 muzzle, recoilMuzzle;
+            public Vector2 muzzle;
+            public Vector2[] walkMuzzles = System.Array.Empty<Vector2>();
 
             internal Sprite GetBody(bool moving, float time) =>
                 moving ? walk[CharacterWalkCycle.WalkingFrame(time)] : ready;
+
+            internal Vector2 GetMuzzle(bool moving, float time) =>
+                moving && walkMuzzles.Length == CharacterWalkCycle.WalkingFrameCount
+                    ? walkMuzzles[CharacterWalkCycle.WalkingFrame(time)] : muzzle;
         }
 
         public const int Waves = 5;
@@ -51,7 +56,7 @@ namespace Golovomka
 
         public bool IsConfigured => exitDoor && exitDoor.Passage && openHatch && targetWall &&
             pistolFlash && pistolPoses.Length == RangePistol.DirectionCount &&
-            System.Array.TrueForAll(pistolPoses, pose => pose != null && pose.ready && pose.firing && pose.recoil &&
+            System.Array.TrueForAll(pistolPoses, pose => pose != null && pose.ready &&
                 pose.walk.Length == CharacterWalkCycle.WalkingFrameCount && System.Array.TrueForAll(pose.walk, frame => frame)) &&
             targets.Length == 7 &&
             indicators.Length == Waves && System.Array.TrueForAll(targets, item => item &&
