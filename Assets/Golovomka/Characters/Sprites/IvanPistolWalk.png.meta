@@ -175,7 +175,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 1792
+        y: 768
         width: 256
         height: 256
       alignment: 9
@@ -197,7 +197,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 256
-        y: 1792
+        y: 768
         width: 256
         height: 256
       alignment: 9
@@ -219,7 +219,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 512
-        y: 1792
+        y: 768
         width: 256
         height: 256
       alignment: 9
@@ -237,77 +237,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: IvanPistolWalk_NorthEast_0
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 1536
-        width: 256
-        height: 256
-      alignment: 9
-      pivot: {x: 0.5, y: 0.015625}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: d689c762949390841a9218ef92ac36d4
-      internalID: -506499900
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: IvanPistolWalk_NorthEast_1
-      rect:
-        serializedVersion: 2
-        x: 256
-        y: 1536
-        width: 256
-        height: 256
-      alignment: 9
-      pivot: {x: 0.5, y: 0.015625}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: fe025bcea560f3d43b4fcb2338d20c5c
-      internalID: -1567056099
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: IvanPistolWalk_NorthEast_2
-      rect:
-        serializedVersion: 2
-        x: 512
-        y: 1536
-        width: 256
-        height: 256
-      alignment: 9
-      pivot: {x: 0.5, y: 0.015625}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 2f20097bfae638f409d19e956588fffd
-      internalID: 842950955
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
       name: IvanPistolWalk_North_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 1280
+        y: 512
         width: 256
         height: 256
       alignment: 9
@@ -329,7 +263,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 256
-        y: 1280
+        y: 512
         width: 256
         height: 256
       alignment: 9
@@ -351,7 +285,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 512
-        y: 1280
+        y: 512
         width: 256
         height: 256
       alignment: 9
@@ -369,77 +303,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: IvanPistolWalk_NorthWest_0
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 1024
-        width: 256
-        height: 256
-      alignment: 9
-      pivot: {x: 0.5, y: 0.015625}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 6c232b32b68aff142ae216e1b6c8b7d2
-      internalID: 1034299340
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: IvanPistolWalk_NorthWest_1
-      rect:
-        serializedVersion: 2
-        x: 256
-        y: 1024
-        width: 256
-        height: 256
-      alignment: 9
-      pivot: {x: 0.5, y: 0.015625}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 809e4b2891cfab3459ad6f7090d5986f
-      internalID: -878439551
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: IvanPistolWalk_NorthWest_2
-      rect:
-        serializedVersion: 2
-        x: 512
-        y: 1024
-        width: 256
-        height: 256
-      alignment: 9
-      pivot: {x: 0.5, y: 0.015625}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 0997a75f42e8a4742a630abad9da887f
-      internalID: 812760595
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
       name: IvanPistolWalk_West_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 768
+        y: 256
         width: 256
         height: 256
       alignment: 9
@@ -461,7 +329,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 256
-        y: 768
+        y: 256
         width: 256
         height: 256
       alignment: 9
@@ -483,7 +351,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 512
-        y: 768
+        y: 256
         width: 256
         height: 256
       alignment: 9
@@ -501,77 +369,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: IvanPistolWalk_SouthWest_0
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 512
-        width: 256
-        height: 256
-      alignment: 9
-      pivot: {x: 0.5, y: 0.015625}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 4deff8e1f88f2ff4587c0f5eae5e4c0f
-      internalID: -181096536
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: IvanPistolWalk_SouthWest_1
-      rect:
-        serializedVersion: 2
-        x: 256
-        y: 512
-        width: 256
-        height: 256
-      alignment: 9
-      pivot: {x: 0.5, y: 0.015625}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 0a05401b4736a4a4cbaa00b9f895c3dd
-      internalID: -867547625
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: IvanPistolWalk_SouthWest_2
-      rect:
-        serializedVersion: 2
-        x: 512
-        y: 512
-        width: 256
-        height: 256
-      alignment: 9
-      pivot: {x: 0.5, y: 0.015625}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 34c3dde3f52b18546aa66278177558ee
-      internalID: -843325801
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
       name: IvanPistolWalk_South_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 256
+        y: 0
         width: 256
         height: 256
       alignment: 9
@@ -593,7 +395,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 256
-        y: 256
+        y: 0
         width: 256
         height: 256
       alignment: 9
@@ -615,7 +417,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 512
-        y: 256
+        y: 0
         width: 256
         height: 256
       alignment: 9
@@ -628,72 +430,6 @@ TextureImporter:
       bones: []
       spriteID: cb280696cb845b248917a42ec0676728
       internalID: 1384341444
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: IvanPistolWalk_SouthEast_0
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 0
-        width: 256
-        height: 256
-      alignment: 9
-      pivot: {x: 0.5, y: 0.015625}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 4be5e624a8829aa4e90fba03d5eb8c3d
-      internalID: 1394121717
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: IvanPistolWalk_SouthEast_1
-      rect:
-        serializedVersion: 2
-        x: 256
-        y: 0
-        width: 256
-        height: 256
-      alignment: 9
-      pivot: {x: 0.5, y: 0.015625}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 30b5c1a1099dd6743b2dca0e980d09b5
-      internalID: 1057947921
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: IvanPistolWalk_SouthEast_2
-      rect:
-        serializedVersion: 2
-        x: 512
-        y: 0
-        width: 256
-        height: 256
-      alignment: 9
-      pivot: {x: 0.5, y: 0.015625}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: bce83cb07a1c31941a3a2598f48db0cf
-      internalID: -1763091942
       vertices: []
       indices: 
       edges: []
@@ -715,21 +451,9 @@ TextureImporter:
       IvanPistolWalk_East_0: 1798866340
       IvanPistolWalk_East_1: -636981926
       IvanPistolWalk_East_2: -1883404230
-      IvanPistolWalk_NorthEast_0: -506499900
-      IvanPistolWalk_NorthEast_1: -1567056099
-      IvanPistolWalk_NorthEast_2: 842950955
-      IvanPistolWalk_NorthWest_0: 1034299340
-      IvanPistolWalk_NorthWest_1: -878439551
-      IvanPistolWalk_NorthWest_2: 812760595
       IvanPistolWalk_North_0: -1689208576
       IvanPistolWalk_North_1: 512501041
       IvanPistolWalk_North_2: 1570497279
-      IvanPistolWalk_SouthEast_0: 1394121717
-      IvanPistolWalk_SouthEast_1: 1057947921
-      IvanPistolWalk_SouthEast_2: -1763091942
-      IvanPistolWalk_SouthWest_0: -181096536
-      IvanPistolWalk_SouthWest_1: -867547625
-      IvanPistolWalk_SouthWest_2: -843325801
       IvanPistolWalk_South_0: -594806049
       IvanPistolWalk_South_1: -1455727848
       IvanPistolWalk_South_2: 1384341444

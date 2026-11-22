@@ -74,6 +74,15 @@ namespace Golovomka
                 return;
             }
 
+            if (currentFinale)
+            {
+                var frame = currentRoom.CameraBounds;
+                roomCamera.orthographicSize = Mathf.Max(frame.extents.y, frame.extents.x / aspect) * 1.015f;
+                roomCamera.transform.position = frame.center + Vector3.back * 10;
+                laboratoryCameraVelocity = 0;
+                return;
+            }
+
             var bounds = laboratoryCameraBounds;
             roomCamera.orthographicSize = Mathf.Max(.01f, bounds.extents.y) * 1.005f;
             float halfWidth = roomCamera.orthographicSize * aspect;
@@ -107,6 +116,7 @@ namespace Golovomka
         {
             FitRoomCamera();
             PositionStationExitLabel();
+            UpdatePhoneRing();
         }
 
         void PositionStationExitLabel()

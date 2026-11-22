@@ -5,25 +5,29 @@ namespace Golovomka
 {
     sealed class RangePistol
     {
-        internal const int DirectionCount = 8;
+        internal const int DirectionCount = 4;
+        internal const int ShotFrameCount = 3;
         const float FlashDuration = .06f;
+        const float RecoilEnd = .16f;
+        const float ShotAnimationEnd = .24f;
+
+        internal static int PoseIndex(Vector2 direction) => CharacterWalkCycle.Octant(direction) / 2;
+        internal static int TraceSortingOrder(Vector2 direction, float feetY) =>
+            direction == Vector2.up ? 99 - Mathf.RoundToInt(feetY * 10f) : 250;
 
         readonly SpriteRenderer flash;
         readonly SortingGroup sorting;
         readonly SpriteMask bodyMask;
         readonly TargetRangeRoom.PistolPose[] poses;
-        readonly Color flashColor;
         SpriteRenderer posingActor;
         Sprite walkingSprite, activePose;
         EchoShot shot;
-        LineRenderer shotTrace;
-        Vector2? shotMuzzle;
+        bool hasShot;
 
         public RangePistol(Transform parent, bool echo, Sprite flashSprite,
             TargetRangeRoom.PistolPose[] poses)
         {
             this.poses = poses;
-            flashColor = echo ? new Color(.35f, .9f, 1f, .75f) : Color.white;
             sorting = new GameObject(echo ? "Вспышка копии" : "Вспышка Ивана").AddComponent<SortingGroup>();
             sorting.transform.SetParent(parent, false);
             bodyMask = new GameObject("Силуэт персонажа").AddComponent<SpriteMask>();
@@ -34,20 +38,21 @@ namespace Golovomka
             flash.enabled = false;
             flash.sprite = flashSprite;
             flash.sortingOrder = 1;
+            flash.maskInteraction = SpriteMaskInteraction.VisibleOutsideMask;
+            flash.transform.localScale = Vector3.one * .72f;
+            flash.color = echo ? new Color(.35f, .9f, 1f, .75f) : Color.white;
         }
 
-        public void Fire(EchoShot firedShot, LineRenderer trace)
+        public void Fire(EchoShot firedShot)
         {
             shot = firedShot;
-            shotTrace = trace;
-            shotMuzzle = null;
+            hasShot = true;
         }
 
         public void Hide()
         {
             RenderOff();
-            shotTrace = null;
-            shotMuzzle = null;
+            hasShot = false;
         }
 
         void RenderOff()
@@ -64,48 +69,25 @@ namespace Golovomka
                 return;
             }
 
-            var pose = poses[CharacterWalkCycle.Octant(direction)];
-            UseBody(actor, pose.GetBody(moving, time));
-
             float age = time - shot.time;
-            flash.enabled = shotTrace && age >= 0 && age < FlashDuration;
-            bodyMask.enabled = false;
-            if (!flash.enabled && (!shotTrace || !shotTrace.enabled)) return;
+            bool firing = hasShot && age >= 0 && age < ShotAnimationEnd;
+            var pose = poses[PoseIndex(firing ? shot.direction : direction)];
+            int phase = age < FlashDuration ? 0 : age < RecoilEnd ? 1 : 2;
+            UseBody(actor, firing ? pose.shoot[phase] : pose.GetBody(moving, time));
 
-            var muzzleOffset = poses[CharacterWalkCycle.Octant(shot.direction)].GetMuzzle(moving, time);
-            var feet = shot.origin - Vector2.up * TargetRangeRoom.MuzzleHeight;
-            shotMuzzle ??= feet + (Vector2)actor.transform.TransformVector(muzzleOffset);
-            Vector2 muzzle = direction == shot.direction
-                ? (Vector2)actor.transform.TransformPoint(muzzleOffset) : shotMuzzle.Value;
+            // В боковых и переднем кадрах вспышка уже нарисована в спрайте.
+            flash.enabled = firing && age < FlashDuration && shot.direction == Vector2.up;
+            bodyMask.enabled = flash.enabled;
+            if (!flash.enabled) return;
 
-            bool behindActor = shot.direction.y > 0 || shot.direction.x < 0;
             sorting.sortingLayerID = actor.sortingLayerID;
-            sorting.sortingOrder = actor.sortingOrder + (behindActor ? -1 : 1);
-            if (flash.enabled)
-            {
-                float angle = Mathf.Atan2(shot.direction.y, shot.direction.x) * Mathf.Rad2Deg;
-                flash.transform.SetPositionAndRotation(muzzle, Quaternion.Euler(0f, 0f, angle));
-                flash.transform.localScale = Vector3.one * .72f;
-                flash.color = flashColor;
-            }
-
-            bodyMask.enabled = behindActor && flash.enabled;
-            flash.maskInteraction = behindActor
-                ? SpriteMaskInteraction.VisibleOutsideMask : SpriteMaskInteraction.None;
-            if (bodyMask.enabled)
-            {
-                bodyMask.sprite = actor.sprite;
-                bodyMask.transform.SetPositionAndRotation(actor.transform.position, actor.transform.rotation);
-                Vector3 scale = actor.transform.lossyScale;
-                bodyMask.transform.localScale = new Vector3(actor.flipX ? -scale.x : scale.x,
-                    actor.flipY ? -scale.y : scale.y, scale.z);
-            }
-
-            if (shotTrace.enabled)
-            {
-                Vector2 end = shotTrace.GetPosition(1);
-                shotTrace.SetPosition(0, Vector2.Dot(end - muzzle, shot.direction) > 0f ? muzzle : end);
-            }
+            sorting.sortingOrder = actor.sortingOrder - 1;
+            flash.transform.SetPositionAndRotation(shot.Muzzle, Quaternion.Euler(0f, 0f, 90f));
+            bodyMask.sprite = actor.sprite;
+            bodyMask.transform.SetPositionAndRotation(actor.transform.position, actor.transform.rotation);
+            Vector3 scale = actor.transform.lossyScale;
+            bodyMask.transform.localScale = new Vector3(actor.flipX ? -scale.x : scale.x,
+                actor.flipY ? -scale.y : scale.y, scale.z);
         }
 
         void UseBody(SpriteRenderer actor, Sprite body)

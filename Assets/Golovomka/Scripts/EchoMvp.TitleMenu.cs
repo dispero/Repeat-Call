@@ -147,6 +147,7 @@ namespace Golovomka
 
         void ShowMenu()
         {
+            shotAudio.Stop();
             bool canContinue = EchoHistory.Load(saveFileOverride) != null;
             mode = "menu";
             panel.gameObject.SetActive(false);

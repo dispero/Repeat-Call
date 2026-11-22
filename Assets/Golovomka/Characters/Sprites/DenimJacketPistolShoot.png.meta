@@ -1,0 +1,541 @@
+fileFormatVersion: 2
+guid: 3337a8db12e634c409250d88ea91c54b
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 9111578241899895639
+    second: DenimJacketPistolShoot_0
+  - first:
+      213: -3492938184507280782
+    second: DenimJacketPistolShoot_1
+  - first:
+      213: 891965218904917190
+    second: DenimJacketPistolShoot_2
+  - first:
+      213: 4441786987954527944
+    second: DenimJacketPistolShoot_3
+  - first:
+      213: -799945895491102225
+    second: DenimJacketPistolShoot_4
+  - first:
+      213: 4316661508979326678
+    second: DenimJacketPistolShoot_5
+  - first:
+      213: -1466875381111159012
+    second: DenimJacketPistolShoot_6
+  - first:
+      213: 3517155532059010504
+    second: DenimJacketPistolShoot_7
+  - first:
+      213: -3572810602362755083
+    second: DenimJacketPistolShoot_8
+  - first:
+      213: 5759142147945698903
+    second: DenimJacketPistolShoot_9
+  - first:
+      213: 8965129798160268473
+    second: DenimJacketPistolShoot_10
+  - first:
+      213: 8402210555444638729
+    second: DenimJacketPistolShoot_11
+  - first:
+      213: -5269735249595620689
+    second: DenimJacketPistolShoot_12
+  - first:
+      213: 7557920378670123710
+    second: DenimJacketPistolShoot_13
+  - first:
+      213: 2221957765794034821
+    second: DenimJacketPistolShoot_14
+  - first:
+      213: -3351933624271751930
+    second: DenimJacketPistolShoot_15
+  - first:
+      213: 7727657645274221087
+    second: DenimJacketPistolShoot_16
+  - first:
+      213: 8885833514214973730
+    second: DenimJacketPistolShoot_17
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 78.375
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationMethod: 0
+  spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: DenimJacketPistolShoot_Right_Aim
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 768
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b54c3aeca565c6349a8b82ccb5256127
+      internalID: 1682557139
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacketPistolShoot_Right_Flash
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 768
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ee7b8b1009bbcbe4ba86d7c4ceea67ba
+      internalID: -1100064691
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacketPistolShoot_Right_Recoil
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 768
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7daa29543db027d40ba490f4b0f8a627
+      internalID: -568383037
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacketPistolShoot_Right_Recover
+      rect:
+        serializedVersion: 2
+        x: 960
+        y: 768
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 49e3373edeea66b43af10d9a2d31f906
+      internalID: 185577772
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacketPistolShoot_Left_Aim
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 512
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 233b51d7c36933b49bd9d6c6f9f38603
+      internalID: 1215777220
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacketPistolShoot_Left_Flash
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 512
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3b8ee319abe64eb42a83a393e8a4de3d
+      internalID: -2010746015
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacketPistolShoot_Left_Recoil
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 512
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a0de46ff76cd2e9459af998f81b47302
+      internalID: -2062832836
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacketPistolShoot_Left_Recover
+      rect:
+        serializedVersion: 2
+        x: 960
+        y: 512
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 49f6e25a2288f634495ef3c11e5cad52
+      internalID: -80588205
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacketPistolShoot_Back_Aim
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 256
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 405ff2a36c868654d950edd825edcc20
+      internalID: -2018750919
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacketPistolShoot_Back_Flash
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 256
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 36758fac9e7d2794b82bb1a2306dc8be
+      internalID: 78165498
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacketPistolShoot_Back_Recoil
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 256
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bf861952c39a9dd48ba8f0de8abc2cb2
+      internalID: -1175301701
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacketPistolShoot_Back_Recover
+      rect:
+        serializedVersion: 2
+        x: 960
+        y: 256
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 19b4f779d9300a5498e2d83422f6c275
+      internalID: -450045033
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacketPistolShoot_Front_Aim
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fe29a1973d42df743b11c98d43e8490e
+      internalID: -702036333
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacketPistolShoot_Front_Flash
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 0
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4c9764a4ef828204b8a890b60532e04b
+      internalID: -1946383963
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacketPistolShoot_Front_Recoil
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 0
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a2bf7b4809032b5448b701aeedf550aa
+      internalID: 1303679208
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacketPistolShoot_Front_Recover
+      rect:
+        serializedVersion: 2
+        x: 960
+        y: 0
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7af7482cc467e0b4aa13febe22014fae
+      internalID: 251592015
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 3056bcc0c9644f54d8ca7ce2b61f7dbb
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      DenimJacketPistolShoot_Back_Aim: -2018750919
+      DenimJacketPistolShoot_Back_Flash: 78165498
+      DenimJacketPistolShoot_Back_Recoil: -1175301701
+      DenimJacketPistolShoot_Back_Recover: -450045033
+      DenimJacketPistolShoot_Front_Aim: -702036333
+      DenimJacketPistolShoot_Front_Flash: -1946383963
+      DenimJacketPistolShoot_Front_Recoil: 1303679208
+      DenimJacketPistolShoot_Front_Recover: 251592015
+      DenimJacketPistolShoot_Left_Aim: 1215777220
+      DenimJacketPistolShoot_Left_Flash: -2010746015
+      DenimJacketPistolShoot_Left_Recoil: -2062832836
+      DenimJacketPistolShoot_Left_Recover: -80588205
+      DenimJacketPistolShoot_Right_Aim: 1682557139
+      DenimJacketPistolShoot_Right_Flash: -1100064691
+      DenimJacketPistolShoot_Right_Recoil: -568383037
+      DenimJacketPistolShoot_Right_Recover: 185577772
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

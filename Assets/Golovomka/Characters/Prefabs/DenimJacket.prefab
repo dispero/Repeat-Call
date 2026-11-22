@@ -122,3 +122,42 @@ MonoBehaviour:
   - {fileID: 1605310707, guid: e8c858fa61c3d94409e66cf62d87e23f, type: 3}
   - {fileID: -14474792, guid: e8c858fa61c3d94409e66cf62d87e23f, type: 3}
   - {fileID: -1157533222, guid: e8c858fa61c3d94409e66cf62d87e23f, type: 3}
+  armedWalk:
+  - {fileID: 2031139387, guid: 301942a9c0695ae4fb513ea499bb074b, type: 3}
+  - {fileID: -1740007811, guid: 301942a9c0695ae4fb513ea499bb074b, type: 3}
+  - {fileID: 690544834, guid: 301942a9c0695ae4fb513ea499bb074b, type: 3}
+  - {fileID: 930962296, guid: 301942a9c0695ae4fb513ea499bb074b, type: 3}
+  - {fileID: -2144902910, guid: 301942a9c0695ae4fb513ea499bb074b, type: 3}
+  - {fileID: -1023450836, guid: 301942a9c0695ae4fb513ea499bb074b, type: 3}
+  - {fileID: 1912218132, guid: 301942a9c0695ae4fb513ea499bb074b, type: 3}
+  - {fileID: -926810079, guid: 301942a9c0695ae4fb513ea499bb074b, type: 3}
+  - {fileID: 1294084767, guid: 301942a9c0695ae4fb513ea499bb074b, type: 3}
+  - {fileID: -583065878, guid: 301942a9c0695ae4fb513ea499bb074b, type: 3}
+  - {fileID: 110085332, guid: 301942a9c0695ae4fb513ea499bb074b, type: 3}
+  - {fileID: 1752843354, guid: 301942a9c0695ae4fb513ea499bb074b, type: 3}
+  - {fileID: -905902327, guid: 301942a9c0695ae4fb513ea499bb074b, type: 3}
+  - {fileID: 1639579940, guid: 301942a9c0695ae4fb513ea499bb074b, type: 3}
+  - {fileID: -1519682501, guid: 301942a9c0695ae4fb513ea499bb074b, type: 3}
+  - {fileID: 449123395, guid: 301942a9c0695ae4fb513ea499bb074b, type: 3}
+  armedShoot:
+  - {fileID: 1682557139, guid: 3337a8db12e634c409250d88ea91c54b, type: 3}
+  - {fileID: -1100064691, guid: 3337a8db12e634c409250d88ea91c54b, type: 3}
+  - {fileID: -568383037, guid: 3337a8db12e634c409250d88ea91c54b, type: 3}
+  - {fileID: 185577772, guid: 3337a8db12e634c409250d88ea91c54b, type: 3}
+  - {fileID: 1215777220, guid: 3337a8db12e634c409250d88ea91c54b, type: 3}
+  - {fileID: -2010746015, guid: 3337a8db12e634c409250d88ea91c54b, type: 3}
+  - {fileID: -2062832836, guid: 3337a8db12e634c409250d88ea91c54b, type: 3}
+  - {fileID: -80588205, guid: 3337a8db12e634c409250d88ea91c54b, type: 3}
+  - {fileID: -2018750919, guid: 3337a8db12e634c409250d88ea91c54b, type: 3}
+  - {fileID: 78165498, guid: 3337a8db12e634c409250d88ea91c54b, type: 3}
+  - {fileID: -1175301701, guid: 3337a8db12e634c409250d88ea91c54b, type: 3}
+  - {fileID: -450045033, guid: 3337a8db12e634c409250d88ea91c54b, type: 3}
+  - {fileID: -702036333, guid: 3337a8db12e634c409250d88ea91c54b, type: 3}
+  - {fileID: -1946383963, guid: 3337a8db12e634c409250d88ea91c54b, type: 3}
+  - {fileID: 1303679208, guid: 3337a8db12e634c409250d88ea91c54b, type: 3}
+  - {fileID: 251592015, guid: 3337a8db12e634c409250d88ea91c54b, type: 3}
+  armedMuzzles:
+  - {x: 1.275917, y: 1.7480063}
+  - {x: -1.2376395, y: 1.7097288}
+  - {x: 0, y: 1.8755981}
+  - {x: -0.03827751, y: 1.569378}

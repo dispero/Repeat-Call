@@ -13,6 +13,22 @@ namespace Golovomka
         [SerializeField, Tooltip("По четыре кадра: вправо, влево, назад, вперёд. Затем, если есть, по одной позе или по четыре кадра для диагоналей: вверх-вправо, вверх-влево, вниз-влево, вниз-вправо.")]
         Sprite[] frames = Array.Empty<Sprite>();
 
+        [SerializeField] Sprite[] armedWalk = Array.Empty<Sprite>();
+        [SerializeField] Sprite[] armedShoot = Array.Empty<Sprite>();
+        [SerializeField] Vector2[] armedMuzzles = Array.Empty<Vector2>();
+
+        internal bool HasArmedAnimation => armedWalk.Length == CardinalFrameCount && armedShoot.Length == CardinalFrameCount &&
+            armedMuzzles.Length == CardinalDirectionCount && Array.TrueForAll(armedWalk, frame => frame) &&
+            Array.TrueForAll(armedShoot, frame => frame);
+
+        internal Sprite GetArmedWalkFrame(int facing, bool moving, float time) =>
+            armedWalk[CharacterWalkCycle.FrameIndex(facing, CardinalDirectionCount, moving, time)];
+
+        internal Sprite GetArmedShootFrame(int facing, int phase) =>
+            armedShoot[facing * CharacterWalkCycle.FramesPerDirection + phase];
+
+        internal Vector2 GetArmedMuzzle(int facing) => transform.TransformPoint(armedMuzzles[facing]);
+
         SpriteRenderer spriteRenderer;
         Vector2 previousPosition;
         float walkTime;

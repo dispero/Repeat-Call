@@ -1,0 +1,535 @@
+fileFormatVersion: 2
+guid: 301942a9c0695ae4fb513ea499bb074b
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -4500724662300414154
+    second: DenimJacketPistolWalk_0
+  - first:
+      213: -5461240178252695577
+    second: DenimJacketPistolWalk_1
+  - first:
+      213: -2057928851471195468
+    second: DenimJacketPistolWalk_2
+  - first:
+      213: -2003871789503423679
+    second: DenimJacketPistolWalk_3
+  - first:
+      213: 2325794767088198679
+    second: DenimJacketPistolWalk_4
+  - first:
+      213: -773688495193955379
+    second: DenimJacketPistolWalk_5
+  - first:
+      213: -7382706853279012182
+    second: DenimJacketPistolWalk_6
+  - first:
+      213: 7402260641590109110
+    second: DenimJacketPistolWalk_7
+  - first:
+      213: -3574085045061373867
+    second: DenimJacketPistolWalk_8
+  - first:
+      213: -267050124215543349
+    second: DenimJacketPistolWalk_9
+  - first:
+      213: 2284339392506489414
+    second: DenimJacketPistolWalk_10
+  - first:
+      213: -3014403882455491655
+    second: DenimJacketPistolWalk_11
+  - first:
+      213: 5723476079629343419
+    second: DenimJacketPistolWalk_12
+  - first:
+      213: 436252851921233583
+    second: DenimJacketPistolWalk_13
+  - first:
+      213: -915340320243280503
+    second: DenimJacketPistolWalk_14
+  - first:
+      213: -2880441000697496161
+    second: DenimJacketPistolWalk_15
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 78.375
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationMethod: 0
+  spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: DenimJacketPistolWalk_Right_Ready
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 768
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fecb8d4711e76fd4bb0ba23b64c5f4be
+      internalID: 2031139387
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacketPistolWalk_Right_StepA
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 768
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6e5d22aaac6d57e46894318571742e61
+      internalID: -1740007811
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacketPistolWalk_Right_Pass
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 768
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5077c01b66e592340ade2735dd4c2089
+      internalID: 690544834
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacketPistolWalk_Right_StepB
+      rect:
+        serializedVersion: 2
+        x: 960
+        y: 768
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b8fa64a640a41e143a31d26b4439c747
+      internalID: 930962296
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacketPistolWalk_Left_Ready
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 512
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4b7e9a70f2602ca43b2e1dfee8f86634
+      internalID: -2144902910
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacketPistolWalk_Left_StepA
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 512
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fd18e8df3055bf0468c75acb232e990c
+      internalID: -1023450836
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacketPistolWalk_Left_Pass
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 512
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0237c18caded48d43b24051d91fe80cd
+      internalID: 1912218132
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacketPistolWalk_Left_StepB
+      rect:
+        serializedVersion: 2
+        x: 960
+        y: 512
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ed90dbc9b2883a648b3f7cccc579d558
+      internalID: -926810079
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacketPistolWalk_Back_Ready
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 256
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3c9c2393e623a9c449947b9c2f73b8f0
+      internalID: 1294084767
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacketPistolWalk_Back_StepA
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 256
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3090c95bd41046f41a7dc54ad06aa745
+      internalID: -583065878
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacketPistolWalk_Back_Pass
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 256
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 074932bf393d50b4bac4cf8f82df5d69
+      internalID: 110085332
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacketPistolWalk_Back_StepB
+      rect:
+        serializedVersion: 2
+        x: 960
+        y: 256
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3829767f3c146e34d9a75db9fa483e28
+      internalID: 1752843354
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacketPistolWalk_Front_Ready
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2110f54fb36f0c54e8fccd4eef3600a8
+      internalID: -905902327
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacketPistolWalk_Front_StepA
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 0
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2977fe305e65cd244b3467d9faac86fa
+      internalID: 1639579940
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacketPistolWalk_Front_Pass
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 0
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2621a61f94abe4f44b4a5210c7ad4f3b
+      internalID: -1519682501
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DenimJacketPistolWalk_Front_StepB
+      rect:
+        serializedVersion: 2
+        x: 960
+        y: 0
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8af4301276a5c8743bc6f3f63972e07a
+      internalID: 449123395
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: c56d65d57cef50e4692e4ab1a465d23a
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      DenimJacketPistolWalk_Back_Pass: 110085332
+      DenimJacketPistolWalk_Back_Ready: 1294084767
+      DenimJacketPistolWalk_Back_StepA: -583065878
+      DenimJacketPistolWalk_Back_StepB: 1752843354
+      DenimJacketPistolWalk_Front_Pass: -1519682501
+      DenimJacketPistolWalk_Front_Ready: -905902327
+      DenimJacketPistolWalk_Front_StepA: 1639579940
+      DenimJacketPistolWalk_Front_StepB: 449123395
+      DenimJacketPistolWalk_Left_Pass: 1912218132
+      DenimJacketPistolWalk_Left_Ready: -2144902910
+      DenimJacketPistolWalk_Left_StepA: -1023450836
+      DenimJacketPistolWalk_Left_StepB: -926810079
+      DenimJacketPistolWalk_Right_Pass: 690544834
+      DenimJacketPistolWalk_Right_Ready: 2031139387
+      DenimJacketPistolWalk_Right_StepA: -1740007811
+      DenimJacketPistolWalk_Right_StepB: 930962296
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

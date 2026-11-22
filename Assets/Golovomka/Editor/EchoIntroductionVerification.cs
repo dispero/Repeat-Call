@@ -222,9 +222,16 @@ public static class EchoIntroductionVerification
             !sequence.first.door.Passage.isTrigger && !sequence.second.door.Passage.isTrigger &&
             EchoHistory.Load(m.saveFileOverride)?.returnRoom == 3,
             "Room 2 exit saves the next return point and releases both doors");
+        Check(!m.recording.frames[0].pistolDrawn, "Room 3 first entry starts with the pistol holstered");
         m.RestartCycle();
         Check(m.position == (Vector2)room3.entrance.position && CanStand(m.position) &&
             m.position.x > sequence.second.door.Passage.bounds.max.x, "R spawns beyond the closed B door");
+        bool SpawnPistolIs(bool drawn) => m.recording.frames[0].pistolDrawn == drawn &&
+            ((SpriteRenderer)typeof(EchoMvp).GetField("hero", BindingFlags.Instance | BindingFlags.NonPublic)
+                .GetValue(m)).sprite.name.StartsWith("IvanPistol_") == drawn;
+        Check(SpawnPistolIs(false) && !(bool)typeof(EchoMvp)
+            .GetProperty("CanDrawPistol", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(m),
+            "Room 3 retry starts without access to a pistol");
         Check(buttons.IsConfigured && !buttons.exitDoor.Passage.isTrigger,
             "Room 3 starts with one copy slot and a closed door");
         m.Interact(Interaction.UseRoomPassage);
@@ -299,6 +306,7 @@ public static class EchoIntroductionVerification
         var savedRangeTape = EchoHistory.Load(m.saveFileOverride)?.ForRoom(4);
         Check(savedRangeTape?.shots.Count == 5 && savedRangeTape.shots.All(shot => shot.direction == Vector2.up),
             "Save retains all five upward shot vectors");
+        Check(SpawnPistolIs(true), "Room 4 retry starts and records a drawn pistol");
         m.elapsed = TargetRangeRoom.WaveStart(4) + 1f;
         m.UpdateGhosts();
         Check(!range.Solved, "The recording alone cannot solve the range");
@@ -313,21 +321,194 @@ public static class EchoIntroductionVerification
         }
         Check(range.Solved && range.exitDoor.Passage.isTrigger, "Five pairs open the exit");
         CrossDoor(room4, range.exitDoor, staysOpen: true);
-        var tail = rooms.Single(room => room.disableRecording && room.roomNumber == 5);
-        Check(m.zone == 5 && !m.recordingActive &&
+        var tail = rooms.Single(room => room.roomNumber == 5);
+        var finale = tail.GetComponent<FinaleRoom>();
+        Check(finale && finale.IsConfigured && m.zone == 5 && m.recordingActive &&
             EchoHistory.Load(m.saveFileOverride)?.returnRoom == 5, "The exit saves the next return point");
         m.RestartCycle();
-        Check(m.zone == 5 && !m.recordingActive && m.position == (Vector2)tail.entrance.position &&
+        Check(m.zone == 5 && m.recordingActive && m.elapsed == 0 && m.position == (Vector2)tail.entrance.position &&
             CanStand(m.position) && m.position.x > range.exitDoor.Passage.bounds.max.x,
-            "R returns to the empty room without starting a recording");
+            "R returns to the finale entrance and starts the recording clock");
+        Check(SpawnPistolIs(true), "Room 5 retry starts and records a drawn pistol");
+
+        VerifyLookoutAnimation(finale, m.position, Check);
+        VerifyLookoutCover(finale, m.position, Check);
+
+        Vector2 chaseStart = finale.pursuer.transform.position;
+        Vector2 lookoutStart = finale.lookout.transform.position;
+        Vector2 guardStart = finale.guard.transform.position;
+        Vector2 upper = new Vector2(finale.upperApproach.bounds.center.x, -.44f);
+        Vector2 lower = new Vector2(guardStart.x, -4.7f);
+        Check(CanStand(upper) && CanStand(lower), "Both approaches have walkable positions");
+        Check(tail.CameraBounds.size.x > 20f && CanStand(new Vector2(120f, -7.3f)),
+            "The expanded room has a walkable lower lane and its own camera frame");
+        finale.Tick(0, .1f, m.position, upper);
+        Check(finale.Failure != null && !finale.fyodor.gameObject.activeSelf,
+            "The hostage guard detects the copy on the upper approach");
+        m.RestartCycle();
+        Check(finale.Failure == null && finale.fyodor.gameObject.activeSelf, "A retry restores the hostages");
+        finale.Tick(0, .1f, lower, null);
+        Check(finale.Failure == null, "The lower approach does not alert the hostage guard");
+
+        Vector2 copyInSight = chaseStart + Vector2.right * 2.3f;
+        finale.Tick(0, .2f, lower, copyInSight);
+        finale.Tick(0, .65f, lower, copyInSight);
+        Check(finale.CopyHit && finale.Failure == null, "A gunman's shot can end only the copy's playback");
+        m.RestartCycle();
+
+        finale.Shoot(new Vector2(110.1f, -2.6f), Vector2.right, .2f, m.recording);
+        Check(finale.guard.gameObject.activeSelf && finale.lookout.gameObject.activeSelf,
+            "A distraction shot is stopped by the central equipment");
+        for (int i = 0; i < 36; i++) finale.Tick(.025f, .225f + i * .025f, m.position, null);
+        Check(Vector2.Distance(lookoutStart, finale.lookout.transform.position) > 1f,
+            "The distraction makes the lower guard leave his position");
+        m.elapsed = 1.2f;
+        m.RestartCycle();
+        var finaleTape = EchoHistory.Load(m.saveFileOverride)?.ForRoom(5);
+        Check(finaleTape?.shots.Count == 1 && finaleTape.shots[0].direction == Vector2.right,
+            "The finale shot survives a save and load");
+        m.elapsed = .22f;
+        m.UpdateGhosts();
+        Call("UpdateFinale", .02f, false, false);
+        Check(finale.Status(m.elapsed).Contains("ОТВЛЕЧЁН"), "The saved copy replays its distraction shot");
+        m.elapsed = finaleTape.duration + .01f;
+        m.UpdateGhosts();
+        var ghost = (SpriteRenderer)typeof(EchoMvp).GetField("ghost", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(m);
+        Check(!ghost.enabled, "The finale copy disappears at the end of playback");
+        m.RestartCycle();
+
+        void ShootFrom(Vector2 p, Vector2 direction, float time)
+        {
+            Check(CanStand(p), "Firing position is on the floor: " + p);
+            finale.Shoot(p, direction, time, m.recording);
+        }
+
+        ShootFrom((Vector2)finale.fyodor.transform.position + Vector2.down, Vector2.up, .1f);
+        Check(finale.Failure != null && !finale.fyodor.gameObject.activeSelf, "An accidental shot at a hostage fails the attempt");
+        m.elapsed = .2f;
+        m.RestartCycle();
+
+        ShootFrom(chaseStart + Vector2.left * 1.15f, Vector2.right, .1f);
+        ShootFrom(lookoutStart + Vector2.right * 1.1f, Vector2.left, .7f);
+        Check(finale.Failure != null && finale.guard.gameObject.activeSelf,
+            "Killing both gunmen before the guard fails the attempt");
+        m.elapsed = 1f;
+        m.RestartCycle();
+        Check(finale.pursuer.gameObject.activeSelf && finale.lookout.gameObject.activeSelf &&
+            finale.lookout.transform.position == (Vector3)lookoutStart, "All bandits return to their start positions");
+
+        ShootFrom(chaseStart + Vector2.left * 1.15f, Vector2.right, .1f);
+        ShootFrom(lower, Vector2.up, .7f);
+        ShootFrom(lookoutStart + Vector2.right * 1.1f, Vector2.left, 1.3f);
+        Check(finale.Cleared && finale.Failure == null, "The guard can be defeated from below before the last gunman");
+        m.elapsed = 1.4f;
+        m.position = finale.fyodor.transform.position;
+        Call("UpdateFinale", 0f, false, true);
+        Check(!finale.Complete && m.mode == "play", "Freeing Fyodor alone does not end the game");
+        m.position = finale.alexei.transform.position;
+        Call("UpdateFinale", 0f, false, true);
+        Check(finale.Complete && m.mode == "done" && !m.recordingActive && EchoHistory.Load(m.saveFileOverride).completed,
+            "Both releases finish the game and save completion");
+        m.history = EchoHistory.Load(m.saveFileOverride);
+        m.BeginCycle();
+        Call("ActivateRoom", room1, null, false, false);
+        m.RestartCycle();
+        Check(finale.Complete && !m.recordingActive && m.mode == "done", "The reopened save restores the completed finale");
 
         var old = new EchoHistory { version = 3, returnRoom = 3, firstReturnSeen = true, remoteObtained = true };
         old.tapes.Add(new EchoTape { room = 3, duration = 3 });
         old.tapes.Add(new EchoTape { room = 3, duration = 4 });
         old.Save(m.saveFileOverride);
         var loaded = EchoHistory.Load(m.saveFileOverride);
-        Check(loaded?.version == 7 && loaded.returnRoom == 4 && loaded.ForRoom(4) == null,
+        Check(loaded?.version == 8 && loaded.returnRoom == 4 && loaded.ForRoom(4) == null,
             "Legacy progress survives while old room 4 tapes are dropped");
         return JsonUtility.ToJson(new Result { passed = checks.ToArray(), frame = Time.frameCount });
+    }
+
+    static void VerifyLookoutAnimation(FinaleRoom finale, Vector2 entry, Action<bool, string> check)
+    {
+        const BindingFlags instance = BindingFlags.Instance | BindingFlags.NonPublic;
+        var lookout = typeof(FinaleRoom).GetField("sentry", instance).GetValue(finale);
+        var trace = typeof(FinaleRoom).GetField("lookoutTrace", instance).GetValue(finale);
+        var line = (LineRenderer)trace.GetType().GetField("line").GetValue(trace);
+        var facing = lookout.GetType().GetField("direction");
+        var show = typeof(FinaleRoom).GetMethod("ShowBandit", BindingFlags.Static | BindingFlags.NonPublic);
+        var fire = typeof(FinaleRoom).GetMethod("FireBandit", instance);
+        var body = finale.lookout.GetComponent<SpriteRenderer>();
+        var flash = finale.lookoutGun;
+
+        void CheckFrame(string clip, string direction, string frame, bool moving, float time, bool charging = false)
+        {
+            show.Invoke(null, new object[] { lookout, moving, time, charging, false });
+            string expected = $"DenimJacketPistol{clip}_{direction}_{frame}";
+            check(body.sprite.name == expected, $"Lookout displays {expected}");
+        }
+
+        try
+        {
+            foreach (var (direction, name) in new[]
+            {
+                (Vector2.right, "Right"), (Vector2.left, "Left"), (Vector2.up, "Back"), (Vector2.down, "Front")
+            })
+            {
+                finale.Begin(entry);
+                facing.SetValue(lookout, direction);
+                CheckFrame("Walk", name, "Ready", false, 0);
+                CheckFrame("Walk", name, "StepA", true, .01f);
+                CheckFrame("Walk", name, "Pass", true, .20f);
+                CheckFrame("Walk", name, "StepB", true, .35f);
+                CheckFrame("Shoot", name, "Aim", false, .50f, charging: true);
+                check(!flash.enabled, "Lookout keeps the separate pistol hidden while aiming");
+
+                fire.Invoke(finale, new object[] { lookout, entry + Vector2.up * 100f, null, direction, 1f, trace });
+                facing.SetValue(lookout, -direction);
+                CheckFrame("Shoot", name, "Flash", false, 1.02f);
+                check(flash.enabled == (direction == Vector2.up), $"Lookout uses a separate flash only from behind ({name})");
+                if (direction == Vector2.up)
+                {
+                    Vector2 start = line.GetPosition(0);
+                    Vector2 end = line.GetPosition(1);
+                    check(Mathf.Abs(start.x - body.transform.position.x) < .001f &&
+                        Mathf.Abs(end.x - start.x) < .001f && Vector2.Distance(flash.transform.position, start) < .001f,
+                        "Lookout's rear shot and flash share the center line");
+                    check(flash.sortingOrder < body.sortingOrder && line.sortingOrder < body.sortingOrder,
+                        "Lookout's rear shot is sorted behind the body");
+                }
+                CheckFrame("Shoot", name, "Recoil", false, 1.10f);
+                check(!flash.enabled, $"Lookout flash ends before recoil ({name})");
+                CheckFrame("Shoot", name, "Recover", false, 1.19f);
+                facing.SetValue(lookout, direction);
+                CheckFrame("Walk", name, "Ready", false, 1.26f);
+            }
+        }
+        finally
+        {
+            finale.Begin(entry);
+        }
+        check(!flash.enabled && !line.enabled && body.sprite.name == "DenimJacketPistolWalk_Left_Ready",
+            "Finale retry clears the lookout's shot and restores the idle pose");
+    }
+
+    static void VerifyLookoutCover(FinaleRoom finale, Vector2 entry, Action<bool, string> check)
+    {
+        const BindingFlags instance = BindingFlags.Instance | BindingFlags.NonPublic;
+        try
+        {
+            finale.pursuer.gameObject.SetActive(false);
+            Vector2 start = finale.lookout.transform.position;
+            Vector2 player = start + new Vector2(-4.15f, .74f);
+            var lookout = typeof(FinaleRoom).GetField("sentry", instance).GetValue(finale);
+            var firedAt = lookout.GetType().GetField("firedAt");
+            for (int step = 0; step < 100 && (float)firedAt.GetValue(lookout) < 0f; step++)
+                finale.Tick(.05f, step * .05f, player, null);
+            check(Vector2.Distance(start, finale.lookout.transform.position) > .2f,
+                "Lookout leaves the blocked firing position beside the central equipment");
+            check((float)firedAt.GetValue(lookout) >= 0f && finale.Failure == "Иван погиб.",
+                "Lookout fires only after reaching a position with a clear shot");
+        }
+        finally
+        {
+            finale.Begin(entry);
+        }
     }
 }

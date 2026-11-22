@@ -5,20 +5,18 @@ namespace Golovomka
     [DisallowMultipleComponent]
     public sealed class TargetRangeRoom : MonoBehaviour
     {
+        internal event System.Action ShotFired;
+
         [System.Serializable]
         public sealed class PistolPose
         {
             public Sprite ready;
             public Sprite[] walk = new Sprite[CharacterWalkCycle.WalkingFrameCount];
+            public Sprite[] shoot = new Sprite[RangePistol.ShotFrameCount];
             public Vector2 muzzle;
-            public Vector2[] walkMuzzles = System.Array.Empty<Vector2>();
 
             internal Sprite GetBody(bool moving, float time) =>
                 moving ? walk[CharacterWalkCycle.WalkingFrame(time)] : ready;
-
-            internal Vector2 GetMuzzle(bool moving, float time) =>
-                moving && walkMuzzles.Length == CharacterWalkCycle.WalkingFrameCount
-                    ? walkMuzzles[CharacterWalkCycle.WalkingFrame(time)] : muzzle;
         }
 
         public const int Waves = 5;
@@ -38,6 +36,7 @@ namespace Golovomka
         public Sprite openHatch;
         public Collider2D targetWall;
         public Sprite pistolFlash;
+        [Tooltip("Порядок ракурсов: вправо, вверх, влево, вниз.")]
         public PistolPose[] pistolPoses = new PistolPose[RangePistol.DirectionCount];
 
         readonly int[] hits = new int[Waves];
@@ -57,7 +56,10 @@ namespace Golovomka
         public bool IsConfigured => exitDoor && exitDoor.Passage && openHatch && targetWall &&
             pistolFlash && pistolPoses.Length == RangePistol.DirectionCount &&
             System.Array.TrueForAll(pistolPoses, pose => pose != null && pose.ready &&
-                pose.walk.Length == CharacterWalkCycle.WalkingFrameCount && System.Array.TrueForAll(pose.walk, frame => frame)) &&
+                pose.walk.Length == CharacterWalkCycle.WalkingFrameCount &&
+                pose.shoot.Length == RangePistol.ShotFrameCount &&
+                System.Array.TrueForAll(pose.shoot, frame => frame) &&
+                System.Array.TrueForAll(pose.walk, frame => frame)) &&
             targets.Length == 7 &&
             indicators.Length == Waves && System.Array.TrueForAll(targets, item => item &&
                 item.transform.parent && item.transform.parent.TryGetComponent<SpriteRenderer>(out _)) &&
@@ -110,21 +112,26 @@ namespace Golovomka
             foreach (var indicator in indicators) indicator.color = new Color(.25f, .24f, .21f);
             if (playerTrace) playerTrace.enabled = false;
             if (echoTrace) echoTrace.enabled = false;
+            HidePistols();
+            playerTraceUntil = echoTraceUntil = 0;
+        }
+
+        internal void HidePistols()
+        {
             playerPistol?.Hide();
             echoPistol?.Hide();
-            playerTraceUntil = echoTraceUntil = 0;
         }
 
         internal static bool IsCardinalShot(Vector2 direction) =>
             (direction.x == 0f && Mathf.Abs(direction.y) == 1f) ||
             (direction.y == 0f && Mathf.Abs(direction.x) == 1f);
 
-        public bool Shoot(Vector2 origin, Vector2 direction, float time, EchoTape recording)
+        public bool Shoot(Vector2 origin, Vector2 direction, float time, EchoTape recording, Vector2 muzzleOffset = default)
         {
             if (time < nextShot || Solved || !IsCardinalShot(direction)) return false;
 
             nextShot = time + ShotInterval;
-            var shot = new EchoShot(time, origin, direction);
+            var shot = new EchoShot(time, origin, direction, muzzleOffset);
             recording.shots.Add(shot);
             Resolve(shot, false);
             return true;
@@ -142,7 +149,8 @@ namespace Golovomka
 
         void Resolve(EchoShot shot, bool echo)
         {
-            Vector2 origin = shot.origin;
+            ShotFired?.Invoke();
+            Vector2 origin = shot.Muzzle;
             Vector2 direction = shot.direction;
             float distance = Range;
             float targetDistance = Range;
@@ -193,9 +201,10 @@ namespace Golovomka
                 if (echo) echoTrace = trace;
                 else playerTrace = trace;
             }
-            GetPistol(echo).Fire(shot, trace);
+            trace.sortingOrder = RangePistol.TraceSortingOrder(direction, shot.origin.y - MuzzleHeight);
             trace.SetPosition(0, origin);
             trace.SetPosition(1, origin + direction * distance);
+            AnimateShot(shot, echo);
             if (echo) echoTraceUntil = shot.time + .08f;
             else playerTraceUntil = shot.time + .08f;
         }
@@ -206,8 +215,10 @@ namespace Golovomka
             return playerPistol ??= new RangePistol(transform, false, pistolFlash, pistolPoses);
         }
 
-        internal Sprite GetPistolPose(Vector2 direction, bool moving, float time) =>
-            pistolPoses[CharacterWalkCycle.Octant(direction)].GetBody(moving, time);
+        internal void AnimateShot(EchoShot shot, bool echo) => GetPistol(echo).Fire(shot);
+
+        internal Vector2 GetPistolMuzzle(Vector2 direction) =>
+            pistolPoses[RangePistol.PoseIndex(direction)].muzzle;
 
         public void ShowPistols(SpriteRenderer player, Vector2 direction, bool playerMoving, bool playerArmed,
             SpriteRenderer copy, Vector2 copyDirection, bool copyMoving, bool copyArmed, float time)

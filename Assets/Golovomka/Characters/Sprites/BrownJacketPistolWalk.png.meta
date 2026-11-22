@@ -1,0 +1,535 @@
+fileFormatVersion: 2
+guid: a0bc8b26c3c061d4090e98689eb626a9
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -8854759192325773726
+    second: BrownJacketPistolWalk_0
+  - first:
+      213: -7195925427792142447
+    second: BrownJacketPistolWalk_1
+  - first:
+      213: 4422019627522233888
+    second: BrownJacketPistolWalk_2
+  - first:
+      213: -2904448437122822759
+    second: BrownJacketPistolWalk_3
+  - first:
+      213: -7176157196795155554
+    second: BrownJacketPistolWalk_4
+  - first:
+      213: -5345417761798173089
+    second: BrownJacketPistolWalk_5
+  - first:
+      213: -8641573466741768328
+    second: BrownJacketPistolWalk_6
+  - first:
+      213: 46584879594460816
+    second: BrownJacketPistolWalk_7
+  - first:
+      213: -5318064139173470048
+    second: BrownJacketPistolWalk_8
+  - first:
+      213: -6398839168293288212
+    second: BrownJacketPistolWalk_9
+  - first:
+      213: -3332918853830347501
+    second: BrownJacketPistolWalk_10
+  - first:
+      213: 7720035760461497124
+    second: BrownJacketPistolWalk_11
+  - first:
+      213: -7629771422023701090
+    second: BrownJacketPistolWalk_12
+  - first:
+      213: 5043126555327561258
+    second: BrownJacketPistolWalk_13
+  - first:
+      213: 4117402608755287294
+    second: BrownJacketPistolWalk_14
+  - first:
+      213: -7071791159513604919
+    second: BrownJacketPistolWalk_15
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 78.375
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationMethod: 0
+  spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: BrownJacketPistolWalk_Right_Ready
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 768
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: aa7946c104006b74ba96dd3784366c82
+      internalID: 1145647701
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BrownJacketPistolWalk_Right_StepA
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 768
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 92698f7242b300a429fd023249648f2e
+      internalID: -45432009
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BrownJacketPistolWalk_Right_Pass
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 768
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7c60a2bd119d9b546b9ae3726c79a97d
+      internalID: 1278563554
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BrownJacketPistolWalk_Right_StepB
+      rect:
+        serializedVersion: 2
+        x: 960
+        y: 768
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c8f1a73b696d6c94ea8ef704c345c80e
+      internalID: -272368000
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BrownJacketPistolWalk_Left_Ready
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 512
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1e68ee8b79d32744dbb166f2b8ea4323
+      internalID: -2040620472
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BrownJacketPistolWalk_Left_StepA
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 512
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6e6e5f1e665b47042aa44a59324d600b
+      internalID: 2137276705
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BrownJacketPistolWalk_Left_Pass
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 512
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 37d2d95dbadbdc34eac3887f853a4ff7
+      internalID: 150453410
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BrownJacketPistolWalk_Left_StepB
+      rect:
+        serializedVersion: 2
+        x: 960
+        y: 512
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4be742ba1672f7947ad313ceb4ad30f3
+      internalID: -1355408603
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BrownJacketPistolWalk_Back_Ready
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 256
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6786c01ca533c5948a2315af2f646d6d
+      internalID: -1272213186
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BrownJacketPistolWalk_Back_StepA
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 256
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5fc3a831deccc0747831328478c8a13d
+      internalID: 1740754408
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BrownJacketPistolWalk_Back_Pass
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 256
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0f2919a318fd23849a712aa48cd0a0da
+      internalID: -253739764
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BrownJacketPistolWalk_Back_StepB
+      rect:
+        serializedVersion: 2
+        x: 960
+        y: 256
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6d9a6e75ca9a5d84d8a4540b8efa735c
+      internalID: 867565299
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BrownJacketPistolWalk_Front_Ready
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b1bc9052b9db58845905deb8b54c14bb
+      internalID: -235238730
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BrownJacketPistolWalk_Front_StepA
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 0
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d9437a1d23fcfac4197f638f27f29e8a
+      internalID: 1543051316
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BrownJacketPistolWalk_Front_Pass
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 0
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2a14212895ee8fa4ca036c50d6b7661c
+      internalID: 1924822722
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BrownJacketPistolWalk_Front_StepB
+      rect:
+        serializedVersion: 2
+        x: 960
+        y: 0
+        width: 320
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.015625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f249c2ba24ecf9d47b8eabf616818f42
+      internalID: -1968341197
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 1fd1ec4ccfa1cbd4c96379eadbd45099
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      BrownJacketPistolWalk_Back_Pass: -253739764
+      BrownJacketPistolWalk_Back_Ready: -1272213186
+      BrownJacketPistolWalk_Back_StepA: 1740754408
+      BrownJacketPistolWalk_Back_StepB: 867565299
+      BrownJacketPistolWalk_Front_Pass: 1924822722
+      BrownJacketPistolWalk_Front_Ready: -235238730
+      BrownJacketPistolWalk_Front_StepA: 1543051316
+      BrownJacketPistolWalk_Front_StepB: -1968341197
+      BrownJacketPistolWalk_Left_Pass: 150453410
+      BrownJacketPistolWalk_Left_Ready: -2040620472
+      BrownJacketPistolWalk_Left_StepA: 2137276705
+      BrownJacketPistolWalk_Left_StepB: -1355408603
+      BrownJacketPistolWalk_Right_Pass: 1278563554
+      BrownJacketPistolWalk_Right_Ready: 1145647701
+      BrownJacketPistolWalk_Right_StepA: -45432009
+      BrownJacketPistolWalk_Right_StepB: -272368000
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

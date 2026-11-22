@@ -12,6 +12,8 @@ namespace Golovomka
             get
             {
                 var tape = history.ForRoom(zone);
+                if (currentFinale && (tape?.room != zone || tape.shots.Exists(shot => !TargetRangeRoom.IsCardinalShot(shot.direction))))
+                    return null;
                 // Старая серия с диагональными попаданиями может требовать другой позиции для выстрела.
                 return currentRange && tape != null && tape.shots.Exists(shot => !TargetRangeRoom.IsCardinalShot(shot.direction))
                     ? null : tape;
@@ -57,12 +59,13 @@ namespace Golovomka
                 if (currentButtons && recording.buttonPresses.Count > 0 &&
                     recording.buttonPresses[recording.buttonPresses.Count - 1].time >= elapsed)
                     elapsed += .001f;
-                if (currentRange && recording.shots.Count > 0 &&
+                if ((currentRange || currentFinale) && recording.shots.Count > 0 &&
                     recording.shots[recording.shots.Count - 1].time >= elapsed)
                     elapsed += .001f;
                 Record(); recording.duration = elapsed;
                 if (elapsed > 0 && (!currentButtons || recording.buttonPresses.Count > 0) &&
-                    (!currentRange || currentRange.HasCompleteRecording))
+                    (!currentRange || currentRange.HasCompleteRecording) &&
+                    (!currentFinale || currentFinale.HasRecording(recording)))
                     history.Push(recording);
                 else history.cycle++;
             }
@@ -73,7 +76,7 @@ namespace Golovomka
             panel.gameObject.SetActive(false);
             var returnRoom = rooms.TryGetValue(history.returnRoom, out var savedRoom) && savedRoom.isActiveAndEnabled
                 ? savedRoom : introductionRoom;
-            ActivateRoom(returnRoom);
+            ActivateRoom(returnRoom, returning: true);
             FitRoomCamera(snap: true);
         }
 

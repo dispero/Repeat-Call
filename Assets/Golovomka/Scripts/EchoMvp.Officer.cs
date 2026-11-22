@@ -13,6 +13,9 @@ namespace Golovomka
             _ => Vector2.down
         };
 
+        Vector2 OfficerMuzzle() =>
+            hero.transform.TransformPoint(pistolArt.GetPistolMuzzle(ShotDirection));
+
         void UpdateOfficerFacing(Vector2 move, Keyboard keyboard)
         {
             int horizontal = move.x > 0 ? 0 : 1;

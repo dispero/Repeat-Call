@@ -30,12 +30,16 @@ namespace Golovomka
     {
         public float time;
         public Vector2 origin, direction;
+        public Vector2 muzzleOffset;
+        // Старые записи вверх могли хранить смещение ствола вправо от корпуса.
+        internal Vector2 Muzzle => origin + new Vector2(direction == Vector2.up ? 0f : muzzleOffset.x, muzzleOffset.y);
 
-        public EchoShot(float time, Vector2 origin, Vector2 direction)
+        public EchoShot(float time, Vector2 origin, Vector2 direction, Vector2 muzzleOffset = default)
         {
             this.time = time;
             this.origin = origin;
             this.direction = direction;
+            this.muzzleOffset = muzzleOffset;
         }
     }
 
@@ -66,7 +70,7 @@ namespace Golovomka
     {
         public const int MaxRoomNumber = 5;
         public const float TimedRoomInsertionWidth = 18f;
-        public int version = 7, cycle = 1;
+        public int version = 8, cycle = 1;
         public int returnRoom;
         [Serializable] sealed class LegacyProgress { public int clearedRooms; }
         public bool completed;
@@ -108,7 +112,7 @@ namespace Golovomka
                     if (!File.Exists(file)) continue;
                     string json = File.ReadAllText(file);
                     var data = JsonUtility.FromJson<EchoHistory>(json);
-                    if (data == null || data.version < 3 || data.version > 7 || data.cycle < 1 || data.tapes == null)
+                    if (data == null || data.version < 3 || data.version > 8 || data.cycle < 1 || data.tapes == null)
                         continue;
                     int maxRoom = data.version == 3 ? 4 : MaxRoomNumber;
                     // Форматы 3 и 4 могли хранить по две записи на комнату.
@@ -135,13 +139,17 @@ namespace Golovomka
                             previous = press.time;
                         }
                         tape.shots ??= new List<EchoShot>();
-                        previous = -TargetRangeRoom.ShotInterval;
+                        bool finale = data.version >= 8 && tape.room == 5;
+                        float interval = finale ? FinaleRoom.ShotInterval : TargetRangeRoom.ShotInterval;
+                        previous = -interval;
                         foreach (var shot in tape.shots)
                         {
-                            if (tape.room != 4 || !(shot.time >= 0 && shot.time < tape.duration &&
-                                shot.time >= previous + TargetRangeRoom.ShotInterval) ||
+                            if ((tape.room != 4 && !finale) || !(shot.time >= 0 && shot.time < tape.duration &&
+                                shot.time >= previous + interval) ||
                                 !float.IsFinite(shot.origin.x) || !float.IsFinite(shot.origin.y) ||
-                                !(Mathf.Abs(shot.direction.sqrMagnitude - 1f) < .001f))
+                                !float.IsFinite(shot.Muzzle.x) || !float.IsFinite(shot.Muzzle.y) ||
+                                (finale ? !TargetRangeRoom.IsCardinalShot(shot.direction)
+                                    : !(Mathf.Abs(shot.direction.sqrMagnitude - 1f) < .001f)))
                                 valid = false;
                             previous = shot.time;
                         }
@@ -170,7 +178,7 @@ namespace Golovomka
                                 frame.pistolDrawn = frame.zone == 4;
                                 tape.frames[i] = frame;
                             }
-                    data.version = 7;
+                    data.version = 8;
                     var seenRooms = new HashSet<int>();
                     for (int i = data.tapes.Count - 1; i >= 0; i--)
                         if (!seenRooms.Add(data.tapes[i].room)) data.tapes.RemoveAt(i);
