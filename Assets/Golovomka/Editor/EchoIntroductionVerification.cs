@@ -73,6 +73,17 @@ public static class EchoIntroductionVerification
         m.RestartCycle(); Check(m.zone==0 && !m.recordingActive && m.history.tapes.Count==0,"No recording or R in police station");
         m.Interact(Interaction.EnterLaboratory); Check(m.zone==0,"Phone required");
         Call("Close"); m.Interact(Interaction.AnswerPhone); Call("Close"); m.Interact(Interaction.EnterLaboratory);
+        var fade = GameObject.Find("StationFade").GetComponent<UnityEngine.UI.Image>();
+        Call("AdvanceStationFade", .125f);
+        Check(m.zone == 0 && !m.recordingActive && Mathf.Approximately(fade.color.a, .5f),
+            "Station darkens before the scene switches");
+        Call("AdvanceStationFade", .125f);
+        Check(m.zone == 1 && m.elapsed == 0 && fade.color.a == 1f,
+            "Laboratory activates at full black with a fresh recording");
+        Call("AdvanceStationFade", .125f);
+        Check(m.elapsed == 0 && Mathf.Approximately(fade.color.a, .5f), "Laboratory fades in");
+        Call("AdvanceStationFade", .125f);
+        Check(!fade.gameObject.activeSelf && fade.color.a == 0f, "Fade releases gameplay");
         var intro = UnityEngine.Object.FindAnyObjectByType<Room01Layout>();
         Check(intro && Array.TrueForAll(stationRoots, root => !root.activeSelf), "Laboratory scene active and station roots hidden");
         var rooms = UnityEngine.Object.FindObjectsByType<LaboratoryRoom>(FindObjectsSortMode.None);
@@ -91,6 +102,8 @@ public static class EchoIntroductionVerification
             m.position == (Vector2)station.entrance.position && !m.recordingActive && m.history.tapes.Count == 0,
             "Returning to the station discards the unfinished attempt and restores its scene");
         m.Interact(Interaction.AnswerPhone); Call("Close"); m.Interact(Interaction.EnterLaboratory);
+        Call("AdvanceStationFade", .25f);
+        Call("AdvanceStationFade", .25f);
         Vector2 plate = m.CurrentPlateA;
         var remote = ReachRemote(intro.remote.position);
         Check(intro.gameObject.activeInHierarchy && m.position==spawn && m.recordingActive,"Laboratory scene can be reactivated");
@@ -178,6 +191,18 @@ public static class EchoIntroductionVerification
         Check(Can(b),"Ivan can record A then B without crossing the first door");
         Move(b);
         float timeB = m.elapsed;
+        var camera = Camera.main;
+        float cameraX = camera.transform.position.x;
+        Check(!m.history.room2DoorPreviewSeen && !sequence.first.door.Passage.isTrigger && sequence.second.door.Passage.isTrigger,
+            "Ivan starts the first preview at the exit controlled by the left plate");
+        Call("AdvanceRoom2DoorPreview", .55f);
+        Call("FitRoomCamera", false);
+        Check(Mathf.Abs(camera.transform.position.x - doorB.x) < Mathf.Abs(cameraX - doorB.x) &&
+            m.position == b && m.elapsed == timeB, "Preview moves the camera to B while Ivan and recording stay put");
+        Call("AdvanceRoom2DoorPreview", 1.2f);
+        Check(Mathf.Approximately(camera.transform.position.x, cameraX) &&
+            EchoHistory.Load(m.saveFileOverride)?.room2DoorPreviewSeen == true,
+            "Preview returns the camera and remembers completion in the save");
         m.elapsed += 6;
         m.RestartCycle();
         Check(m.position==(Vector2)room2.entrance.position && m.elapsed==0 && m.history.ForRoom(2).Count==1,
@@ -188,6 +213,8 @@ public static class EchoIntroductionVerification
         Move(between);
         m.elapsed=timeB; m.UpdateGhosts();
         Check(!m.plateA && m.plateB && Can(doorB), "Copy opens B only");
+        Check(typeof(EchoMvp).GetField("room2PreviewDoor", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(m) == null,
+            "Playback does not repeat the door preview");
         CrossDoor(room2, sequence.second.door);
         var room3 = rooms.Single(room => room.roomNumber == 3);
         var buttons = room3.GetComponent<TimedButtonsRoom>();

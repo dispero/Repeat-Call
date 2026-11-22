@@ -57,6 +57,7 @@ namespace Golovomka
         public bool manualRecording;
         public bool completed;
         public bool firstReturnSeen, remoteObtained;
+        public bool room2DoorPreviewSeen;
         public List<EchoTape> tapes = new List<EchoTape>(); // Oldest first.
         public List<EchoTape> ForRoom(int room)
         {

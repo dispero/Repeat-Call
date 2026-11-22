@@ -11,6 +11,41 @@ namespace Golovomka
         [SerializeField, Min(.01f)] float laboratoryCameraSmoothTime = .22f;
         Bounds laboratoryCameraBounds;
         float laboratoryCameraVelocity;
+        const float DoorPreviewPan = .55f;
+        const float DoorPreviewHold = .65f;
+        SlidingDoor room2PreviewDoor;
+        float doorPreviewTime;
+        float doorPreviewStartX;
+
+        void BeginRoom2DoorPreview(SlidingDoor door)
+        {
+            room2PreviewDoor = door;
+            doorPreviewTime = 0f;
+            doorPreviewStartX = roomCamera.transform.position.x;
+            laboratoryCameraVelocity = 0f;
+        }
+
+        void AdvanceRoom2DoorPreview(float deltaTime)
+        {
+            float previous = doorPreviewTime;
+            doorPreviewTime += deltaTime;
+            if (previous < DoorPreviewPan && doorPreviewTime >= DoorPreviewPan)
+                room2PreviewDoor.SetOpen(true);
+            if (doorPreviewTime < 2 * DoorPreviewPan + DoorPreviewHold) return;
+
+            FitRoomCamera();
+            room2PreviewDoor = null;
+            history.room2DoorPreviewSeen = true;
+            Save();
+        }
+
+        float Room2PreviewCameraX(float minX, float maxX)
+        {
+            float doorX = Mathf.Clamp(room2PreviewDoor.Passage.bounds.center.x, minX, maxX);
+            float atDoor = Mathf.Min(doorPreviewTime / DoorPreviewPan,
+                (2 * DoorPreviewPan + DoorPreviewHold - doorPreviewTime) / DoorPreviewPan);
+            return Mathf.SmoothStep(Mathf.Clamp(doorPreviewStartX, minX, maxX), doorX, atDoor);
+        }
 
         void CacheLaboratoryCameraBounds()
         {
@@ -45,7 +80,11 @@ namespace Golovomka
             float minX = Mathf.Min(bounds.center.x, bounds.min.x + halfWidth);
             float maxX = Mathf.Max(bounds.center.x, bounds.max.x - halfWidth);
             float cameraX = Mathf.Clamp(roomCamera.transform.position.x, minX, maxX);
-            if (snap)
+            if (room2PreviewDoor)
+            {
+                cameraX = Room2PreviewCameraX(minX, maxX);
+            }
+            else if (snap)
             {
                 laboratoryCameraVelocity = 0;
                 cameraX = Mathf.Clamp(position.x, minX, maxX);

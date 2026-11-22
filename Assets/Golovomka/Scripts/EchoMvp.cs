@@ -47,6 +47,9 @@ namespace Golovomka
         Text stationExitLabel;
         int selection;
         bool phoneRead;
+        const float StationFadeDuration = .25f;
+        UnityEngine.UI.Image stationFade;
+        float stationFadeTime;
         float nextSample;
         PoliceStationLayout station;
         Room01Layout room01;
@@ -169,6 +172,7 @@ namespace Golovomka
         public void BeginCycle()
         {
             facing = 3; phoneRead = false; mode = "play";
+            titleScreen.SetActive(false);
             ActivateRoom(null);
             panel.gameObject.SetActive(false);
         }
@@ -191,9 +195,24 @@ namespace Golovomka
         void Update()
         {
             if (!canvas) return;
+            if (stationFade.gameObject.activeSelf)
+            {
+                AdvanceStationFade(Time.unscaledDeltaTime);
+                return;
+            }
+            if (room2PreviewDoor)
+            {
+                AdvanceRoom2DoorPreview(Mathf.Min(Time.unscaledDeltaTime, .05f));
+                return;
+            }
             var k = Keyboard.current; if (k == null) return;
             bool enter = k.enterKey.wasPressedThisFrame || k.numpadEnterKey.wasPressedThisFrame;
-            if (mode == "menu" || mode == "pause" || mode == "confirm")
+            if (mode == "menu" || mode == "confirm")
+            {
+                UpdateTitleMenu(k, enter);
+                return;
+            }
+            if (mode == "pause")
             {
                 string[] choices = Choices();
                 if (k.downArrowKey.wasPressedThisFrame || k.sKey.wasPressedThisFrame) selection = (selection + 1) % choices.Length;
@@ -209,6 +228,7 @@ namespace Golovomka
             if (k.rKey.wasPressedThisFrame) { RestartCycle(); return; }
             float dt = Mathf.Min(Time.deltaTime, .05f); if (recordingActive) elapsed += dt;
             UpdateGhosts();
+            if (room2PreviewDoor) return;
             Vector2 move = new Vector2((k.dKey.isPressed || k.rightArrowKey.isPressed ? 1 : 0) - (k.aKey.isPressed || k.leftArrowKey.isPressed ? 1 : 0),
                 (k.wKey.isPressed || k.upArrowKey.isPressed ? 1 : 0) - (k.sKey.isPressed || k.downArrowKey.isPressed ? 1 : 0));
             Vector2 previousPosition = position;
@@ -227,7 +247,7 @@ namespace Golovomka
             var target = Nearby();
             prompt.text = target == Interaction.None ? (history.remoteObtained && currentRoom ? "WASD — идти    E — осмотр    R — вернуться к точке пульта    ESC — пауза" : "WASD / СТРЕЛКИ — идти    E — осмотр    ESC — пауза") : "[ E ]  " +
                 (target == Interaction.UseRoomPassage ? FindPassage().label : InteractionLabel(target));
-            if (k.eKey.wasPressedThisFrame && target != Interaction.None) Interact(target);
+            if (!room2PreviewDoor && k.eKey.wasPressedThisFrame && target != Interaction.None) Interact(target);
             HUD();
         }
         public void Record() { if (recordingActive && zone > 0) recording.frames.Add(new EchoFrame(elapsed, position, zone, facing)); }
@@ -245,6 +265,9 @@ namespace Golovomka
             plateA = hasPlateA && EchoHistory.OnPlate(actor, CurrentPlateA);
             plateB = currentSequence &&
                 EchoHistory.OnPlate(actor, currentSequence.second.plate.transform.position);
+            bool previewDoor = zone == 2 && currentSequence && plateB && autoFitRoom &&
+                !history.room2DoorPreviewSeen && !room2PreviewDoor && !immediateDoor;
+            bool showOpening = previewDoor && !currentSequence.second.door.Passage.isTrigger;
             var tapes = ActiveTapes;
             for (int i = 0; i < ghosts.Length; i++)
             {
@@ -277,6 +300,13 @@ namespace Golovomka
                 if (!sequence.isActiveAndEnabled) continue;
                 sequence.Apply(sequence == currentSequence && plateA, sequence == currentSequence && plateB,
                     feet, immediateDoor);
+            }
+            if (previewDoor)
+            {
+                var door = currentSequence.second.door;
+                // Откладываем движение створок до момента, когда дверь окажется в кадре.
+                if (showOpening) door.SetOpen(false);
+                BeginRoom2DoorPreview(door);
             }
         }
 
@@ -325,6 +355,7 @@ namespace Golovomka
 
         public void Interact(Interaction target)
         {
+            if (stationFade.gameObject.activeSelf) return;
             switch (target)
             {
                 case Interaction.InspectRemote:
@@ -343,8 +374,32 @@ namespace Golovomka
                 case Interaction.AnswerPhone: phoneRead = true; Dialog("АВТОМАТИЧЕСКИЙ ВЫЗОВ", "Лаборатория в подвале предприятия. Сработала система безопасности. Автоматический вызов полиции.\n\nИван узнаёт адрес: здесь работают его отец и брат. Выход из участка справа у дальней стены."); break;
                 case Interaction.EnterLaboratory:
                     if (!phoneRead) { Dialog("ДЕЖУРНЫЙ", "Сначала ответьте на телефон. Поступил вызов."); break; }
-                    ActivateRoom(introductionRoom);
+                    stationFadeTime = 0;
+                    stationFade.color = Color.clear;
+                    stationFade.transform.SetAsLastSibling();
+                    stationFade.gameObject.SetActive(true);
                     break;
+            }
+        }
+
+        void AdvanceStationFade(float deltaTime)
+        {
+            stationFadeTime += deltaTime;
+            float progress = Mathf.Clamp01(stationFadeTime / StationFadeDuration);
+            bool leavingStation = zone == 0;
+            float opacity = Mathf.SmoothStep(0, 1, progress);
+            stationFade.color = new Color(0, 0, 0, leavingStation ? opacity : 1 - opacity);
+            if (progress < 1) return;
+
+            if (leavingStation)
+            {
+                ActivateRoom(introductionRoom);
+                prompt.text = "";
+                stationFadeTime = 0;
+            }
+            else
+            {
+                stationFade.gameObject.SetActive(false);
             }
         }
         void HUD()
@@ -371,6 +426,7 @@ namespace Golovomka
 
         void ActivateRoom(LaboratoryRoom targetRoom, Transform arrival = null, bool keepPosition = false)
         {
+            room2PreviewDoor = null;
             bool enteringLaboratory = targetRoom && !currentRoom;
             currentRoom = targetRoom;
             currentSequence = targetRoom ? targetRoom.GetComponent<SequenceRoomLayout>() : null;
@@ -446,23 +502,25 @@ namespace Golovomka
             dialogBody = Text("Body", panel, new Vector2(820, 340), new Vector2(0, -20), 21, new Color(.86f, .9f, .89f));
             menu = Text("Menu", panel, new Vector2(820, 210), new Vector2(0, -70), 23, Color.white);
             ArrangeOverlayHUD();
+            CreateTitleMenu();
+            var fadeObject = new GameObject("StationFade", typeof(RectTransform), typeof(UnityEngine.UI.Image));
+            stationFade = fadeObject.GetComponent<UnityEngine.UI.Image>();
+            var fadeRect = stationFade.rectTransform;
+            fadeRect.SetParent(canvas.transform, false);
+            fadeRect.anchorMin = Vector2.zero;
+            fadeRect.anchorMax = Vector2.one;
+            fadeRect.offsetMin = fadeRect.offsetMax = Vector2.zero;
+            stationFade.raycastTarget = false;
+            fadeObject.SetActive(false);
         }
         void Panel(string title, string body) { panel.gameObject.SetActive(true); panel.SetAsLastSibling(); dialogTitle.text = title; dialogBody.text = body; menu.text = ""; }
         void Dialog(string title, string body) { mode = "dialog"; Panel(title, body + "\n\nE / ENTER — продолжить"); }
         void Close() { mode = "play"; panel.gameObject.SetActive(false); }
-        void ShowMenu() { mode = "menu"; selection = 0; Panel("GOLOVOMKA / ЭХО", "Лаборатория захвачена. Ваш прошлый путь может помочь вам сейчас."); MenuText(); }
-        string[] Choices() { return mode == "confirm" ? new[] { "Новая игра — заменить сохранение", "Отмена" } : mode == "pause" ? new[] { "Продолжить", "Вернуться к входу комнаты", "Главное меню", "Выход" } : new[] { "Продолжить", "Новая игра", "Выход" }; }
+        string[] Choices() => new[] { "Продолжить", "Вернуться к входу комнаты", "Главное меню", "Выход" };
         void MenuText() { var items = Choices(); menu.text = ""; for (int i = 0; i < items.Length; i++) menu.text += (i == selection ? ">  " : "    ") + items[i] + "\n"; }
         void Select()
         {
-            if (mode == "confirm") { if (selection == 0) { history = new EchoHistory(); Save(); BeginCycle(); } else ShowMenu(); return; }
-            if (mode == "pause")
-            {
-                if (selection == 0) Close(); else if (selection == 1) RestartCycle(); else if (selection == 2) ShowMenu(); else Application.Quit(); return;
-            }
-            if (selection == 0) { history = EchoHistory.Load() ?? new EchoHistory(); BeginCycle(); }
-            else if (selection == 1) { mode = "confirm"; selection = 1; Panel("НОВАЯ ИГРА", "Существующие записи и прогресс будут заменены."); MenuText(); }
-            else Application.Quit();
+            if (selection == 0) Close(); else if (selection == 1) RestartCycle(); else if (selection == 2) ShowMenu(); else Application.Quit();
         }
     }
 }
