@@ -36,7 +36,7 @@ namespace Golovomka
         [SerializeField, Min(0)] float moveSpeed = 3.6f;
         Vector3 heroBaseScale;
         CharacterWalk officerWalk;
-        readonly SpriteRenderer[] ghosts = new SpriteRenderer[LaboratoryRoom.MaxCopies];
+        SpriteRenderer ghost;
         static readonly Vector2 FeetSize = new Vector2(.44f, .28f);
         static readonly ContactFilter2D SolidContacts = new ContactFilter2D { useTriggers = false };
         readonly List<Collider2D> overlapHits = new List<Collider2D>();
@@ -63,6 +63,12 @@ namespace Golovomka
         readonly List<SequenceRoomLayout> sequences = new List<SequenceRoomLayout>();
         SequenceRoomLayout currentSequence;
         TimedButtonsRoom currentButtons;
+        TargetRangeRoom currentRange;
+        TargetRangeRoom pistolArt;
+        bool pistolDrawn;
+        bool CanDrawPistol => zone >= 4 && pistolArt;
+        Vector2 ShotDirection => OfficerDirection(facing);
+        bool officerMoving;
         LaboratoryRoom introductionRoom, currentRoom;
         GameObject[] stationRoots, laboratoryRoots;
         Color amber = new Color(1, .74f, .36f);
@@ -102,16 +108,22 @@ namespace Golovomka
             foreach (var root in laboratoryRoots)
             foreach (var room in root.GetComponentsInChildren<LaboratoryRoom>(true))
             {
-                if (room.TryGetComponent<TimedButtonsRoom>(out var buttons) && (!buttons.IsConfigured || room.copyLimit != 1))
+                if (room.TryGetComponent<TimedButtonsRoom>(out var buttons) && !buttons.IsConfigured)
                 {
-                    Debug.LogError("Проверьте кнопки, табло, дверь и лимит копий комнаты.", room);
+                    Debug.LogError("Проверьте кнопки, табло и дверь комнаты.", room);
                     yield break;
                 }
+                if (room.TryGetComponent<TargetRangeRoom>(out var range) && !range.IsConfigured)
+                {
+                    Debug.LogError("Назначьте мишени, индикаторы, стену, дверь и спрайты пистолета тира.", room);
+                    yield break;
+                }
+                if (range) pistolArt = range;
                 if (room.TryGetComponent<SequenceRoomLayout>(out var puzzle))
                 {
-                    if (!puzzle.IsConfigured || (puzzle.requireBothPlates && room.copyLimit != LaboratoryRoom.MaxCopies))
+                    if (!puzzle.IsConfigured)
                     {
-                        Debug.LogError("Проверьте ссылки плит, дверей и лимит копий комнаты.", puzzle);
+                        Debug.LogError("Проверьте ссылки плит и дверей комнаты.", puzzle);
                         yield break;
                     }
                     sequences.Add(puzzle);
@@ -119,7 +131,7 @@ namespace Golovomka
                 if (!room.entrance || room.roomNumber < 1 || room.roomNumber > EchoHistory.MaxRoomNumber ||
                     rooms.ContainsKey(room.roomNumber))
                 {
-                    Debug.LogError("Задайте точку входа и уникальный номер комнаты от 1 до 4.", room);
+                    Debug.LogError("Задайте точку входа и уникальный номер комнаты от 1 до 5.", room);
                     yield break;
                 }
                 rooms.Add(room.roomNumber, room);
@@ -132,15 +144,11 @@ namespace Golovomka
 
             Application.targetFrameRate = 60;
             font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            for (int i = 0; i < ghosts.Length; i++)
-            {
-                var ghost = new GameObject("Echo" + i, typeof(SpriteRenderer)).GetComponent<SpriteRenderer>();
-                ghost.transform.SetParent(transform, false);
-                ghost.sharedMaterial = hero.sharedMaterial;
-                ghost.color = new Color(.3f, .85f, 1, .55f);
-                ghost.enabled = false;
-                ghosts[i] = ghost;
-            }
+            ghost = new GameObject("Echo", typeof(SpriteRenderer)).GetComponent<SpriteRenderer>();
+            ghost.transform.SetParent(transform, false);
+            ghost.sharedMaterial = hero.sharedMaterial;
+            ghost.color = new Color(.3f, .85f, 1, .55f);
+            ghost.enabled = false;
             UI();
             history = EchoHistory.Load() ?? new EchoHistory();
             BeginCycle();
@@ -243,6 +251,8 @@ namespace Golovomka
             if (room2PreviewDoor) return;
             Vector2 move = new Vector2((k.dKey.isPressed || k.rightArrowKey.isPressed ? 1 : 0) - (k.aKey.isPressed || k.leftArrowKey.isPressed ? 1 : 0),
                 (k.wKey.isPressed || k.upArrowKey.isPressed ? 1 : 0) - (k.sKey.isPressed || k.downArrowKey.isPressed ? 1 : 0));
+            bool toggledPistol = CanDrawPistol && k.qKey.wasPressedThisFrame;
+            if (toggledPistol) pistolDrawn = !pistolDrawn;
             Vector2 previousPosition = position;
             if (move != Vector2.zero)
             {
@@ -251,18 +261,31 @@ namespace Golovomka
                 Vector2 step = position + new Vector2(delta.x, 0); if (CanMove(step)) position = step;
                 step = position + new Vector2(0, delta.y); if (CanMove(step)) position = step;
             }
-            hero.sprite = OfficerFrame(facing, position != previousPosition, Time.time);
+            if (pistolDrawn && currentRange && recordingActive)
+            {
+                Vector2 origin = position + Vector2.up * TargetRangeRoom.MuzzleHeight;
+                if (k.spaceKey.wasPressedThisFrame || (Mouse.current?.leftButton.wasPressedThisFrame ?? false))
+                    currentRange.Shoot(origin, ShotDirection, elapsed, recording);
+            }
+            officerMoving = position != previousPosition;
+            hero.sprite = officerWalk.GetFrame(facing, officerMoving, Time.time);
             Place(hero, position); UpdateGhosts();
             var crossing = FindCrossing(previousPosition);
             if (crossing != null) { UsePassage(crossing); return; }
-            if (recordingActive && elapsed >= nextSample) { Record(); nextSample = elapsed + .05f; }
+            if (recordingActive && (toggledPistol || elapsed >= nextSample)) { Record(); nextSample = elapsed + .05f; }
             var target = Nearby();
             prompt.text = target == Interaction.None ? (history.remoteObtained && currentRoom ? "WASD — идти    E — осмотр    R — вернуться к точке пульта    ESC — пауза" : "WASD / СТРЕЛКИ — идти    E — осмотр    ESC — пауза") : "[ E ]  " +
                 (target == Interaction.UseRoomPassage ? FindPassage().label : InteractionLabel(target));
+            if (CanDrawPistol) prompt.text += pistolDrawn ? "    Q — убрать пистолет" : "    Q — достать пистолет";
+            if (currentRange && pistolDrawn) prompt.text += "    ЛКМ / ПРОБЕЛ — выстрел";
             if (!room2PreviewDoor && k.eKey.wasPressedThisFrame && target != Interaction.None) Interact(target);
             HUD();
         }
-        public void Record() { if (recordingActive && zone > 0) recording.frames.Add(new EchoFrame(elapsed, position, zone, facing)); }
+        public void Record()
+        {
+            if (recordingActive && zone > 0)
+                recording.frames.Add(new EchoFrame(elapsed, position, zone, facing, ShotDirection, pistolDrawn));
+        }
         void Place(SpriteRenderer sprite, Vector2 p)
         {
             sprite.transform.position = new Vector3(Mathf.Round(p.x * 16) / 16, Mathf.Round(p.y * 16) / 16, 0);
@@ -280,20 +303,22 @@ namespace Golovomka
             bool previewDoor = zone == 2 && currentSequence && plateB && autoFitRoom &&
                 !history.room2DoorPreviewSeen && !room2PreviewDoor && !immediateDoor;
             bool showOpening = previewDoor && !currentSequence.second.door.Passage.isTrigger;
-            var tapes = ActiveTapes;
-            for (int i = 0; i < ghosts.Length; i++)
+            var tape = ActiveTape;
+            ghost.enabled = false;
+            Vector2 copyDirection = Vector2.up;
+            bool copyMoving = false;
+            bool copyPistolDrawn = false;
+            if (recordingActive && tape != null && tape.Sample(elapsed, out var frame) && frame.zone == zone)
             {
-                var ghost = ghosts[i];
-                ghost.enabled = false;
-                if (!recordingActive || !currentRoom || i >= currentRoom.copyLimit || i >= tapes.Count) continue;
-                var tape = tapes[tapes.Count - i - 1];
-                if (!tape.Sample(elapsed, out var frame) || frame.zone != zone) continue;
                 ghost.enabled = true;
-                bool moving = tape.Sample(Mathf.Max(0, elapsed - .08f), out var previous)
+                copyPistolDrawn = frame.pistolDrawn;
+                var copyPosition = new Vector2(frame.x, frame.y);
+                copyMoving = tape.Sample(Mathf.Max(0, elapsed - .08f), out var previous)
                     && previous.zone == frame.zone
-                    && new Vector2(frame.x - previous.x, frame.y - previous.y).sqrMagnitude > .0001f;
-                Place(ghost, new Vector2(frame.x, frame.y));
-                ghost.sprite = OfficerFrame(frame.facing, moving, elapsed);
+                    && (copyPosition - new Vector2(previous.x, previous.y)).sqrMagnitude > .0001f;
+                copyDirection = OfficerDirection(frame.facing);
+                Place(ghost, copyPosition);
+                ghost.sprite = officerWalk.GetFrame(frame.facing, copyMoving, elapsed);
                 if (hasPlateA) plateA |= EchoHistory.OnPlate(frame, CurrentPlateA);
                 if (currentSequence) plateB |= EchoHistory.OnPlate(frame, currentSequence.second.plate.transform.position);
             }
@@ -302,11 +327,20 @@ namespace Golovomka
             var feet = new Bounds(FeetCenter(position), FeetSize);
             if (currentButtons)
             {
-                if (recordingActive && tapes.Count > 0)
-                    currentButtons.Replay(tapes[tapes.Count - 1], elapsed);
+                if (recordingActive && tape != null) currentButtons.Replay(tape, elapsed);
                 currentButtons.Show(elapsed);
                 currentButtons.exitDoor.SetPassage(currentButtons.Solved, feet, immediateDoor);
             }
+            if (currentRange)
+            {
+                if (recordingActive) currentRange.Replay(tape, elapsed);
+                currentRange.Show(elapsed);
+                currentRange.ShowPistols(hero, ShotDirection, officerMoving, pistolDrawn,
+                    ghost, copyDirection, copyMoving, copyPistolDrawn, elapsed);
+                currentRange.exitDoor.SetPassage(currentRange.Solved, feet, immediateDoor);
+            }
+            else if (CanDrawPistol && pistolDrawn)
+                hero.sprite = pistolArt.GetPistolPose(ShotDirection, officerMoving, Time.time);
             foreach (var sequence in sequences)
             {
                 if (!sequence.isActiveAndEnabled) continue;
@@ -418,34 +452,39 @@ namespace Golovomka
         }
         void HUD()
         {
-            var tapes = ActiveTapes;
+            var tape = ActiveTape;
             heading.text = zone == 0 ? "ПОЛИЦЕЙСКИЙ УЧАСТОК" : "ПОДВАЛ / КОМНАТА " + zone;
             objective.text = zone == 0 ? "Ответить на вызов и отправиться к отцу"
+                : currentRange ? currentRange.Objective(tape != null)
                 : currentRoom != introductionRoom ? currentRoom.objective
                 : history.remoteObtained ? "Оставьте копию на панели и пройдите дверь справа"
                 : history.firstReturnSeen ? "Копия повторяет ваш путь. Заберите пульт у стола" : "Осмотрите комнату и пульт, появившийся из-под стола";
             status.text = "ЦИКЛ " + history.cycle.ToString("00") + "   •   " + (recordingActive ? "ЗАПИСЬ " + elapsed.ToString("0.0") + " с" : "ЗАПИСЬ НЕ АКТИВНА");
-            if (currentRoom && !currentRoom.disableRecording) status.text += "   /   КОПИЙ: " + currentRoom.copyLimit;
-            status.text += "\n";
-            for (int i = 0; currentRoom && i < currentRoom.copyLimit && i < tapes.Count; i++)
-            {
-                if (i > 0) status.text += "   ";
-                status.text += "КОПИЯ: " + Mathf.Max(0, tapes[tapes.Count - i - 1].duration - elapsed).ToString("0.0") + " с";
-            }
+            if (currentRoom && !currentRoom.disableRecording) status.text += "   /   КОПИЙ: 1";
+            if (currentRoom && tape != null)
+                status.text += "\nКОПИЯ: " + Mathf.Max(0, tape.duration - elapsed).ToString("0.0") + " с";
             if (currentRoom && (currentRoom == introductionRoom || currentSequence))
                 status.text += "\nПЛИТА А: " + (plateA ? "АКТИВНА" : "—");
             if (currentSequence) status.text += "   ПЛИТА Б: " + (plateB ? "АКТИВНА" : "—");
             if (currentButtons) status.text += "\n" + currentButtons.Status(elapsed);
+            if (currentRange) status.text += "\n" + currentRange.Status(elapsed, tape != null);
         }
 
         void ActivateRoom(LaboratoryRoom targetRoom, Transform arrival = null, bool keepPosition = false)
         {
             room2PreviewDoor = null;
             bool enteringLaboratory = targetRoom && !currentRoom;
+            if (currentRange)
+            {
+                currentRange.Hide();
+                currentRange.exitDoor.SetPassage(history.returnRoom > zone, new Bounds(FeetCenter(position), FeetSize), true);
+            }
             currentRoom = targetRoom;
             currentSequence = targetRoom ? targetRoom.GetComponent<SequenceRoomLayout>() : null;
             currentButtons = targetRoom ? targetRoom.GetComponent<TimedButtonsRoom>() : null;
+            currentRange = targetRoom ? targetRoom.GetComponent<TargetRangeRoom>() : null;
             zone = targetRoom ? targetRoom.roomNumber : 0;
+            if (!keepPosition || !CanDrawPistol) pistolDrawn = false;
             bool inStation = !targetRoom;
             SetRoomVisible(inStation ? laboratoryRoots : stationRoots, false);
             SetRoomVisible(inStation ? stationRoots : laboratoryRoots, true);
@@ -462,6 +501,7 @@ namespace Golovomka
             }
             else ResetRoomRecording();
             if (currentButtons) currentButtons.ResetAttempt(history.returnRoom > zone);
+            if (currentRange) currentRange.ResetAttempt(history.returnRoom > zone);
 
             stationExitLabel.enabled = inStation;
             if (enteringLaboratory) CacheLaboratoryCameraBounds();
@@ -485,10 +525,11 @@ namespace Golovomka
 
         void RefreshActors()
         {
-            hero.sprite = OfficerFrame(facing, false, 0);
+            officerMoving = false;
+            hero.sprite = officerWalk.GetFrame(facing, false, 0);
             hero.transform.localScale = heroBaseScale * (zone > 0 ? .65f : 1f);
             Place(hero, position);
-            foreach (var ghost in ghosts) ghost.transform.localScale = hero.transform.localScale;
+            ghost.transform.localScale = hero.transform.localScale;
             UpdateGhosts(immediateDoor: true);
             HUD();
         }

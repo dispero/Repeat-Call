@@ -335,15 +335,16 @@ MonoBehaviour:
     version: 3
     cycle: 1
     returnRoom: 0
-    copySlots: 1
-    manualRecording: 0
     completed: 0
     firstReturnSeen: 0
     remoteObtained: 0
+    room2DoorPreviewSeen: 0
     tapes: []
   recording:
     room: 0
     frames: []
+    buttonPresses: []
+    shots: []
     duration: 0
   elapsed: 0
   zone: 0
@@ -440,10 +441,10 @@ Camera:
   m_LensShift: {x: 0, y: 0}
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0.09905893
-    y: 0.23939808
-    width: 0.5943536
-    height: 0.61559504
+    x: 0.054753978
+    y: 0.027948977
+    width: 0.89091223
+    height: 0.943278
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 60

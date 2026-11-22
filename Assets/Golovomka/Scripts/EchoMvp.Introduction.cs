@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Golovomka
@@ -8,7 +7,16 @@ namespace Golovomka
         public Vector2 CurrentPlateA => currentSequence
             ? currentSequence.first.plate.transform.position
             : room01.plateOverlay.transform.position;
-        List<EchoTape> ActiveTapes => history.ForRoom(zone);
+        EchoTape ActiveTape
+        {
+            get
+            {
+                var tape = history.ForRoom(zone);
+                // Старая серия с диагональными попаданиями может требовать другой позиции для выстрела.
+                return currentRange && tape != null && tape.shots.Exists(shot => !TargetRangeRoom.IsCardinalShot(shot.direction))
+                    ? null : tape;
+            }
+        }
 
         void UpdateIntroductionVisuals(bool immediate = false)
         {
@@ -49,9 +57,13 @@ namespace Golovomka
                 if (currentButtons && recording.buttonPresses.Count > 0 &&
                     recording.buttonPresses[recording.buttonPresses.Count - 1].time >= elapsed)
                     elapsed += .001f;
+                if (currentRange && recording.shots.Count > 0 &&
+                    recording.shots[recording.shots.Count - 1].time >= elapsed)
+                    elapsed += .001f;
                 Record(); recording.duration = elapsed;
-                if (elapsed > 0 && (!currentButtons || recording.buttonPresses.Count > 0))
-                    history.Push(recording, currentRoom.copyLimit);
+                if (elapsed > 0 && (!currentButtons || recording.buttonPresses.Count > 0) &&
+                    (!currentRange || currentRange.HasCompleteRecording))
+                    history.Push(recording);
                 else history.cycle++;
             }
             else history.cycle++;

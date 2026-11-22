@@ -5,6 +5,14 @@ namespace Golovomka
 {
     public partial class EchoMvp
     {
+        static Vector2 OfficerDirection(int direction) => direction switch
+        {
+            0 => Vector2.right,
+            1 => Vector2.left,
+            2 => Vector2.up,
+            _ => Vector2.down
+        };
+
         void UpdateOfficerFacing(Vector2 move, Keyboard keyboard)
         {
             int horizontal = move.x > 0 ? 0 : 1;
@@ -25,9 +33,5 @@ namespace Golovomka
                 facing = vertical;
         }
 
-        Sprite OfficerFrame(int direction, bool moving, float time)
-        {
-            return officerWalk.GetFrame(direction, moving, time);
-        }
     }
 }

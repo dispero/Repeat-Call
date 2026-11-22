@@ -8,14 +8,12 @@ namespace Golovomka
     public sealed class LaboratoryRoom : MonoBehaviour
     {
         public const string ScenePath = "Assets/Golovomka/Scenes/Laboratory.unity";
-        public const int MaxCopies = 2;
 
         [Min(1)] public int roomNumber = 1;
         public Transform entrance;
         public BoxCollider2D cameraArea;
         public Vector2 cameraSize;
         [Min(0)] public float previewWidth;
-        [Range(1, MaxCopies)] public int copyLimit = 1;
         public bool disableRecording;
         [TextArea] public string objective;
         public Passage[] passages = Array.Empty<Passage>();

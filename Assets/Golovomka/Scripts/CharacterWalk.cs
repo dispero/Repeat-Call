@@ -6,7 +6,11 @@ namespace Golovomka
     [DisallowMultipleComponent, RequireComponent(typeof(SpriteRenderer))]
     public sealed class CharacterWalk : MonoBehaviour
     {
-        [SerializeField, Tooltip("Четыре кадра на направление: вправо, влево, назад, вперёд.")]
+        const int CardinalDirectionCount = 4;
+        const int CardinalFrameCount = CardinalDirectionCount * CharacterWalkCycle.FramesPerDirection;
+        const int DiagonalPoseFrameCount = CardinalFrameCount + CardinalDirectionCount;
+
+        [SerializeField, Tooltip("По четыре кадра: вправо, влево, назад, вперёд. Затем, если есть, по одной позе или по четыре кадра для диагоналей: вверх-вправо, вверх-влево, вниз-влево, вниз-вправо.")]
         Sprite[] frames = Array.Empty<Sprite>();
 
         SpriteRenderer spriteRenderer;
@@ -14,9 +18,30 @@ namespace Golovomka
         float walkTime;
         int direction;
 
-        internal bool IsConfigured => frames.Length == CharacterWalkCycle.FrameCount && Array.TrueForAll(frames, frame => frame);
+        bool HasDiagonalPosesOnly => frames.Length == DiagonalPoseFrameCount;
+        int DirectionCount => HasDiagonalPosesOnly ? 8 : frames.Length / CharacterWalkCycle.FramesPerDirection;
 
-        internal Sprite GetFrame(int facing, bool moving, float time) => frames[CharacterWalkCycle.FrameIndex(facing, moving, time)];
+        internal bool IsConfigured =>
+            (frames.Length == CardinalFrameCount || HasDiagonalPosesOnly || frames.Length == 2 * CardinalFrameCount) &&
+            Array.TrueForAll(frames, frame => frame);
+
+        internal int GetFacing(Vector2 look, int fallback)
+        {
+            if (DirectionCount != 8 || look == Vector2.zero) return fallback;
+            return CharacterWalkCycle.Octant(look) switch
+            {
+                0 => 0, 1 => 4, 2 => 2, 3 => 5,
+                4 => 1, 5 => 6, 6 => 3, _ => 7
+            };
+        }
+
+        internal Sprite GetFrame(int facing, bool moving, float time)
+        {
+            if (HasDiagonalPosesOnly && facing >= CardinalDirectionCount)
+                return frames[CardinalFrameCount + Mathf.Min(facing, DirectionCount - 1) - CardinalDirectionCount];
+
+            return frames[CharacterWalkCycle.FrameIndex(facing, DirectionCount, moving, time)];
+        }
 
         void OnEnable()
         {
@@ -46,7 +71,7 @@ namespace Golovomka
                 int sideways = displacement.x > 0 ? 0 : 1;
                 int forwards = displacement.y > 0 ? 2 : 3;
                 bool useHorizontal = Mathf.Approximately(horizontal, vertical) ? direction == sideways : horizontal > vertical;
-                direction = useHorizontal ? sideways : forwards;
+                direction = GetFacing(displacement, useHorizontal ? sideways : forwards);
             }
             else
                 walkTime = 0;
