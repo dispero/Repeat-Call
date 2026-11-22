@@ -241,7 +241,7 @@ public static class EchoIntroductionVerification
         var room4 = rooms.Single(room => room.roomNumber == 4);
         var shared = room4.GetComponent<SequenceRoomLayout>();
         Check(m.zone == 4 && m.history.returnRoom == 4 && room4.copyLimit == 2 &&
-            shared.requireBothCopies && shared.IsConfigured, "The next room unlocks two copies");
+            shared.requireBothPlates && shared.IsConfigured, "The next room unlocks two copies");
         Vector2 sharedA = shared.first.plate.transform.position;
         Vector2 sharedB = shared.second.plate.transform.position;
         var sharedDoor = shared.first.door.Passage;
@@ -251,11 +251,12 @@ public static class EchoIntroductionVerification
         m.RestartCycle();
         Check(m.zone == 4 && m.position == (Vector2)room4.entrance.position, "R returns to the saved room");
         Move(sharedA);
+        Check(m.plateA && !m.plateB && !sharedDoor.isTrigger, "Ivan activates A without opening the shared door");
         m.elapsed = 6;
         m.RestartCycle();
         Move(sharedB);
-        Check(m.plateA && !m.plateB && !sharedDoor.isTrigger,
-            "One copy and the player cannot open the door");
+        Check(m.plateA && m.plateB && sharedDoor.isTrigger,
+            "One copy and Ivan can open the shared door together");
         m.elapsed = 8;
         m.RestartCycle();
         Check(m.elapsed == 0 && m.position == (Vector2)room4.entrance.position &&

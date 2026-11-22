@@ -100,7 +100,7 @@ namespace Golovomka
                 }
                 if (room.TryGetComponent<SequenceRoomLayout>(out var puzzle))
                 {
-                    if (!puzzle.IsConfigured || (puzzle.requireBothCopies && room.copyLimit != LaboratoryRoom.MaxCopies))
+                    if (!puzzle.IsConfigured || (puzzle.requireBothPlates && room.copyLimit != LaboratoryRoom.MaxCopies))
                     {
                         Debug.LogError("Проверьте ссылки плит, дверей и лимит копий комнаты.", puzzle);
                         yield break;
@@ -242,9 +242,8 @@ namespace Golovomka
         {
             var actor = new EchoFrame(0, position, zone, facing);
             bool hasPlateA = currentRoom && (currentRoom == introductionRoom || currentSequence);
-            bool playerPressesPlates = !currentSequence || !currentSequence.requireBothCopies;
-            plateA = playerPressesPlates && hasPlateA && EchoHistory.OnPlate(actor, CurrentPlateA);
-            plateB = playerPressesPlates && currentSequence &&
+            plateA = hasPlateA && EchoHistory.OnPlate(actor, CurrentPlateA);
+            plateB = currentSequence &&
                 EchoHistory.OnPlate(actor, currentSequence.second.plate.transform.position);
             var tapes = ActiveTapes;
             for (int i = 0; i < ghosts.Length; i++)

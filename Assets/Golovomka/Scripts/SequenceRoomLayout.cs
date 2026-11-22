@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Golovomka
 {
@@ -25,13 +26,14 @@ namespace Golovomka
         }
 
         public Gate first = new Gate(), second = new Gate();
-        public bool requireBothCopies;
+        [FormerlySerializedAs("requireBothCopies")]
+        public bool requireBothPlates;
         public bool IsConfigured => first.IsConfigured && second.IsConfigured &&
-            (requireBothCopies ? first.door == second.door : first.door != second.door);
+            (requireBothPlates ? first.door == second.door : first.door != second.door);
 
         public void Apply(bool plateA, bool plateB, Bounds feet, bool immediate)
         {
-            if (requireBothCopies)
+            if (requireBothPlates)
             {
                 first.ShowSignal(plateA);
                 second.ShowSignal(plateB);
