@@ -18,7 +18,8 @@ namespace Golovomka
             InspectRemote,
             PickUpRemote,
             UseRoomPassage,
-            PressTimedButton
+            PressTimedButton,
+            ReadNoticeBoard
         }
 
         public EchoHistory history;
@@ -43,9 +44,12 @@ namespace Golovomka
         Font font;
         Canvas canvas;
         RectTransform panel;
-        Text heading, objective, status, prompt, dialogTitle, dialogBody, menu, caution;
+        Text heading, objective, status, prompt, dialogTitle, dialogBody, caution;
         Text stationExitLabel;
-        int selection;
+        static readonly string[] PauseOptions = { "Продолжить", "Вернуться к входу комнаты", "Главное меню", "Выход" };
+        readonly Text[] pauseLabels = new Text[PauseOptions.Length];
+        RectTransform pauseMenu;
+        int pauseSelection;
         bool phoneRead;
         const float StationFadeDuration = .25f;
         UnityEngine.UI.Image stationFade;
@@ -214,17 +218,23 @@ namespace Golovomka
             }
             if (mode == "pause")
             {
-                string[] choices = Choices();
-                if (k.downArrowKey.wasPressedThisFrame || k.sKey.wasPressedThisFrame) selection = (selection + 1) % choices.Length;
-                if (k.upArrowKey.wasPressedThisFrame || k.wKey.wasPressedThisFrame) selection = (selection + choices.Length - 1) % choices.Length;
-                MenuText();
-                if (enter) Select();
-                else if (k.escapeKey.wasPressedThisFrame && mode == "pause") Close();
+                int index = pauseSelection;
+                if (k.downArrowKey.wasPressedThisFrame || k.sKey.wasPressedThisFrame) index++;
+                if (k.upArrowKey.wasPressedThisFrame || k.wKey.wasPressedThisFrame) index--;
+                if (index != pauseSelection) FocusPauseOption((index + PauseOptions.Length) % PauseOptions.Length);
+                if (enter) UsePauseOption(pauseSelection);
+                else if (k.escapeKey.wasPressedThisFrame) Close();
                 return;
             }
             if (mode == "dialog") { if (enter || k.eKey.wasPressedThisFrame || k.escapeKey.wasPressedThisFrame) Close(); return; }
             if (mode == "done") { if (enter) ShowMenu(); return; }
-            if (k.escapeKey.wasPressedThisFrame) { mode = "pause"; selection = 0; Panel("ПАУЗА", "Запись и копии приостановлены."); MenuText(); return; }
+            if (k.escapeKey.wasPressedThisFrame)
+            {
+                mode = "pause";
+                FocusPauseOption(0);
+                Panel("ПАУЗА", "Запись и копии приостановлены.");
+                return;
+            }
             if (k.rKey.wasPressedThisFrame) { RestartCycle(); return; }
             float dt = Mathf.Min(Time.deltaTime, .05f); if (recordingActive) elapsed += dt;
             UpdateGhosts();
@@ -350,6 +360,7 @@ namespace Golovomka
             Interaction.InspectRemote => "Осмотреть пульт",
             Interaction.PickUpRemote => "Взять пульт",
             Interaction.PressTimedButton => "Нажать кнопку",
+            Interaction.ReadNoticeBoard => "Прочитать заметки",
             _ => ""
         };
 
@@ -358,6 +369,7 @@ namespace Golovomka
             if (stationFade.gameObject.activeSelf) return;
             switch (target)
             {
+                case Interaction.ReadNoticeBoard: ReadNoticeBoard(); break;
                 case Interaction.InspectRemote:
                 case Interaction.PickUpRemote: UseIntroRemote(); break;
                 case Interaction.PressTimedButton:
@@ -500,7 +512,7 @@ namespace Golovomka
             var panelGo = new GameObject("Dialog", typeof(RectTransform), typeof(UnityEngine.UI.Image)); panelGo.transform.SetParent(go.transform, false); panel = panelGo.GetComponent<RectTransform>(); panel.sizeDelta = new Vector2(920, 490); panelGo.GetComponent<UnityEngine.UI.Image>().color = new Color(.035f, .065f, .085f, .99f);
             dialogTitle = Text("Title", panel, new Vector2(820, 55), new Vector2(0, 180), 27, amber);
             dialogBody = Text("Body", panel, new Vector2(820, 340), new Vector2(0, -20), 21, new Color(.86f, .9f, .89f));
-            menu = Text("Menu", panel, new Vector2(820, 210), new Vector2(0, -70), 23, Color.white);
+            CreatePauseMenu();
             ArrangeOverlayHUD();
             CreateTitleMenu();
             var fadeObject = new GameObject("StationFade", typeof(RectTransform), typeof(UnityEngine.UI.Image));
@@ -513,14 +525,57 @@ namespace Golovomka
             stationFade.raycastTarget = false;
             fadeObject.SetActive(false);
         }
-        void Panel(string title, string body) { panel.gameObject.SetActive(true); panel.SetAsLastSibling(); dialogTitle.text = title; dialogBody.text = body; menu.text = ""; }
+        void Panel(string title, string body)
+        {
+            pauseMenu.gameObject.SetActive(mode == "pause");
+            panel.gameObject.SetActive(true);
+            panel.SetAsLastSibling();
+            dialogTitle.text = title;
+            dialogBody.text = body;
+        }
         void Dialog(string title, string body) { mode = "dialog"; Panel(title, body + "\n\nE / ENTER — продолжить"); }
         void Close() { mode = "play"; panel.gameObject.SetActive(false); }
-        string[] Choices() => new[] { "Продолжить", "Вернуться к входу комнаты", "Главное меню", "Выход" };
-        void MenuText() { var items = Choices(); menu.text = ""; for (int i = 0; i < items.Length; i++) menu.text += (i == selection ? ">  " : "    ") + items[i] + "\n"; }
-        void Select()
+
+        void CreatePauseMenu()
         {
-            if (selection == 0) Close(); else if (selection == 1) RestartCycle(); else if (selection == 2) ShowMenu(); else Application.Quit();
+            pauseMenu = MenuRegion("PauseMenu", panel, Vector2.zero, Vector2.one);
+            var colors = ColorBlock.defaultColorBlock;
+            colors.normalColor = new Color(1f, 1f, 1f, .06f);
+            colors.highlightedColor = new Color(1f, 1f, 1f, .16f);
+            colors.pressedColor = new Color(1f, .74f, .36f, .25f);
+            for (int i = 0; i < PauseOptions.Length; i++)
+            {
+                var row = new GameObject("Option" + (i + 1), typeof(RectTransform), typeof(UnityEngine.UI.Image));
+                var rect = row.GetComponent<RectTransform>();
+                rect.SetParent(pauseMenu, false);
+                rect.anchorMin = rect.anchorMax = new Vector2(.5f, .5f);
+                rect.anchoredPosition = new Vector2(0, 12 - i * 46);
+                rect.sizeDelta = new Vector2(820, 40);
+                var button = row.AddComponent<UnityEngine.UI.Button>();
+                button.targetGraphic = row.GetComponent<UnityEngine.UI.Image>();
+                button.navigation = new Navigation { mode = Navigation.Mode.None };
+                button.colors = colors;
+                int index = i;
+                button.onClick.AddListener(() => UsePauseOption(index));
+                pauseLabels[i] = Text("Label", rect, new Vector2(794, 40), Vector2.zero, 23, Color.white, TextAnchor.MiddleLeft);
+            }
+            pauseMenu.gameObject.SetActive(false);
+        }
+
+        void FocusPauseOption(int index)
+        {
+            pauseSelection = index;
+            for (int i = 0; i < PauseOptions.Length; i++)
+                pauseLabels[i].text = (i == index ? ">  " : "    ") + PauseOptions[i];
+        }
+
+        void UsePauseOption(int index)
+        {
+            if (mode != "pause") return;
+            if (index == 0) Close();
+            else if (index == 1) RestartCycle();
+            else if (index == 2) ShowMenu();
+            else QuitGame();
         }
     }
 }

@@ -8,5 +8,9 @@ namespace Golovomka
 
         public Transform entrance, phone, exit, exitLabel, furniture;
         public SpriteRenderer phoneSprite;
+        public Transform noticeBoard;
+        [TextArea] public string leftNotice;
+        [TextArea] public string rightNotice;
+        [TextArea] public string lowerNotice;
     }
 }
