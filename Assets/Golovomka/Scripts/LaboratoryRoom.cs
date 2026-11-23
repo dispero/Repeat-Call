@@ -33,6 +33,7 @@ namespace Golovomka
             public float minimumXOffset;
             public SlidingDoor crossingDoor;
             public bool crossToRight;
+            public float crossingOffset;
             public bool requiresRemote;
             [FormerlySerializedAs("completesRoom")] public bool setsReturnPoint;
             public Destination destination;
@@ -58,11 +59,12 @@ namespace Golovomka
                 if (!crossingDoor || ((requiresRemote || setsReturnPoint) && !hasRemote)) return false;
                 var doorway = crossingDoor.Passage;
                 if (!doorway || !doorway.isTrigger) return false;
-                float threshold = doorway.bounds.center.x;
+                float center = doorway.bounds.center.x;
+                float threshold = center + (crossToRight ? crossingOffset : -crossingOffset);
                 bool crossed = crossToRight ? from.x <= threshold && to.x > threshold
                     : from.x >= threshold && to.x < threshold;
                 // Горизонтальный шаг контроллера выполняется до вертикального.
-                return crossed && doorway.OverlapPoint(new Vector2(threshold, from.y));
+                return crossed && doorway.OverlapPoint(new Vector2(center, from.y));
             }
         }
     }

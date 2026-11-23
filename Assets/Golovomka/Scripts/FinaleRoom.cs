@@ -251,9 +251,9 @@ namespace Golovomka
         {
             Vector2 point = bandit.body.transform.position;
             bool lured = local && time < lureUntil;
-            bool seesPlayer = !lured && (!local || InLowerArea(player)) && Visible(point, player, local ? 5f : 8f);
-            bool seesCopy = copy.HasValue && (!local || lured || InLowerArea(copy.Value)) &&
-                Visible(point, copy.Value, local ? 5f : 8f);
+            float sightRange = local ? 5f : 8f;
+            bool seesPlayer = !lured && Visible(point, player, sightRange);
+            bool seesCopy = copy.HasValue && Visible(point, copy.Value, sightRange);
             bool targetCopy = seesCopy && (!seesPlayer ||
                 (copy.Value - point).sqrMagnitude <= (player - point).sqrMagnitude + .1f);
             Vector2 target = targetCopy ? copy.Value : player;
@@ -261,13 +261,18 @@ namespace Golovomka
             Vector2 direction = Cardinal(aim);
             Vector2 muzzle = BanditMuzzle(bandit, direction);
             bool seesTarget = seesPlayer || seesCopy;
-            bool movingToLure = lured && Vector2.Distance(point, lurePosition.position) > .25f;
             float aimDistance = Range;
-            bool aimedAtTarget = seesTarget && !movingToLure && aim.sqrMagnitude > .012f &&
+            bool aimedAtTarget = seesTarget && aim.sqrMagnitude > .012f &&
                 Hit(muzzle, direction, target, ref aimDistance);
             bool blocked = aimedAtTarget && Cast(muzzle, direction, Range, shooterFeet: point) <= aimDistance;
+            bool canFire = aimedAtTarget && !blocked;
+            if (seesTarget && (local || !canFire))
+            {
+                bandit.lastSeen = target;
+                bandit.tracked = true;
+            }
 
-            if (aimedAtTarget && !blocked)
+            if (canFire)
             {
                 bandit.firingPosition = null;
                 if (bandit.chargingDirection != direction || bandit.chargingCopy != targetCopy)
@@ -279,26 +284,17 @@ namespace Golovomka
                     FireBandit(bandit, player, copy, direction, time, local ? lookoutTrace : pursuerTrace);
                     bandit.nextShot = time + .85f;
                 }
-                ShowBandit(bandit, false, time, time < bandit.chargeUntil, lured);
+                ShowBandit(bandit, false, time, time < bandit.chargeUntil);
                 return;
             }
 
             bandit.chargingDirection = Vector2.zero;
-            if (seesTarget)
-            {
-                bandit.lastSeen = target;
-                bandit.tracked = true;
-            }
             Vector2 destination = bandit.tracked ? bandit.lastSeen : bandit.start;
-            if (local)
-            {
-                destination = lured ? (Vector2)lurePosition.position : bandit.start;
-                if (!lured && seesTarget)
-                    destination.y = Mathf.Clamp(target.y, bandit.start.y - 1.25f, bandit.start.y + .45f);
-            }
-            if (seesTarget && !movingToLure && direction.y != 0)
+            if (lured && !seesTarget) destination = lurePosition.position;
+            if (seesTarget && direction.y != 0)
                 destination.x = target.x - (muzzle.x - point.x);
-            if (local && !lured)
+            if (!seesTarget || lured) bandit.firingPosition = null;
+            if (local && seesTarget && !lured)
             {
                 if (blocked && (!bandit.firingPosition.HasValue ||
                     !HasFiringLine(bandit, bandit.firingPosition.Value, target)))
@@ -318,10 +314,8 @@ namespace Golovomka
                 bandit.direction = Cardinal(step - point);
             }
             else if (seesTarget) bandit.direction = direction;
-            ShowBandit(bandit, moving, time, false, lured);
+            ShowBandit(bandit, moving, time);
         }
-
-        bool InLowerArea(Vector2 p) => p.y < sentry.start.y + 1f && Mathf.Abs(p.x - sentry.start.x) < 5f;
 
         Vector2? FindLookoutFiringPosition(Bandit bandit, Vector2 from, Vector2 target)
         {
@@ -495,7 +489,7 @@ namespace Golovomka
             return result;
         }
 
-        static void ShowBandit(Bandit bandit, bool moving, float time, bool charging = false, bool lured = false)
+        static void ShowBandit(Bandit bandit, bool moving, float time, bool charging = false)
         {
             Vector2 direction = bandit.direction;
             int facing = Facing(direction);
@@ -519,7 +513,6 @@ namespace Golovomka
                 bandit.gun.transform.position = bandit.body.transform.position + (Vector3)(Vector2.up * .86f + direction * .55f);
                 bandit.gun.transform.rotation = Quaternion.Euler(0, 0, Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg);
             }
-            bandit.sprite.color = charging ? new Color(1, .67f, .53f) : lured ? new Color(.62f, .9f, 1) : Color.white;
         }
 
         static Sprite ArmedBanditFrame(Bandit bandit, int facing, bool moving, float time, bool charging)

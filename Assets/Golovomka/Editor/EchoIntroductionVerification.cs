@@ -150,8 +150,13 @@ public static class EchoIntroductionVerification
         {
             var passage = Array.Find(room.passages, item => item.IsAutomatic);
             var bounds = door.Passage.bounds;
-            Vector2 before = bounds.center - Vector3.right * .05f;
-            Vector2 after = bounds.center + Vector3.right * .05f;
+            Vector2 threshold = bounds.center + Vector3.right * passage.crossingOffset;
+            if (room.roomNumber == 4)
+                Check(threshold.x < bounds.min.x - .22f &&
+                    !passage.Crossed(bounds.center - Vector3.right * .05f, bounds.center + Vector3.right * .05f, true),
+                    "Finale entry starts in the range before Ivan's feet reach the doorway");
+            Vector2 before = threshold - Vector2.right * .05f;
+            Vector2 after = threshold + Vector2.right * .05f;
             Check(passage.crossingDoor == door && door.Passage.isTrigger &&
                 !passage.Crossed(before, after, false) && !passage.Crossed(after, after, true) &&
                 !passage.Crossed(after, before, true), "Crossing requires movement in the correct direction and the remote");
@@ -335,7 +340,7 @@ public static class EchoIntroductionVerification
             EchoHistory.Load(m.saveFileOverride)?.returnRoom == 5, "The exit saves the next return point");
         m.RestartCycle();
         Check(m.zone == 5 && m.recordingActive && m.elapsed == 0 && m.position == (Vector2)tail.entrance.position &&
-            CanStand(m.position) && m.position.x > range.exitDoor.Passage.bounds.max.x,
+            CanStand(m.position) && m.position.x < range.exitDoor.Passage.bounds.min.x - .22f && range.exitDoor.Passage.isTrigger,
             "R returns to the finale entrance and starts the recording clock");
         Check(SpawnPistolIs(true), "Room 5 retry starts and records a drawn pistol");
 
@@ -447,7 +452,7 @@ public static class EchoIntroductionVerification
 
         void CheckFrame(string clip, string direction, string frame, bool moving, float time, bool charging = false)
         {
-            show.Invoke(null, new object[] { lookout, moving, time, charging, false });
+            show.Invoke(null, new object[] { lookout, moving, time, charging });
             string expected = $"DenimJacketPistol{clip}_{direction}_{frame}";
             check(body.sprite.name == expected, $"Lookout displays {expected}");
         }

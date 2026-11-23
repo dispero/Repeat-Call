@@ -583,7 +583,11 @@ namespace Golovomka
             else ResetRoomRecording();
             if (currentButtons) currentButtons.ResetAttempt(history.returnRoom > zone);
             if (currentRange) currentRange.ResetAttempt(history.returnRoom > zone);
-            if (currentFinale) currentFinale.Begin(position);
+            if (currentFinale)
+            {
+                if (pistolArt) pistolArt.exitDoor.SetPassage(true, new Bounds(FeetCenter(position), FeetSize), true);
+                currentFinale.Begin(position);
+            }
 
             stationExitLabel.enabled = inStation;
             if (enteringLaboratory) CacheLaboratoryCameraBounds();
