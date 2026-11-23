@@ -43,11 +43,19 @@ namespace Golovomka
             {
                 history.firstReturnSeen = true;
                 ReturnToRoom();
-                Dialog("Пульт возвращения",
-                    "Заберите пульт у стола. После этого нажмите R, чтобы вернуться ко входу, который запомнил пульт. " +
-                    "Копия Ивана повторит его маршрут и действия из предыдущей попытки.\n\n" +
-                    "Пульт разработал Фёдор Карамазов. Он создал его втайне, когда работал учёным в СССР, " +
-                    "а затем увёз с собой в США.");
+                var art = Resources.Load<Texture2D>("Menu/RemoteHelp");
+                if (art)
+                {
+                    mode = "dialog";
+                    shotAudio.Stop();
+                    ShowIllustratedCard(art);
+                }
+                else
+                {
+                    Dialog("Пульт возвращения",
+                        "Копия повторяет маршрут и действия из предыдущей попытки. " +
+                        "Заберите пульт у стола. После подбора R возвращает ко входу и начинает новую запись.");
+                }
             }
             else if (!history.remoteObtained)
             {
@@ -55,8 +63,6 @@ namespace Golovomka
                 Save();
                 UpdateIntroductionVisuals();
                 prompt.text = string.Empty;
-                Dialog(string.Empty, "Вы взяли временной пульт. Нажмите R, чтобы вернуться в прошлое и оставить копию",
-                    "E/ENTER - продолжить");
             }
         }
 

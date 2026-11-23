@@ -149,6 +149,8 @@ namespace Golovomka
             bool canContinue = EchoHistory.Load(saveFileOverride) != null;
             mode = "menu";
             panel.gameObject.SetActive(false);
+            pauseMenu.gameObject.SetActive(false);
+            illustratedCard.gameObject.SetActive(false);
             titleScreen.transform.SetAsLastSibling();
             titleScreen.SetActive(true);
             SetTitleOptions(TitleLabels, canContinue, canContinue ? 0 : 1);
