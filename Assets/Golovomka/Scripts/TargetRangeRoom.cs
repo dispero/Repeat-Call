@@ -6,6 +6,7 @@ namespace Golovomka
     public sealed class TargetRangeRoom : MonoBehaviour
     {
         internal event System.Action ShotFired;
+        internal event System.Action TargetsRising;
 
         [System.Serializable]
         public sealed class PistolPose
@@ -52,6 +53,7 @@ namespace Golovomka
         };
         int nextReplayShot;
         int recordedWaves;
+        int shownWaves;
         float nextShot;
         bool unlocked;
         LineRenderer playerTrace, echoTrace;
@@ -106,6 +108,7 @@ namespace Golovomka
         {
             System.Array.Clear(hits, 0, hits.Length);
             recordedWaves = nextReplayShot = 0;
+            shownWaves = 0;
             nextShot = 0;
             unlocked = alreadyPassed;
             Hide();
@@ -270,6 +273,12 @@ namespace Golovomka
                 float extension = Mathf.Clamp01(1f + Mathf.Min(sinceStart, Window - sinceStart) / HatchTravelTime);
                 ShowTarget(pair.first, 1, extension);
                 ShowTarget(pair.second, 2, extension);
+                int waveBit = 1 << wave;
+                if (extension > 0f && (shownWaves & waveBit) == 0)
+                {
+                    shownWaves |= waveBit;
+                    TargetsRising?.Invoke();
+                }
             }
             for (int i = 0; i < indicators.Length; i++)
                 indicators[i].color = unlocked || hits[i] == 3 ? new Color(.53f, .9f, .55f)

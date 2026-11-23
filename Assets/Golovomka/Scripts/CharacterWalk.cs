@@ -6,6 +6,10 @@ namespace Golovomka
     [DisallowMultipleComponent, RequireComponent(typeof(SpriteRenderer))]
     public sealed class CharacterWalk : MonoBehaviour
     {
+        [SerializeField, Tooltip("Область попадания пуль. Размер и смещение редактируются в BoxCollider2D.")]
+        BoxCollider2D shotHitbox;
+        internal BoxCollider2D ShotHitbox => shotHitbox;
+
         const int CardinalDirectionCount = 4;
         const int CardinalFrameCount = CardinalDirectionCount * CharacterWalkCycle.FramesPerDirection;
         const int DiagonalPoseFrameCount = CardinalFrameCount + CardinalDirectionCount;
@@ -17,16 +21,26 @@ namespace Golovomka
         [SerializeField] Sprite[] armedShoot = Array.Empty<Sprite>();
         [SerializeField] Vector2[] armedMuzzles = Array.Empty<Vector2>();
         [SerializeField] Sprite[] deathFrames = Array.Empty<Sprite>();
+        [SerializeField] Sprite[] deathLeftFrames = Array.Empty<Sprite>();
         [SerializeField] Sprite armedLeftReady;
         [SerializeField] Sprite[] armedLeftShoot = Array.Empty<Sprite>();
         [SerializeField] Vector2 armedLeftMuzzle;
         bool HasLeftArmedAnimation => armedLeftReady && armedLeftShoot.Length == 4 &&
             Array.TrueForAll(armedLeftShoot, frame => frame);
 
-        internal bool HasDeathAnimation => deathFrames.Length == 12 && Array.TrueForAll(deathFrames, frame => frame);
+        bool HasLeftDeathAnimation => deathLeftFrames.Length == 4 && Array.TrueForAll(deathLeftFrames, frame => frame);
+        internal bool HasDeathAnimation => HasLeftDeathAnimation ||
+            deathFrames.Length == 12 && Array.TrueForAll(deathFrames, frame => frame);
         internal const float DeathAnimationDuration = .54f;
-        internal Sprite GetDeathFrame(int facing, float time) =>
-            deathFrames[facing * 3 + Mathf.Clamp(Mathf.FloorToInt(time / (DeathAnimationDuration / 3f)), 0, 2)];
+        internal Sprite GetDeathFrame(int facing, float time)
+        {
+            if (HasLeftDeathAnimation)
+                return deathLeftFrames[DeathFrameIndex(time, deathLeftFrames.Length)];
+            return deathFrames[facing * 3 + DeathFrameIndex(time, 3)];
+        }
+
+        static int DeathFrameIndex(float time, int count) =>
+            Mathf.Clamp(Mathf.FloorToInt(time / (DeathAnimationDuration / count)), 0, count - 1);
 
         internal bool HasArmedAnimation => HasLeftArmedAnimation || armedWalk.Length == CardinalFrameCount && armedShoot.Length == CardinalFrameCount &&
             armedMuzzles.Length == CardinalDirectionCount && Array.TrueForAll(armedWalk, frame => frame) &&

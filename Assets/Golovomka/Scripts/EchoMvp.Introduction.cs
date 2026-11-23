@@ -79,6 +79,7 @@ namespace Golovomka
             var returnRoom = rooms.TryGetValue(history.returnRoom, out var savedRoom) && savedRoom.isActiveAndEnabled
                 ? savedRoom : introductionRoom;
             ActivateRoom(returnRoom, returning: true);
+            if (teleportAudio.clip) teleportAudio.Play();
             FitRoomCamera(snap: true);
         }
 

@@ -7,6 +7,7 @@ namespace Golovomka
         AudioSource phoneAudio, shotAudio, menuSelectAudio, menuMusicAudio;
         AudioSource gameMusicAudio;
         AudioSource buttonCountdownAudio, buttonSignalAudio, correctButtonAudio;
+        AudioSource targetRiseAudio, teleportAudio;
         bool buttonCountdownStarted;
 
         void InitializeAudio()
@@ -25,6 +26,8 @@ namespace Golovomka
             buttonCountdownAudio = CreateAudioSource("CountDown2", .65f);
             buttonSignalAudio = CreateAudioSource("Room3Sound", .65f);
             correctButtonAudio = CreateAudioSource("CorrectSound3", .65f);
+            targetRiseAudio = CreateAudioSource("TargetSound", .65f);
+            teleportAudio = CreateAudioSource("Teleportation", .65f);
         }
 
         AudioSource CreateAudioSource(string clipName, float volume)
@@ -77,6 +80,11 @@ namespace Golovomka
         void PlayCorrectButton()
         {
             if (correctButtonAudio.clip) correctButtonAudio.Play();
+        }
+
+        void PlayTargetRise()
+        {
+            if (targetRiseAudio.clip) targetRiseAudio.Play();
         }
     }
 }

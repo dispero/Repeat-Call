@@ -155,6 +155,8 @@ namespace Golovomka
         {
             HideSpeechUI();
             shotAudio.Stop();
+            targetRiseAudio.Stop();
+            teleportAudio.Stop();
             gameMusicAudio.Stop();
             if (menuMusicAudio.clip && !menuMusicAudio.isPlaying) menuMusicAudio.Play();
             bool canContinue = EchoHistory.Load(saveFileOverride) != null;

@@ -19,9 +19,8 @@ namespace Golovomka
         public SpriteRenderer portal;
 
         const float Range = 9f;
+        const float CloseAimRange = 1.25f;
         internal const float ShotInterval = .42f;
-        const float HitRadius = .33f;
-        const float BodyHitHeight = 2.85f;
         const float ReleaseRadius = 1.15f;
         const float LureDuration = 4.25f;
         const float ShotFlashDuration = .06f;
@@ -35,6 +34,7 @@ namespace Golovomka
             layerMask = Physics2D.DefaultRaycastLayers
         };
         readonly List<RaycastHit2D> hits = new List<RaycastHit2D>();
+        internal CharacterWalk officerBody;
         Bandit chaser, watcher, sentry;
         CharacterWalk[] captives;
         SpriteRenderer[] ropes;
@@ -63,7 +63,7 @@ namespace Golovomka
             public Vector2 lastSeen, direction, chargingDirection, firedDirection, firedMuzzle;
             public Vector2? firingPosition;
             public float chargeUntil, nextShot, firedAt;
-            public bool tracked, chargingCopy;
+            public bool tracked, chargingCopy, chargingClose;
             public bool dead;
             public float deathTime;
             public int deathFacing;
@@ -92,6 +92,7 @@ namespace Golovomka
                 deathTime = 0;
                 deathFacing = Facing(direction);
                 gun.enabled = false;
+                body.ShotHitbox.enabled = false;
                 if (body.HasDeathAnimation) sprite.sprite = body.GetDeathFrame(deathFacing, 0);
                 else body.gameObject.SetActive(false);
             }
@@ -108,6 +109,7 @@ namespace Golovomka
                 body.transform.position = start;
                 body.gameObject.SetActive(true);
                 dead = false;
+                body.ShotHitbox.enabled = true;
                 deathTime = 0;
                 lastSeen = start;
                 direction = look;
@@ -115,7 +117,7 @@ namespace Golovomka
                 chargeUntil = nextShot = 0;
                 firedAt = float.NegativeInfinity;
                 firingPosition = null;
-                tracked = chargingCopy = false;
+                tracked = chargingCopy = chargingClose = false;
             }
         }
 
@@ -233,7 +235,7 @@ namespace Golovomka
             Test(watcher);
             Test(sentry);
             for (int i = 0; i < captives.Length; i++)
-                if (captives[i].gameObject.activeSelf && Hit(origin, direction, captives[i].transform.position, ref distance))
+                if (captives[i].gameObject.activeSelf && Hit(origin, direction, captives[i].transform.position, ref distance, captives[i]))
                     stoppedByHostage = true;
 
             var trace = copy ? copyTrace : playerTrace;
@@ -263,7 +265,7 @@ namespace Golovomka
                     distance = 0f;
                     victim = bandit;
                 }
-                else if (Hit(origin, direction, target, ref distance)) victim = bandit;
+                else if (Hit(origin, direction, target, ref distance, bandit.body)) victim = bandit;
             }
         }
 
@@ -323,13 +325,16 @@ namespace Golovomka
                 bandit.tracked = true;
             }
 
-            // Подготовка сохраняется при обходе видимой цели и смене ракурса.
-            if (seesTarget)
+            // Вблизи подготовка сохраняется при обходе, на расстоянии нужна устойчивая линия огня.
+            bool closeAim = aim.sqrMagnitude <= CloseAimRange * CloseAimRange;
+            if (seesTarget && (closeAim || canFire))
             {
-                if (bandit.chargingDirection == Vector2.zero || bandit.chargingCopy != targetCopy)
+                if (bandit.chargingDirection == Vector2.zero || bandit.chargingCopy != targetCopy ||
+                    bandit.chargingClose != closeAim || (!closeAim && bandit.chargingDirection != direction))
                     bandit.chargeUntil = time + (local ? .5f : .4f);
                 bandit.chargingDirection = direction;
                 bandit.chargingCopy = targetCopy;
+                bandit.chargingClose = closeAim;
             }
             else bandit.chargingDirection = Vector2.zero;
 
@@ -429,7 +434,7 @@ namespace Golovomka
             bool hitCopy = copy.HasValue && Hit(origin, direction, copy.Value, ref distance);
             int hostage = -1;
             for (int i = 0; i < captives.Length; i++)
-                if (captives[i].gameObject.activeSelf && Hit(origin, direction, captives[i].transform.position, ref distance))
+                if (captives[i].gameObject.activeSelf && Hit(origin, direction, captives[i].transform.position, ref distance, captives[i]))
                     hostage = i;
             DrawTrace(trace, origin, direction, distance, time, bandit.body.transform.position.y);
             if (hostage >= 0) LoseHostage(hostage, "В заложника попала пуля.");
@@ -492,15 +497,21 @@ namespace Golovomka
             ? bandit.body.GetArmedMuzzle(Facing(direction))
             : (Vector2)bandit.body.transform.position + Vector2.up * .86f + direction * .55f;
 
-        static bool Hit(Vector2 origin, Vector2 direction, Vector2 target, ref float distance)
+        bool Hit(Vector2 origin, Vector2 direction, Vector2 target, ref float distance, CharacterWalk body = null)
         {
-            // Проверяем видимую область тела над точкой опоры.
-            Vector2 offset = target + Vector2.up * (BodyHitHeight * .5f) - origin;
+            if (!body) body = officerBody;
+            if (!body || !body.ShotHitbox || !body.ShotHitbox.enabled) return false;
+            var shape = body.ShotHitbox;
+            // Проецируем коллайдер к позиции записи без перемещения настоящего персонажа.
+            Vector2 centerOffset = shape.transform.TransformPoint(shape.offset) - body.transform.position;
+            Vector2 scale = shape.transform.lossyScale;
+            Vector2 halfSize = new Vector2(Mathf.Abs(shape.size.x * scale.x), Mathf.Abs(shape.size.y * scale.y)) * .5f;
+            Vector2 offset = target + centerOffset - origin;
             float along = Vector2.Dot(offset, direction);
             bool horizontal = direction.x != 0;
-            float extent = horizontal ? HitRadius : BodyHitHeight * .5f;
+            float extent = horizontal ? halfSize.x : halfSize.y;
             float across = horizontal ? Mathf.Abs(offset.y) : Mathf.Abs(offset.x);
-            if (along + extent <= 0 || across > (horizontal ? BodyHitHeight * .5f : HitRadius)) return false;
+            if (along + extent <= 0 || across > (horizontal ? halfSize.y : halfSize.x)) return false;
             float entry = Mathf.Max(.001f, along - extent);
             if (entry >= distance) return false;
             distance = entry;

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6421891820424569772}
   - component: {fileID: 8330224717957508022}
   - component: {fileID: 47792382974331912}
+  - component: {fileID: 7262203900083662399}
   m_Layer: 0
   m_Name: GreyHairedScientist
   m_TagString: Untagged
@@ -105,6 +106,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05e45737adee7d84d9b9dd6d60ce6412, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Golovomka.CharacterWalk
+  shotHitbox: {fileID: 7262203900083662399}
   frames:
   - {fileID: -753230381, guid: afe69600515f9d2428c1c7d4bf902323, type: 3}
   - {fileID: -1986437156, guid: afe69600515f9d2428c1c7d4bf902323, type: 3}
@@ -122,3 +124,57 @@ MonoBehaviour:
   - {fileID: 1556263077, guid: afe69600515f9d2428c1c7d4bf902323, type: 3}
   - {fileID: 1539533731, guid: afe69600515f9d2428c1c7d4bf902323, type: 3}
   - {fileID: 734530775, guid: afe69600515f9d2428c1c7d4bf902323, type: 3}
+  armedWalk: []
+  armedShoot: []
+  armedMuzzles: []
+  deathFrames: []
+  deathLeftFrames: []
+  armedLeftReady: {fileID: 0}
+  armedLeftShoot: []
+  armedLeftMuzzle: {x: 0, y: 0}
+--- !u!61 &7262203900083662399
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5744138539990638340}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 1.4994155}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.49668875, y: 0}
+    oldSize: {x: 1.9266348, y: 3.1770334}
+    newSize: {x: 1.8755981, y: 3.1770334}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 0.69446623, y: 2.998831}
+  m_EdgeRadius: 0

@@ -134,6 +134,7 @@ namespace Golovomka
                 {
                     pistolArt = range;
                     range.ShotFired += PlayShot;
+                    range.TargetsRising += PlayTargetRise;
                 }
                 if (room.TryGetComponent<FinaleRoom>(out var finale) && !finale.IsConfigured)
                 {
@@ -571,6 +572,7 @@ namespace Golovomka
             buttonCountdownStarted = false;
             buttonSignalAudio.Stop();
             correctButtonAudio.Stop();
+            targetRiseAudio.Stop();
             room2PreviewDoor = null;
             bool enteringLaboratory = targetRoom && !currentRoom;
             bool continuingForward = currentRoom && targetRoom && keepPosition && !returning && targetRoom.roomNumber > zone;
@@ -590,6 +592,7 @@ namespace Golovomka
             currentButtons = targetRoom ? targetRoom.GetComponent<TimedButtonsRoom>() : null;
             currentRange = targetRoom ? targetRoom.GetComponent<TargetRangeRoom>() : null;
             currentFinale = targetRoom ? targetRoom.GetComponent<FinaleRoom>() : null;
+            if (currentFinale) currentFinale.officerBody = officerWalk;
             zone = targetRoom ? targetRoom.roomNumber : 0;
             if (!keepPosition || !CanDrawPistol)
                 pistolDrawn = returning && CanDrawPistol;
