@@ -115,13 +115,19 @@ public static class EchoIntroductionVerification
         Check(nearby == Interaction.InspectRemote,"Remote reachable from floor");
         m.Interact(nearby);
         Check(m.position==spawn && m.history.firstReturnSeen && !m.history.remoteObtained && m.history.ForRoom(1) != null,"First return creates one recording at room entrance");
+        Check(m.mode == "dialog" && m.elapsed == 0 && m.recordingActive,
+            "The remote explanation opens at the entrance before playback advances");
+        Call("Update");
+        Check(m.elapsed == 0 && m.recording.frames.Count == 1, "The explanation pauses the attempt clock");
+        Call("Close");
+        Check(m.mode == "play" && m.elapsed == 0, "Closing the explanation resumes from the common zero");
         Check(m.history.ForRoom(1).Sample(onPlateTime,out var f) && Vector2.Distance(new Vector2(f.x,f.y),plate)<.1f,"First copy repeats panel approach");
         m.elapsed=onPlateTime; m.UpdateGhosts(); Check(m.plateA,"First copy opens door");
         m.elapsed=m.history.ForRoom(1).duration+.1f; m.UpdateGhosts(); Check(!m.plateA,"Copy ends and releases panel");
         m.position=remote;
         nearby = (Interaction)Call("Nearby");
         Check(nearby == Interaction.PickUpRemote,"Second interaction offers pickup");
-        m.Interact(nearby); Check(m.history.remoteObtained,"Remote pickup");
+        m.Interact(nearby); Check(m.history.remoteObtained && m.mode == "play", "Remote pickup does not reopen the explanation");
         m.RestartCycle(); Move(plate); float holdStart=m.elapsed;
         for(int i=0;i<600;i++){m.elapsed+=.02f;m.Record();}
         m.RestartCycle(); Check(m.zone==1 && m.position==spawn && m.elapsed==0 && m.recordingActive,"R resets current room and common clock");

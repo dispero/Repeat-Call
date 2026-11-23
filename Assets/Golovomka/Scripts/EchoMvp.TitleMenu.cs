@@ -8,8 +8,8 @@ namespace Golovomka
 {
     public partial class EchoMvp
     {
-        static readonly string[] TitleLabels = { "Продолжить", "Новая игра", "Выход" };
-        static readonly string[] ConfirmLabels = { "Начать заново", "Отмена" };
+        static readonly string[] TitleLabels = { "Продолжить", "Новая Игра", "Выход" };
+        static readonly string[] ConfirmLabels = { "Начать Заново", "Отмена" };
         static readonly Color TitleAccent = new Color32(255, 195, 107, 255);
         static readonly Color TitlePaper = new Color32(230, 214, 181, 255);
         static readonly Color TitleDisabled = new Color32(147, 148, 132, 255);
