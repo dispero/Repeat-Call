@@ -115,10 +115,15 @@ namespace Golovomka
             foreach (var root in laboratoryRoots)
             foreach (var room in root.GetComponentsInChildren<LaboratoryRoom>(true))
             {
-                if (room.TryGetComponent<TimedButtonsRoom>(out var buttons) && !buttons.IsConfigured)
+                if (room.TryGetComponent<TimedButtonsRoom>(out var buttons))
                 {
-                    Debug.LogError("Проверьте кнопки, табло и дверь комнаты.", room);
-                    yield break;
+                    if (!buttons.IsConfigured)
+                    {
+                        Debug.LogError("Проверьте кнопки, табло и дверь комнаты.", room);
+                        yield break;
+                    }
+                    buttons.SignalShown += PlayButtonSignal;
+                    buttons.PlayerPressAccepted += PlayCorrectButton;
                 }
                 if (room.TryGetComponent<TargetRangeRoom>(out var range) && !range.IsConfigured)
                 {
@@ -207,6 +212,7 @@ namespace Golovomka
 
         public void BeginCycle(LaboratoryRoom resumeRoom = null)
         {
+            menuMusicAudio.Stop();
             replayFinale = false;
             facing = resumeRoom ? 0 : 3; phoneRead = false; mode = "play";
             titleScreen.SetActive(false);
@@ -231,7 +237,7 @@ namespace Golovomka
         }
         void Update()
         {
-            if (!canvas) return;
+            if (!canvas || mode == "quitting") return;
             if (stationFade.gameObject.activeSelf)
             {
                 ResetOfficerMovement();
@@ -318,7 +324,7 @@ namespace Golovomka
             {
                 mode = "pause";
                 LayoutPauseMenu();
-                FocusPauseOption(0);
+                FocusPauseOption(0, playSound: false);
                 Panel("ПАУЗА", "Запись и копии приостановлены.");
                 return;
             }
@@ -400,6 +406,7 @@ namespace Golovomka
             if (currentButtons)
             {
                 if (recordingActive && tape != null) currentButtons.Replay(tape, elapsed);
+                if (recordingActive) UpdateButtonCountdown();
                 currentButtons.Show(elapsed);
                 currentButtons.exitDoor.SetPassage(currentButtons.Solved, feet, immediateDoor);
             }
@@ -560,6 +567,10 @@ namespace Golovomka
             HideSpeechUI();
             finaleDefeatCard.gameObject.SetActive(false);
             shotAudio.Stop();
+            buttonCountdownAudio.Stop();
+            buttonCountdownStarted = false;
+            buttonSignalAudio.Stop();
+            correctButtonAudio.Stop();
             room2PreviewDoor = null;
             bool enteringLaboratory = targetRoom && !currentRoom;
             bool continuingForward = currentRoom && targetRoom && keepPosition && !returning && targetRoom.roomNumber > zone;
@@ -583,6 +594,8 @@ namespace Golovomka
             if (!keepPosition || !CanDrawPistol)
                 pistolDrawn = returning && CanDrawPistol;
             bool inStation = !targetRoom;
+            if (inStation) gameMusicAudio.Stop();
+            else if (enteringLaboratory && gameMusicAudio.clip) gameMusicAudio.Play();
             SetRoomVisible(inStation ? laboratoryRoots : stationRoots, false);
             SetRoomVisible(inStation ? stationRoots : laboratoryRoots, true);
             UpdateFurnitureSorting(inStation ? station.furniture : room01.furniture,
@@ -771,7 +784,11 @@ namespace Golovomka
         }
         void Panel(string title, string body)
         {
-            if (mode == "pause" || mode == "dialog") shotAudio.Stop();
+            if (mode == "pause" || mode == "dialog")
+            {
+                shotAudio.Stop();
+                buttonCountdownAudio.Pause();
+            }
             pauseMenu.gameObject.SetActive(mode == "pause");
             panel.gameObject.SetActive(true);
             panel.SetAsLastSibling();
@@ -786,7 +803,12 @@ namespace Golovomka
             mode = "dialog";
             Panel(title, body + "\n\n" + continueHint);
         }
-        void Close() { mode = "play"; panel.gameObject.SetActive(false); }
+        void Close()
+        {
+            mode = "play";
+            panel.gameObject.SetActive(false);
+            buttonCountdownAudio.UnPause();
+        }
 
         void CreatePauseMenu()
         {
@@ -808,6 +830,10 @@ namespace Golovomka
                 button.colors = colors;
                 int index = i;
                 button.onClick.AddListener(() => UsePauseOption(index));
+                AddMenuHover(button, () =>
+                {
+                    if (mode == "pause") FocusPauseOption(index);
+                });
                 pauseLabels[i] = Text("Label", rect, new Vector2(794, 40), Vector2.zero, 23, Color.white, TextAnchor.MiddleLeft);
             }
             pauseMenu.gameObject.SetActive(false);
@@ -825,8 +851,9 @@ namespace Golovomka
             }
         }
 
-        void FocusPauseOption(int index)
+        void FocusPauseOption(int index, bool playSound = true)
         {
+            if (playSound && pauseSelection != index) PlayMenuSelect();
             pauseSelection = index;
             for (int i = 0; i < PauseOptions.Length; i++)
                 pauseLabels[i].text = (i == index ? ">  " : "    ") + PauseOptions[i];
@@ -835,6 +862,7 @@ namespace Golovomka
         void UsePauseOption(int index)
         {
             if (mode != "pause") return;
+            PlayMenuSelect();
             if (index == 0) Close();
             else if (index == PauseReturnOption) RestartCycle();
             else if (index == 2) ShowMenu();

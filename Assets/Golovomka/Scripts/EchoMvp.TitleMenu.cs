@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -89,14 +90,22 @@ namespace Golovomka
 
                 int index = i;
                 button.onClick.AddListener(() => UseTitleOption(index));
-                var hover = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
-                hover.callback.AddListener(_ =>
+                AddMenuHover(button, () =>
                 {
-                    if (button.interactable) FocusTitleOption(index);
+                    if (mode is "menu" or "confirm") FocusTitleOption(index);
                 });
-                frame.gameObject.AddComponent<EventTrigger>().triggers.Add(hover);
             }
             titleScreen.SetActive(false);
+        }
+
+        static void AddMenuHover(Button button, System.Action focus)
+        {
+            var hover = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
+            hover.callback.AddListener(_ =>
+            {
+                if (button.interactable) focus();
+            });
+            button.gameObject.AddComponent<EventTrigger>().triggers.Add(hover);
         }
 
         static void FitMenuGraphic(RectTransform target, float aspectRatio)
@@ -146,6 +155,8 @@ namespace Golovomka
         {
             HideSpeechUI();
             shotAudio.Stop();
+            gameMusicAudio.Stop();
+            if (menuMusicAudio.clip && !menuMusicAudio.isPlaying) menuMusicAudio.Play();
             bool canContinue = EchoHistory.Load(saveFileOverride) != null;
             mode = "menu";
             panel.gameObject.SetActive(false);
@@ -171,11 +182,12 @@ namespace Golovomka
                 };
                 titleIcons[i].uvRect = new Rect((mode == "confirm" ? i + 1 : i) / 3f, 0, 1f / 3f, 1);
             }
-            FocusTitleOption(selected);
+            FocusTitleOption(selected, playSound: false);
         }
 
-        void FocusTitleOption(int index)
+        void FocusTitleOption(int index, bool playSound = true)
         {
+            if (playSound && titleSelection != index) PlayMenuSelect();
             titleSelection = index;
             for (int i = 0; i < titleButtons.Length; i++)
             {
@@ -214,14 +226,14 @@ namespace Golovomka
 
         void UseTitleOption(int index)
         {
+            if (mode is not ("menu" or "confirm") || !titleButtons[index].interactable) return;
+            PlayMenuSelect();
             if (mode == "confirm")
             {
                 if (index == 0) StartNewGame();
                 else ShowMenu();
                 return;
             }
-            if (mode != "menu") return;
-
             switch (index)
             {
                 case 0:
@@ -243,8 +255,16 @@ namespace Golovomka
             }
         }
 
-        static void QuitGame()
+        void QuitGame()
         {
+            mode = "quitting";
+            StartCoroutine(QuitAfterMenuSound());
+        }
+
+        IEnumerator QuitAfterMenuSound()
+        {
+            if (menuSelectAudio.clip)
+                yield return new WaitForSecondsRealtime(menuSelectAudio.clip.length);
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
 #else

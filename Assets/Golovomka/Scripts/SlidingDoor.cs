@@ -16,6 +16,10 @@ namespace Golovomka
         float openingTravel;
         float opening;
         float target;
+        int movementDirection;
+        AudioSource movementAudio;
+        AudioClip openClip;
+        AudioClip closeClip;
         BoxCollider2D passage;
         BoxCollider2D approach;
         public BoxCollider2D Passage => passage ? passage : (passage = GetComponent<BoxCollider2D>());
@@ -26,6 +30,12 @@ namespace Golovomka
             rightClosed = rightLeaf.localPosition;
             openingTravel = travel;
             ConfigureMask();
+
+            openClip = Resources.Load<AudioClip>("Audio/DoorOpen");
+            closeClip = Resources.Load<AudioClip>("Audio/DoorClose");
+            movementAudio = gameObject.AddComponent<AudioSource>();
+            movementAudio.playOnAwake = false;
+            movementAudio.spatialBlend = 0;
         }
 
         void ConfigureMask()
@@ -114,6 +124,15 @@ namespace Golovomka
 
         void Apply(float amount)
         {
+            if (amount == opening) return;
+
+            int direction = amount > opening ? 1 : -1;
+            if (direction != movementDirection)
+            {
+                var clip = direction > 0 ? openClip : closeClip;
+                if (clip && movementAudio.isActiveAndEnabled) movementAudio.PlayOneShot(clip);
+            }
+            movementDirection = amount == target ? 0 : direction;
             opening = amount;
             Vector3 offset = Vector3.right * (openingTravel * Mathf.SmoothStep(0, 1, opening));
             leftLeaf.localPosition = leftClosed - offset;

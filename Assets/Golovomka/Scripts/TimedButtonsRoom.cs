@@ -25,7 +25,11 @@ namespace Golovomka
 
         int accepted;
         int replayIndex;
+        int displayedStep = -1;
         bool unlocked;
+
+        public event Action SignalShown;
+        public event Action PlayerPressAccepted;
 
         public bool Solved => unlocked || accepted == (1 << order.Length) - 1;
         public float EndTime => startDelay + (order.Length - 1) * stepInterval + pressWindow;
@@ -48,6 +52,7 @@ namespace Golovomka
         public void ResetAttempt(bool alreadyPassed)
         {
             accepted = replayIndex = 0;
+            displayedStep = -1;
             unlocked = alreadyPassed;
             Show(0);
         }
@@ -79,10 +84,12 @@ namespace Golovomka
         public void Press(int button, float time, EchoTape recording)
         {
             var press = new EchoButtonPress(time, button);
+            int previousAccepted = accepted;
             if (!Accept(press)) return;
             var presses = recording.buttonPresses;
             if (presses.Count == 0 || WindowAt(presses[presses.Count - 1].time) != WindowAt(time))
                 presses.Add(press);
+            if (accepted != previousAccepted) PlayerPressAccepted?.Invoke();
         }
 
         public void Replay(EchoTape tape, float time)
@@ -111,6 +118,9 @@ namespace Golovomka
                 indicators[i].color = active == i ? Color.Lerp(color, Color.white, .42f)
                     : pressed ? color : color * new Color(.65f, .65f, .65f);
             }
+            bool newSignal = active >= 0 && active != displayedStep;
+            displayedStep = active;
+            if (newSignal) SignalShown?.Invoke();
         }
 
         public string Status(float time)

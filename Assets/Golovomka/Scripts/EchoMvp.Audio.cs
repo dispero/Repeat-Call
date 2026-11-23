@@ -4,7 +4,10 @@ namespace Golovomka
 {
     public partial class EchoMvp
     {
-        AudioSource phoneAudio, shotAudio;
+        AudioSource phoneAudio, shotAudio, menuSelectAudio, menuMusicAudio;
+        AudioSource gameMusicAudio;
+        AudioSource buttonCountdownAudio, buttonSignalAudio, correctButtonAudio;
+        bool buttonCountdownStarted;
 
         void InitializeAudio()
         {
@@ -14,6 +17,14 @@ namespace Golovomka
             phoneAudio = CreateAudioSource("PhoneRing", .65f);
             phoneAudio.loop = true;
             shotAudio = CreateAudioSource("ShotSound", .45f);
+            menuSelectAudio = CreateAudioSource("MenuSelect", .65f);
+            menuMusicAudio = CreateAudioSource("MenuMusic2", .3f);
+            menuMusicAudio.loop = true;
+            gameMusicAudio = CreateAudioSource("GameMusic", .3f);
+            gameMusicAudio.loop = true;
+            buttonCountdownAudio = CreateAudioSource("CountDown2", .65f);
+            buttonSignalAudio = CreateAudioSource("Room3Sound", .65f);
+            correctButtonAudio = CreateAudioSource("CorrectSound3", .65f);
         }
 
         AudioSource CreateAudioSource(string clipName, float volume)
@@ -38,6 +49,34 @@ namespace Golovomka
         void PlayShot()
         {
             if (shotAudio && shotAudio.clip) shotAudio.PlayOneShot(shotAudio.clip);
+        }
+
+        void PlayMenuSelect()
+        {
+            if (menuSelectAudio.clip) menuSelectAudio.Play();
+        }
+
+        void UpdateButtonCountdown()
+        {
+            var clip = buttonCountdownAudio.clip;
+            if (buttonCountdownStarted || !clip || currentButtons.Solved) return;
+
+            float timeLeft = currentButtons.startDelay - elapsed;
+            if (timeLeft <= 0 || timeLeft > clip.length) return;
+
+            buttonCountdownStarted = true;
+            buttonCountdownAudio.Play();
+        }
+
+        void PlayButtonSignal()
+        {
+            if (buttonCountdownAudio.isPlaying) buttonCountdownAudio.Stop();
+            if (buttonSignalAudio.clip) buttonSignalAudio.Play();
+        }
+
+        void PlayCorrectButton()
+        {
+            if (correctButtonAudio.clip) correctButtonAudio.Play();
         }
     }
 }
