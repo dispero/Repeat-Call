@@ -323,13 +323,20 @@ namespace Golovomka
                 bandit.tracked = true;
             }
 
+            // Подготовка сохраняется при обходе видимой цели и смене ракурса.
+            if (seesTarget)
+            {
+                if (bandit.chargingDirection == Vector2.zero || bandit.chargingCopy != targetCopy)
+                    bandit.chargeUntil = time + (local ? .5f : .4f);
+                bandit.chargingDirection = direction;
+                bandit.chargingCopy = targetCopy;
+            }
+            else bandit.chargingDirection = Vector2.zero;
+
             if (canFire)
             {
                 bandit.firingPosition = null;
-                if (bandit.chargingDirection != direction || bandit.chargingCopy != targetCopy)
-                    bandit.chargeUntil = time + (local ? .5f : .4f);
-                bandit.direction = bandit.chargingDirection = direction;
-                bandit.chargingCopy = targetCopy;
+                bandit.direction = direction;
                 if (time >= bandit.chargeUntil && time >= bandit.nextShot)
                 {
                     FireBandit(bandit, player, copy, direction, time, local ? lookoutTrace : pursuerTrace, pointBlank);
@@ -339,7 +346,6 @@ namespace Golovomka
                 return;
             }
 
-            bandit.chargingDirection = Vector2.zero;
             Vector2 destination = bandit.tracked ? bandit.lastSeen : bandit.start;
             if (lured && !seesTarget) destination = lurePosition.position;
             if (seesTarget && direction.y != 0)

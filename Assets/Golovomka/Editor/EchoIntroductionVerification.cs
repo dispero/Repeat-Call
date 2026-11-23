@@ -376,6 +376,7 @@ public static class EchoIntroductionVerification
         VerifyLookoutAnimation(finale, m.position, Check);
         VerifyLookoutCover(finale, m.position, Check);
         VerifyPointBlankShots(finale, m.position, Check);
+        VerifyBanditOrbit(finale, m.position, Check);
 
         Vector2 chaseStart = finale.pursuer.transform.position;
         Vector2 lookoutStart = finale.lookout.transform.position;
@@ -598,6 +599,83 @@ public static class EchoIntroductionVerification
                 finale.Replay(tape, .1f);
                 check(BanditDefeated(bandit) && finale.Failure == null,
                     "The copy can replay a point-blank hit");
+            }
+        }
+        finally
+        {
+            finale.Begin(entry);
+        }
+    }
+
+    static void VerifyBanditOrbit(FinaleRoom finale, Vector2 entry, Action<bool, string> check)
+    {
+        const BindingFlags instance = BindingFlags.Instance | BindingFlags.NonPublic;
+        var update = typeof(FinaleRoom).GetMethod("UpdateBandit", instance);
+        try
+        {
+            foreach (string name in new[] { "chaser", "sentry" })
+            {
+                var bandit = typeof(FinaleRoom).GetField(name, instance).GetValue(finale);
+                var type = bandit.GetType();
+                var body = (CharacterWalk)type.GetField("body").GetValue(bandit);
+                var firedAt = type.GetField("firedAt");
+                bool local = name == "sentry";
+                void Tick(Vector2 target, float time, Vector2? copy = null) =>
+                    update.Invoke(finale, new object[] { bandit, target, copy, 0f, time, local });
+                foreach (float radius in new[] { .45f, .6f, .8f })
+                {
+                    finale.Begin(entry);
+                    body.transform.position = new Vector2(121, -6);
+                    Vector2 center = body.transform.position;
+                    float previousShot = float.NegativeInfinity;
+                    int shots = 0;
+                    bool respectsInterval = true;
+                    // Изолированная проверка поворота и огня, перемещение бандита остановлено через dt = 0.
+                    for (int i = 0; i < 600; i++)
+                    {
+                        float time = i * .02f;
+                        float angle = time * 3.2f / radius;
+                        Tick(center + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * radius, time);
+                        float shot = (float)firedAt.GetValue(bandit);
+                        if (shot <= previousShot) continue;
+                        respectsInterval &= shot - previousShot >= .849f;
+                        previousShot = shot;
+                        shots++;
+                    }
+                    check(shots >= 3 && respectsInterval,
+                        $"{name} fires repeatedly at a circling target at radius {radius}, respecting cooldown");
+                }
+
+                finale.Begin(entry);
+                body.transform.position = new Vector2(121, -6);
+                Vector2 near = (Vector2)body.transform.position + Vector2.left * 1.8f;
+                Tick(near, .1f);
+                Tick(near + Vector2.left * 100, .3f);
+                Tick(near, 1f);
+                Tick(near, 1.2f);
+                check(float.IsNegativeInfinity((float)firedAt.GetValue(bandit)),
+                    $"{name} prepares again after losing sight of the target");
+                Tick(near, 1.6f);
+                check((float)firedAt.GetValue(bandit) == 1.6f,
+                    $"{name} fires after reacquiring and preparing");
+
+                finale.Begin(entry);
+                body.transform.position = new Vector2(121, -6);
+                Tick(near, 0f);
+                Tick(near + Vector2.left * 100, .3f, near);
+                Tick(near + Vector2.left * 100, .5f, near);
+                check(float.IsNegativeInfinity((float)firedAt.GetValue(bandit)),
+                    $"{name} prepares again when switching from Ivan to the copy");
+                Tick(near + Vector2.left * 100, .9f, near);
+                check((float)firedAt.GetValue(bandit) == .9f,
+                    $"{name} fires at the copy after preparing");
+
+                finale.Begin(entry);
+                body.transform.position = new Vector2(121, -6);
+                Tick(near, 5f);
+                Tick(near, 5.2f);
+                check(float.IsNegativeInfinity((float)firedAt.GetValue(bandit)),
+                    $"{name} retry restores the initial preparation delay");
             }
         }
         finally
