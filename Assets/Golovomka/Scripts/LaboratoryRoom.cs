@@ -22,7 +22,7 @@ namespace Golovomka
             ? cameraArea.bounds
             : new Bounds(transform.position, cameraSize);
 
-        public enum Destination { Room, Station, Message, DemoEnd }
+        public enum Destination { Room = 0, Message = 2, DemoEnd = 3 }
 
         [Serializable]
         public sealed class Passage

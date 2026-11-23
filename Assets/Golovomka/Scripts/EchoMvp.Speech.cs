@@ -5,7 +5,6 @@ namespace Golovomka
 {
     public partial class EchoMvp
     {
-        const string RemoteLine = "Откуда тут взялся пульт и зачем он нужен?";
         const string RangeLine = "Здесь я воспользуюсь пистолетом";
         const float SpeechLettersPerSecond = 35f;
         const float SpeechReadTime = 1.7f;
@@ -18,7 +17,7 @@ namespace Golovomka
         float speechTime;
         int speechLetters;
         bool pistolHelpFollowsSpeech;
-        bool remoteLineShown, rangeGuideShown;
+        bool rangeGuideShown;
 
         void CreateSpeechUI()
         {

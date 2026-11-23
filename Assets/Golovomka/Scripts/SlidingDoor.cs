@@ -8,7 +8,7 @@ namespace Golovomka
         [SerializeField] Transform leftLeaf;
         [SerializeField] Transform rightLeaf;
         [SerializeField, Min(0)] float travel = .65f;
-        [SerializeField, Min(.01f)] float duration = .24f;
+        [SerializeField, Min(.01f)] float duration = .45f;
 
         const float SideClearance = .60f;
         Vector3 leftClosed;
@@ -104,10 +104,12 @@ namespace Golovomka
             if (approach && approach.isTrigger != passable) approach.isTrigger = passable;
         }
 
-        void LateUpdate()
+        void LateUpdate() => AdvanceLeaves(Time.deltaTime);
+
+        void AdvanceLeaves(float deltaTime)
         {
             if (opening != target)
-                Apply(Mathf.MoveTowards(opening, target, Time.deltaTime / duration));
+                Apply(Mathf.MoveTowards(opening, target, deltaTime / duration));
         }
 
         void Apply(float amount)

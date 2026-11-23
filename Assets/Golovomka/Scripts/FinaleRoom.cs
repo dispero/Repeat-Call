@@ -199,16 +199,16 @@ namespace Golovomka
             Vector2 shooterFeet = shot.origin - Vector2.up * TargetRangeRoom.MuzzleHeight;
             float distance = Cast(origin, direction, Range, shooterFeet: shooterFeet);
             Bandit victim = null;
-            int hostage = -1;
+            bool stoppedByHostage = false;
             Test(chaser);
             Test(watcher);
             Test(sentry);
             for (int i = 0; i < captives.Length; i++)
                 if (captives[i].gameObject.activeSelf && Hit(origin, direction, captives[i].transform.position, ref distance))
-                    hostage = i;
+                    stoppedByHostage = true;
 
             DrawTrace(copy ? copyTrace : playerTrace, origin, direction, distance, time, shooterFeet.y);
-            if (hostage >= 0) { LoseHostage(hostage, "В заложника попала пуля."); return; }
+            if (stoppedByHostage) return;
             if (victim != null) victim.body.gameObject.SetActive(false);
             if (watcher.Alive && !chaser.Alive && !sentry.Alive)
                 LoseHostage(0, "Охранник убил заложника после гибели обоих сообщников.");
@@ -258,14 +258,16 @@ namespace Golovomka
                 (copy.Value - point).sqrMagnitude <= (player - point).sqrMagnitude + .1f);
             Vector2 target = targetCopy ? copy.Value : player;
             Vector2 aim = target - point;
-            Vector2 direction = Cardinal(aim);
-            Vector2 muzzle = BanditMuzzle(bandit, direction);
             bool seesTarget = seesPlayer || seesCopy;
+            bool pointBlank = seesTarget && Mathf.Abs(aim.x) < BodySize.x && Mathf.Abs(aim.y) < BodySize.y;
+            // В упор ствол может находиться за целью. Для наложившихся фигур сохраняем ракурс.
+            Vector2 direction = pointBlank ? bandit.direction : Cardinal(aim);
+            Vector2 muzzle = BanditMuzzle(bandit, direction);
             float aimDistance = Range;
-            bool aimedAtTarget = seesTarget && aim.sqrMagnitude > .012f &&
+            bool aimedAtTarget = seesTarget && !pointBlank &&
                 Hit(muzzle, direction, target, ref aimDistance);
             bool blocked = aimedAtTarget && Cast(muzzle, direction, Range, shooterFeet: point) <= aimDistance;
-            bool canFire = aimedAtTarget && !blocked;
+            bool canFire = pointBlank || (aimedAtTarget && !blocked);
             if (seesTarget && (local || !canFire))
             {
                 bandit.lastSeen = target;
@@ -281,7 +283,7 @@ namespace Golovomka
                 bandit.chargingCopy = targetCopy;
                 if (time >= bandit.chargeUntil && time >= bandit.nextShot)
                 {
-                    FireBandit(bandit, player, copy, direction, time, local ? lookoutTrace : pursuerTrace);
+                    FireBandit(bandit, player, copy, direction, time, local ? lookoutTrace : pursuerTrace, pointBlank);
                     bandit.nextShot = time + .85f;
                 }
                 ShowBandit(bandit, false, time, time < bandit.chargeUntil);
@@ -352,13 +354,21 @@ namespace Golovomka
             return Hit(muzzle, direction, target, ref distance);
         }
 
-        void FireBandit(Bandit bandit, Vector2 player, Vector2? copy, Vector2 direction, float time, Trace trace)
+        void FireBandit(Bandit bandit, Vector2 player, Vector2? copy, Vector2 direction, float time, Trace trace,
+            bool pointBlank)
         {
             bandit.firedAt = time;
             bandit.firedDirection = direction;
             ShotFired?.Invoke();
             Vector2 origin = BanditMuzzle(bandit, direction);
             bandit.firedMuzzle = origin;
+            if (pointBlank)
+            {
+                trace.line.enabled = false;
+                if (bandit.chargingCopy) CopyHit = true;
+                else Failure = "Иван погиб.";
+                return;
+            }
             float distance = Cast(origin, direction, Range, shooterFeet: bandit.body.transform.position);
             bool hitPlayer = Hit(origin, direction, player, ref distance);
             bool hitCopy = copy.HasValue && Hit(origin, direction, copy.Value, ref distance);

@@ -263,9 +263,11 @@ namespace Golovomka
 
         void StartFromTitle()
         {
-            remoteLineShown = false;
             rangeGuideShown = false;
-            BeginCycle();
+            LaboratoryRoom resumeRoom = null;
+            if (history.returnRoom > 0 && !rooms.TryGetValue(history.returnRoom, out resumeRoom))
+                resumeRoom = introductionRoom;
+            BeginCycle(resumeRoom);
         }
     }
 }

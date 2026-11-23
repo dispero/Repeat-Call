@@ -23,7 +23,8 @@ namespace Golovomka
         void UpdateIntroductionVisuals(bool immediate = false)
         {
             var feet = new Bounds(FeetCenter(position), FeetSize);
-            bool pressed = currentRoom == introductionRoom && plateA;
+            bool pressed = currentRoom == introductionRoom ? plateA :
+                DepartedEchoOnPlate(introductionRoom.roomNumber, room01.plateOverlay.transform.position);
             room01.door.SetPassage(pressed, feet, immediate);
             room01.plateOverlay.color = pressed ? new Color(0, 0, 0, .15f) : Color.clear;
             room01.remoteSprite.enabled = !history.remoteObtained;
@@ -33,31 +34,23 @@ namespace Golovomka
         {
             Vector2 remote = room01.remote.position;
             if (!history.remoteObtained && Vector2.Distance(position, remote) < 1.65f)
-                return history.firstReturnSeen ? Interaction.PickUpRemote : Interaction.InspectRemote;
+                return Interaction.PickUpRemote;
             return Interaction.None;
         }
 
         void UseIntroRemote()
         {
-            if (!history.firstReturnSeen)
-            {
-                history.firstReturnSeen = true;
-                ReturnToRoom();
-                Dialog("Пульт возвращения",
-                    "Заберите пульт у стола. После этого нажмите R, чтобы вернуться ко входу, который запомнил пульт. " +
-                    "Копия Ивана повторит его маршрут и действия из предыдущей попытки.\n\n" +
-                    "Пульт разработал Фёдор Карамазов. Он создал его втайне, когда работал учёным в СССР, " +
-                    "а затем увёз с собой в США.");
-            }
-            else if (!history.remoteObtained)
-            {
-                history.remoteObtained = true;
-                Save();
-                UpdateIntroductionVisuals();
-                prompt.text = string.Empty;
-                Dialog(string.Empty, "Вы взяли временной пульт. Нажмите R, чтобы вернуться в прошлое и оставить копию",
-                    "E/ENTER - продолжить");
-            }
+            if (currentRoom != introductionRoom || IntroNearby() != Interaction.PickUpRemote) return;
+
+            history.remoteObtained = true;
+            Save();
+            UpdateIntroductionVisuals();
+            prompt.text = string.Empty;
+            Dialog("Пульт возвращения",
+                "Вы взяли временной пульт. Нажмите R, чтобы вернуться в прошлое и оставить копию.\n\n" +
+                "Пульт разработал Фёдор Карамазов. Он создал его втайне, когда работал учёным в СССР, " +
+                "а затем увёз с собой в США.",
+                "E/ENTER - продолжить");
         }
 
         void ReturnToRoom()

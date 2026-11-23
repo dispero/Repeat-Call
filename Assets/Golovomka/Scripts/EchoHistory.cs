@@ -74,7 +74,7 @@ namespace Golovomka
         public int returnRoom;
         [Serializable] sealed class LegacyProgress { public int clearedRooms; }
         public bool completed;
-        public bool firstReturnSeen, remoteObtained;
+        public bool remoteObtained;
         public bool room2DoorPreviewSeen;
         public List<EchoTape> tapes = new List<EchoTape>();
 
@@ -161,13 +161,13 @@ namespace Golovomka
                         if (cleared < 0 || cleared > maxRoom) continue;
                         if (cleared > 0)
                         {
-                            data.firstReturnSeen = data.remoteObtained = true;
+                            data.remoteObtained = true;
                             data.returnRoom = Mathf.Min(cleared + 1, maxRoom);
                         }
                     }
-                    if (data.remoteObtained && !data.firstReturnSeen) valid = false;
-                    if (!valid) continue;
                     if (data.version == 3) data.InsertButtonRoom();
+                    if (data.returnRoom == 0 && (data.remoteObtained || data.tapes.Count > 0))
+                        data.returnRoom = 1;
                     if (data.version < 6)
                         data.tapes.RemoveAll(tape => tape.room == 4);
                     if (data.version == 6)

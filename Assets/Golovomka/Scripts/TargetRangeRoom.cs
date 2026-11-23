@@ -225,6 +225,11 @@ namespace Golovomka
         internal Vector2 GetPistolMuzzle(Vector2 direction) =>
             pistolPoses[RangePistol.PoseIndex(direction)].muzzle;
 
+        internal void ShowDepartedEchoPose(SpriteRenderer copy, Vector2 direction, bool moving, float time)
+        {
+            copy.sprite = pistolPoses[RangePistol.PoseIndex(direction)].GetBody(moving, time);
+        }
+
         public void ShowPistols(SpriteRenderer player, Vector2 direction, bool playerMoving, bool playerArmed,
             SpriteRenderer copy, Vector2 copyDirection, bool copyMoving, bool copyArmed, float time)
         {

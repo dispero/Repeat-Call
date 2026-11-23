@@ -97,42 +97,45 @@ public static class EchoIntroductionVerification
         Check(m.zone==1 && m.position==spawn && m.recordingActive && m.recording.frames[0].zone==1, "Basement starts recording at its scene marker");
         var wallColliders = intro.transform.parent.GetComponentsInChildren<UnityEngine.Tilemaps.TilemapCollider2D>();
         Check(Array.Exists(wallColliders, wall => wall.name == "Стены" && wall.shapeCount > 0), "Laboratory wall tiles generate solid shapes");
+        Check((Interaction)Call("Nearby") == Interaction.None, "The laboratory entrance offers no return interaction");
         m.Interact(Interaction.UseRoomPassage);
-        Check(station.gameObject.activeInHierarchy && Array.TrueForAll(labRoots, root => !root.activeSelf) &&
-            m.position == (Vector2)station.entrance.position && !m.recordingActive && m.history.tapes.Count == 0,
-            "Returning to the station discards the unfinished attempt and restores its scene");
-        m.Interact(Interaction.AnswerPhone); Call("Close"); m.Interact(Interaction.EnterLaboratory);
-        Call("AdvanceStationFade", .25f);
-        Call("AdvanceStationFade", .25f);
+        Check(!station.gameObject.activeInHierarchy && m.zone == 1 && m.position == spawn && m.recordingActive,
+            "Interaction at the entrance leaves Ivan and the current attempt in the laboratory");
+        Check(EchoHistory.Load(m.saveFileOverride)?.returnRoom == 1, "Entering the laboratory saves its first checkpoint");
+        Call("ShowMenu");
+        Call("UseTitleOption", 0);
+        Check(!station.gameObject.activeInHierarchy && m.zone == 1 && m.position == spawn && m.recordingActive,
+            "Continue loads the laboratory even before the remote is picked up");
         Vector2 plate = m.CurrentPlateA;
         var remote = ReachRemote(intro.remote.position);
         Check(intro.gameObject.activeInHierarchy && m.position==spawn && m.recordingActive,"Laboratory scene can be reactivated");
         m.RestartCycle(); Check(m.history.cycle==1 && m.position==spawn,"R locked before obtaining remote");
         Move(plate); Check(m.plateA,"First approach presses panel");
-        float onPlateTime=m.elapsed;
         Move(remote); Check(!m.plateA,"Leaving panel removes signal");
         var nearby = (Interaction)Call("Nearby");
-        Check(nearby == Interaction.InspectRemote,"Remote reachable from floor");
+        Check(nearby == Interaction.PickUpRemote, "The first approach offers pickup");
+        float pickupTime = m.elapsed;
+        int pickupFrames = m.recording.frames.Count;
         m.Interact(nearby);
-        Check(m.position==spawn && m.history.firstReturnSeen && !m.history.remoteObtained && m.history.ForRoom(1) != null,"First return creates one recording at room entrance");
-        Check(m.mode == "dialog" && m.elapsed == 0 && m.recordingActive,
-            "The remote explanation opens at the entrance before playback advances");
+        Check(m.position == remote && m.history.remoteObtained && !intro.remoteSprite.enabled &&
+            m.history.cycle == 1 && m.history.ForRoom(1) == null,
+            "The first interaction picks up the remote without returning or creating a copy");
+        var pickupSave = EchoHistory.Load(m.saveFileOverride);
+        Check(pickupSave != null && pickupSave.remoteObtained && pickupSave.ForRoom(1) == null,
+            "The remote is saved before the first return");
+        Check(m.mode == "dialog" && m.recordingActive, "Pickup opens the explanation during the current attempt");
         Call("Update");
-        Check(m.elapsed == 0 && m.recording.frames.Count == 1, "The explanation pauses the attempt clock");
+        Check(m.elapsed == pickupTime && m.recording.frames.Count == pickupFrames, "The explanation pauses the attempt clock");
         Call("Close");
-        Check(m.mode == "play" && m.elapsed == 0, "Closing the explanation resumes from the common zero");
-        Check(m.history.ForRoom(1).Sample(onPlateTime,out var f) && Vector2.Distance(new Vector2(f.x,f.y),plate)<.1f,"First copy repeats panel approach");
-        m.elapsed=onPlateTime; m.UpdateGhosts(); Check(m.plateA,"First copy opens door");
-        m.elapsed=m.history.ForRoom(1).duration+.1f; m.UpdateGhosts(); Check(!m.plateA,"Copy ends and releases panel");
-        m.position=remote;
-        nearby = (Interaction)Call("Nearby");
-        Check(nearby == Interaction.PickUpRemote,"Second interaction offers pickup");
-        m.Interact(nearby); Check(m.history.remoteObtained && m.mode == "play", "Remote pickup does not reopen the explanation");
-        m.RestartCycle(); Move(plate); float holdStart=m.elapsed;
+        Check(m.mode == "play" && m.elapsed == pickupTime && (Interaction)Call("Nearby") != Interaction.PickUpRemote,
+            "Closing the explanation resumes the attempt and pickup is no longer available");
+        Move(plate); float holdStart=m.elapsed;
         for(int i=0;i<600;i++){m.elapsed+=.02f;m.Record();}
         m.RestartCycle(); Check(m.zone==1 && m.position==spawn && m.elapsed==0 && m.recordingActive,"R resets current room and common clock");
         Check(m.history.ForRoom(1) != null,"One recording limit in first room");
         m.elapsed=holdStart+1; m.UpdateGhosts(); Check(m.plateA,"Prepared copy holds panel");
+        m.elapsed=m.history.ForRoom(1).duration+.1f; m.UpdateGhosts(); Check(!m.plateA,"Copy ends and releases panel");
+        m.elapsed=holdStart+1; m.UpdateGhosts();
         Vector2 inside = intro.door.Passage.bounds.center;
         var doorApproach = intro.door.transform.Find("Door Approach").GetComponent<BoxCollider2D>();
         var approach = new Vector2(doorApproach.bounds.min.x - .27f, inside.y);
@@ -146,7 +149,7 @@ public static class EchoIntroductionVerification
         Check(!CanStand(sofa.bounds.center),"Sofa collision");
         Check(!CanStand(desk.bounds.center),"Desk collision");
         m.position=approach; m.elapsed=holdStart+1; m.UpdateGhosts();
-        void CrossDoor(LaboratoryRoom room, SlidingDoor door, bool staysOpen = false)
+        void CrossDoor(LaboratoryRoom room, SlidingDoor door, bool staysOpen = false, bool heldByCopy = false)
         {
             var passage = Array.Find(room.passages, item => item.IsAutomatic);
             var bounds = door.Passage.bounds;
@@ -165,6 +168,8 @@ public static class EchoIntroductionVerification
             m.position = after;
             var crossing = Call("FindCrossing", before);
             Check(ReferenceEquals(crossing, passage), "Crossing picks the automatic exit for the active room");
+            if (heldByCopy) door.SetOpen(true, immediate: true);
+            float timeLeft = (m.history.ForRoom(room.roomNumber)?.duration ?? 0) - m.elapsed;
             Call("UsePassage", crossing);
             Check(m.position == after, "The transition preserves the player's position");
             while (m.position.x < bounds.max.x + .35f)
@@ -174,10 +179,34 @@ public static class EchoIntroductionVerification
                 m.position = step;
             }
             m.UpdateGhosts();
-            Check(door.Passage.isTrigger == staysOpen, "The old door has the expected state after crossing");
+            Check(door.Passage.isTrigger == (staysOpen || heldByCopy), "The old door has the expected state after crossing");
+            if (heldByCopy)
+            {
+                var echo = m.GetComponentsInChildren<SpriteRenderer>().Single(sprite =>
+                    sprite.name == "Echo(Clone)" && sprite.enabled);
+                Check(echo.enabled && m.elapsed == 0 && m.recording.frames.Count == 1,
+                    "The old echo remains visible while the new room starts recording");
+                Call("AdvanceDepartedEchoes", timeLeft + .01f);
+                m.UpdateGhosts();
+                Check(!echo.enabled && !door.Passage.isTrigger, "The old echo releases the plate when its tape ends");
+
+                var opening = typeof(SlidingDoor).GetField("opening", BindingFlags.Instance | BindingFlags.NonPublic);
+                var advance = typeof(SlidingDoor).GetMethod("AdvanceLeaves", BindingFlags.Instance | BindingFlags.NonPublic);
+                Check((float)opening.GetValue(door) == 1f, "Closing keeps the current leaf position at the transition");
+                advance.Invoke(door, new object[] { .225f });
+                Check(Mathf.Approximately((float)opening.GetValue(door), .5f), "The leaves are halfway closed after 0.225 seconds");
+                advance.Invoke(door, new object[] { .225f });
+                Check(Mathf.Approximately((float)opening.GetValue(door), 0f), "The leaves finish closing in 0.45 seconds");
+                door.SetOpen(true);
+                advance.Invoke(door, new object[] { .225f });
+                Check(Mathf.Approximately((float)opening.GetValue(door), .5f), "The leaves are halfway open after 0.225 seconds");
+                advance.Invoke(door, new object[] { .225f });
+                Check(Mathf.Approximately((float)opening.GetValue(door), 1f), "The leaves finish opening in 0.45 seconds");
+                door.SetOpen(false, immediate: true);
+            }
         }
 
-        CrossDoor(room1, intro.door);
+        CrossDoor(room1, intro.door, heldByCopy: true);
         Check(m.zone == 2 && m.history.returnRoom == 2 && m.recordingActive,
             "First exit saves the remote return point and starts recording in room 2");
         Check(m.history.ForRoom(1) != null && m.recording.frames.Count == 1 && m.recording.frames[0].zone == 2,
@@ -185,10 +214,10 @@ public static class EchoIntroductionVerification
         var finished = EchoHistory.Load(m.saveFileOverride);
         Check(finished != null && finished.returnRoom == 2 && finished.remoteObtained,
             "The new return point survives save/load");
-        m.history = finished;
-        m.RestartCycle();
-        Check(m.position == (Vector2)room2.entrance.position && CanStand(m.position),
-            "The loaded return point is walkable");
+        Call("ShowMenu");
+        Call("UseTitleOption", 0);
+        Check(m.zone == 2 && m.position == (Vector2)room2.entrance.position && CanStand(m.position),
+            "Continue loads the latest walkable laboratory checkpoint");
         Vector2 a = sequence.first.plate.transform.position;
         Vector2 b = sequence.second.plate.transform.position;
         Vector2 doorA = sequence.first.door.Passage.bounds.center;
@@ -227,7 +256,7 @@ public static class EchoIntroductionVerification
         Check(!m.plateA && m.plateB && Can(doorB), "Copy opens B only");
         Check(typeof(EchoMvp).GetField("room2PreviewDoor", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(m) == null,
             "Playback does not repeat the door preview");
-        CrossDoor(room2, sequence.second.door);
+        CrossDoor(room2, sequence.second.door, heldByCopy: true);
         var room3 = rooms.Single(room => room.roomNumber == 3);
         var buttons = room3.GetComponent<TimedButtonsRoom>();
         Check(m.zone == 3 && m.history.returnRoom == 3 &&
@@ -346,6 +375,7 @@ public static class EchoIntroductionVerification
 
         VerifyLookoutAnimation(finale, m.position, Check);
         VerifyLookoutCover(finale, m.position, Check);
+        VerifyPointBlankShots(finale, m.position, Check);
 
         Vector2 chaseStart = finale.pursuer.transform.position;
         Vector2 lookoutStart = finale.lookout.transform.position;
@@ -397,9 +427,13 @@ public static class EchoIntroductionVerification
         }
 
         ShootFrom((Vector2)finale.fyodor.transform.position + Vector2.down, Vector2.up, .1f);
-        Check(finale.Failure != null && !finale.fyodor.gameObject.activeSelf, "An accidental shot at a hostage fails the attempt");
+        Check(finale.Failure == null && finale.fyodor.gameObject.activeSelf,
+            "Ivan's shot stops at the hostage without harming him or failing the attempt");
         m.elapsed = .2f;
         m.RestartCycle();
+        finale.Replay(m.history.ForRoom(5), .1f);
+        Check(finale.Failure == null && finale.fyodor.gameObject.activeSelf,
+            "The recorded shot is also harmless to the hostage when replayed by the copy");
 
         ShootFrom(chaseStart + Vector2.left * 1.15f, Vector2.right, .1f);
         ShootFrom(lookoutStart + Vector2.right * 1.1f, Vector2.left, .7f);
@@ -422,13 +456,14 @@ public static class EchoIntroductionVerification
         Call("UpdateFinale", 0f, false, true);
         Check(finale.Complete && m.mode == "done" && !m.recordingActive && EchoHistory.Load(m.saveFileOverride).completed,
             "Both releases finish the game and save completion");
-        m.history = EchoHistory.Load(m.saveFileOverride);
-        m.BeginCycle();
-        Call("ActivateRoom", room1, null, false, false);
-        m.RestartCycle();
+        Call("ShowMenu");
+        Call("UseTitleOption", 0);
         Check(finale.Complete && !m.recordingActive && m.mode == "done", "The reopened save restores the completed finale");
 
-        var old = new EchoHistory { version = 3, returnRoom = 3, firstReturnSeen = true, remoteObtained = true };
+        new EchoHistory { remoteObtained = true }.Save(m.saveFileOverride);
+        Check(EchoHistory.Load(m.saveFileOverride)?.returnRoom == 1,
+            "An older save with a remote but no checkpoint resumes in room 1");
+        var old = new EchoHistory { version = 3, returnRoom = 3, remoteObtained = true };
         old.tapes.Add(new EchoTape { room = 3, duration = 3 });
         old.tapes.Add(new EchoTape { room = 3, duration = 4 });
         old.Save(m.saveFileOverride);
@@ -473,7 +508,7 @@ public static class EchoIntroductionVerification
                 CheckFrame("Shoot", name, "Aim", false, .50f, charging: true);
                 check(!flash.enabled, "Lookout keeps the separate pistol hidden while aiming");
 
-                fire.Invoke(finale, new object[] { lookout, entry + Vector2.up * 100f, null, direction, 1f, trace });
+                fire.Invoke(finale, new object[] { lookout, entry + Vector2.up * 100f, null, direction, 1f, trace, false });
                 facing.SetValue(lookout, -direction);
                 CheckFrame("Shoot", name, "Flash", false, 1.02f);
                 check(flash.enabled == (direction == Vector2.up), $"Lookout uses a separate flash only from behind ({name})");
@@ -518,6 +553,37 @@ public static class EchoIntroductionVerification
                 "Lookout leaves the blocked firing position beside the central equipment");
             check((float)firedAt.GetValue(lookout) >= 0f && finale.Failure == "Иван погиб.",
                 "Lookout fires only after reaching a position with a clear shot");
+        }
+        finally
+        {
+            finale.Begin(entry);
+        }
+    }
+
+    static void VerifyPointBlankShots(FinaleRoom finale, Vector2 entry, Action<bool, string> check)
+    {
+        try
+        {
+            foreach (var attacker in new[] { finale.pursuer, finale.lookout })
+            {
+                finale.Begin(entry);
+                if (attacker == finale.pursuer) finale.lookout.gameObject.SetActive(false);
+                else finale.pursuer.gameObject.SetActive(false);
+
+                Vector2 overlap = attacker.transform.position;
+                finale.Tick(0, .1f, overlap, null);
+                finale.Tick(0, .3f, overlap, null);
+                check(finale.Failure == null, "A point-blank shot still requires preparation");
+                finale.Tick(0, .7f, overlap, null);
+                check(finale.Failure == "Иван погиб.", "Both shooters can hit Ivan at an identical position");
+            }
+
+            finale.Begin(entry);
+            finale.pursuer.gameObject.SetActive(false);
+            Vector2 copy = finale.lookout.transform.position + Vector3.left * .2f;
+            finale.Tick(0, .1f, entry, copy);
+            finale.Tick(0, .7f, entry, copy);
+            check(finale.CopyHit && finale.Failure == null, "A point-blank shot aimed at an overlapping copy hits only the copy");
         }
         finally
         {

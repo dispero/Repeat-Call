@@ -15,7 +15,6 @@ namespace Golovomka
             None,
             AnswerPhone,
             EnterLaboratory,
-            InspectRemote,
             PickUpRemote,
             UseRoomPassage,
             PressTimedButton,
@@ -61,7 +60,7 @@ namespace Golovomka
         PoliceStationLayout station;
         Room01Layout room01;
         readonly Dictionary<int, LaboratoryRoom> rooms = new Dictionary<int, LaboratoryRoom>();
-        readonly List<SequenceRoomLayout> sequences = new List<SequenceRoomLayout>();
+        readonly List<(int room, SequenceRoomLayout layout)> sequences = new List<(int, SequenceRoomLayout)>();
         SequenceRoomLayout currentSequence;
         TimedButtonsRoom currentButtons;
         TargetRangeRoom currentRange;
@@ -144,7 +143,7 @@ namespace Golovomka
                         Debug.LogError("Проверьте ссылки плит и дверей комнаты.", puzzle);
                         yield break;
                     }
-                    sequences.Add(puzzle);
+                    sequences.Add((room.roomNumber, puzzle));
                 }
                 if (!room.entrance || room.roomNumber < 1 || room.roomNumber > EchoHistory.MaxRoomNumber ||
                     rooms.ContainsKey(room.roomNumber))
@@ -202,13 +201,13 @@ namespace Golovomka
             foreach (var root in roots) root.SetActive(visible);
         }
 
-        public void BeginCycle()
+        public void BeginCycle(LaboratoryRoom resumeRoom = null)
         {
             replayFinale = false;
-            facing = 3; phoneRead = false; mode = "play";
+            facing = resumeRoom ? 0 : 3; phoneRead = false; mode = "play";
             titleScreen.SetActive(false);
-            ActivateRoom(null);
             panel.gameObject.SetActive(false);
+            ActivateRoom(resumeRoom, returning: resumeRoom != null);
         }
         void ResetRoomRecording()
         {
@@ -231,15 +230,18 @@ namespace Golovomka
             if (!canvas) return;
             if (stationFade.gameObject.activeSelf)
             {
+                ResetOfficerMovement();
                 AdvanceStationFade(Time.unscaledDeltaTime);
                 return;
             }
             if (room2PreviewDoor)
             {
+                ResetOfficerMovement();
                 AdvanceRoom2DoorPreview(Mathf.Min(Time.unscaledDeltaTime, .05f));
                 return;
             }
             var k = Keyboard.current;
+            if (mode != "play" || k == null) ResetOfficerMovement();
             bool enter = k != null && (k.enterKey.wasPressedThisFrame || k.numpadEnterKey.wasPressedThisFrame);
             bool advance = enter || (k != null && k.eKey.wasPressedThisFrame);
             if (mode == "speech")
@@ -305,6 +307,7 @@ namespace Golovomka
             }
             if (k.rKey.wasPressedThisFrame) { RestartCycle(); return; }
             float dt = Mathf.Min(Time.deltaTime, .05f); if (recordingActive) elapsed += dt;
+            AdvanceDepartedEchoes(dt);
             UpdateGhosts();
             if (room2PreviewDoor) return;
             Vector2 move = new Vector2((k.dKey.isPressed || k.rightArrowKey.isPressed ? 1 : 0) - (k.aKey.isPressed || k.leftArrowKey.isPressed ? 1 : 0),
@@ -312,13 +315,8 @@ namespace Golovomka
             bool toggledPistol = CanDrawPistol && k.qKey.wasPressedThisFrame;
             if (toggledPistol) pistolDrawn = !pistolDrawn;
             Vector2 previousPosition = position;
-            if (move != Vector2.zero)
-            {
-                UpdateOfficerFacing(move, k);
-                var delta = move.normalized * moveSpeed * dt;
-                Vector2 step = position + new Vector2(delta.x, 0); if (CanMove(step)) position = step;
-                step = position + new Vector2(0, delta.y); if (CanMove(step)) position = step;
-            }
+            int previousFacing = facing;
+            MoveOfficer(move, k, dt);
             bool fire = pistolDrawn && (k.spaceKey.wasPressedThisFrame || (Mouse.current?.leftButton.wasPressedThisFrame ?? false));
             officerMoving = position != previousPosition;
             hero.sprite = officerWalk.GetFrame(facing, officerMoving, Time.time);
@@ -331,15 +329,10 @@ namespace Golovomka
             UpdateGhosts();
             var crossing = FindCrossing(previousPosition);
             if (crossing != null) { UsePassage(crossing); return; }
-            if (recordingActive && (toggledPistol || elapsed >= nextSample)) { Record(); nextSample = elapsed + .05f; }
+            if (recordingActive && (toggledPistol || facing != previousFacing || elapsed >= nextSample))
+            { Record(); nextSample = elapsed + .05f; }
             if (currentFinale && UpdateFinale(dt, fire, k.eKey.wasPressedThisFrame)) return;
             var target = Nearby();
-            if (target == Interaction.InspectRemote && !remoteLineShown)
-            {
-                remoteLineShown = true;
-                StartSpeech(RemoteLine);
-                return;
-            }
             prompt.text = target == Interaction.None ? (history.remoteObtained && currentRoom ? "WASD — идти    E — осмотр    R — вернуться к точке пульта    ESC — пауза" : "WASD / СТРЕЛКИ — идти    E — осмотр    ESC — пауза") : "[ E ]  " +
                 (target == Interaction.UseRoomPassage ? FindPassage().label : InteractionLabel(target));
             if (CanDrawPistol) prompt.text += pistolDrawn ? "    Q — убрать пистолет" : "    Q — достать пистолет";
@@ -379,13 +372,8 @@ namespace Golovomka
             {
                 ghost.enabled = true;
                 copyPistolDrawn = frame.pistolDrawn;
-                var copyPosition = new Vector2(frame.x, frame.y);
-                copyMoving = tape.Sample(Mathf.Max(0, elapsed - .08f), out var previous)
-                    && previous.zone == frame.zone
-                    && (copyPosition - new Vector2(previous.x, previous.y)).sqrMagnitude > .0001f;
+                copyMoving = DrawEcho(ghost, tape, frame, elapsed);
                 copyDirection = OfficerDirection(frame.facing);
-                Place(ghost, copyPosition);
-                ghost.sprite = officerWalk.GetFrame(frame.facing, copyMoving, elapsed);
                 if (hasPlateA) plateA |= EchoHistory.OnPlate(frame, CurrentPlateA);
                 if (currentSequence) plateB |= EchoHistory.OnPlate(frame, currentSequence.second.plate.transform.position);
             }
@@ -409,11 +397,12 @@ namespace Golovomka
             else if (CanDrawPistol)
                 pistolArt.ShowPistols(hero, ShotDirection, officerMoving, pistolDrawn,
                     ghost, copyDirection, copyMoving, copyPistolDrawn, elapsed);
-            foreach (var sequence in sequences)
+            foreach (var (room, sequence) in sequences)
             {
                 if (!sequence.isActiveAndEnabled) continue;
-                sequence.Apply(sequence == currentSequence && plateA, sequence == currentSequence && plateB,
-                    feet, immediateDoor);
+                bool active = sequence == currentSequence;
+                sequence.Apply(active ? plateA : DepartedEchoOnPlate(room, sequence.first.plate.transform.position),
+                    active ? plateB : DepartedEchoOnPlate(room, sequence.second.plate.transform.position), feet, immediateDoor);
             }
             if (previewDoor)
             {
@@ -461,7 +450,6 @@ namespace Golovomka
         {
             Interaction.AnswerPhone => "Телефон дежурного",
             Interaction.EnterLaboratory => "Отправиться в лабораторию",
-            Interaction.InspectRemote => "Осмотреть пульт",
             Interaction.PickUpRemote => "Взять пульт",
             Interaction.PressTimedButton => "Нажать кнопку",
             Interaction.ReadNoticeBoard => "Прочитать заметки",
@@ -474,7 +462,6 @@ namespace Golovomka
             switch (target)
             {
                 case Interaction.ReadNoticeBoard: ReadNoticeBoard(); break;
-                case Interaction.InspectRemote:
                 case Interaction.PickUpRemote: UseIntroRemote(); break;
                 case Interaction.PressTimedButton:
                     if (currentButtons && recordingActive)
@@ -509,6 +496,11 @@ namespace Golovomka
 
             if (leavingStation)
             {
+                if (history.returnRoom == 0)
+                {
+                    history.returnRoom = introductionRoom.roomNumber;
+                    Save();
+                }
                 ActivateRoom(introductionRoom);
                 prompt.text = "";
                 stationFadeTime = 0;
@@ -526,7 +518,7 @@ namespace Golovomka
                 : currentRange ? currentRange.Objective(tape != null)
                 : currentRoom != introductionRoom ? currentRoom.objective
                 : history.remoteObtained ? "Оставьте копию на панели и пройдите дверь справа"
-                : history.firstReturnSeen ? "Копия повторяет ваш путь. Заберите пульт у стола" : "Осмотрите комнату и пульт, появившийся из-под стола";
+                : "Заберите пульт у стола";
             status.text = "ЦИКЛ " + history.cycle.ToString("00") + "   •   " + (recordingActive ? "ЗАПИСЬ " + elapsed.ToString("0.0") + " с" : "ЗАПИСЬ НЕ АКТИВНА");
             if (currentRoom && !currentRoom.disableRecording) status.text += "   /   КОПИЙ: 1";
             if (currentRoom && tape != null)
@@ -550,6 +542,10 @@ namespace Golovomka
             shotAudio.Stop();
             room2PreviewDoor = null;
             bool enteringLaboratory = targetRoom && !currentRoom;
+            bool continuingForward = currentRoom && targetRoom && keepPosition && !returning && targetRoom.roomNumber > zone;
+            if (continuingForward) KeepDepartedEcho();
+            else
+                for (int room = 1; room < departedEchoes.Length; room++) ClearDepartedEcho(room);
             if (currentSequence) currentSequence.UpdateCabinetPlant(null);
             if (currentFinale) currentFinale.End();
             if (currentRange)
@@ -572,7 +568,10 @@ namespace Golovomka
             UpdateFurnitureSorting(inStation ? station.furniture : room01.furniture,
                 inStation ? station.phoneSprite : room01.remoteSprite);
             if (!keepPosition)
+            {
                 position = arrival ? arrival.position : (inStation ? station.entrance.position : targetRoom.entrance.position);
+                ResetOfficerMovement();
+            }
             if (inStation || targetRoom.disableRecording)
             {
                 elapsed = 0;
@@ -593,7 +592,7 @@ namespace Golovomka
             if (enteringLaboratory) CacheLaboratoryCameraBounds();
             FitRoomCamera(snap: enteringLaboratory);
             PositionStationExitLabel();
-            RefreshActors();
+            RefreshActors(immediateDoor: !continuingForward);
             if (currentRange && !returning && !rangeGuideShown) StartSpeech(RangeLine, showPistolHelp: true);
             if (currentFinale && history.completed && !replayFinale)
             {
@@ -662,14 +661,14 @@ namespace Golovomka
                 interactiveSprite.sortingOrder = deskSprite.sortingOrder + 1;
         }
 
-        void RefreshActors()
+        void RefreshActors(bool immediateDoor)
         {
             officerMoving = false;
             hero.sprite = officerWalk.GetFrame(facing, false, 0);
             hero.transform.localScale = heroBaseScale * (zone > 0 ? .65f : 1f);
             Place(hero, position);
             ghost.transform.localScale = hero.transform.localScale;
-            UpdateGhosts(immediateDoor: true);
+            UpdateGhosts(immediateDoor);
             HUD();
         }
         Text Text(string name, Transform parent, Vector2 size, Vector2 p, int fontSize, Color color, TextAnchor align = TextAnchor.UpperLeft)
