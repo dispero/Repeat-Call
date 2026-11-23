@@ -31,34 +31,31 @@ namespace Golovomka
 
             var screen = MenuRegion("TitleScreen", canvas.transform, Vector2.zero, Vector2.one);
             titleScreen = screen.gameObject;
-            var backdrop = MenuRegion("LaboratoryBackdrop", screen, Vector2.zero, Vector2.one);
+            var matte = screen.gameObject.AddComponent<Image>();
+            matte.color = new Color32(19, 25, 22, 255);
+            matte.raycastTarget = false;
+
+            var composition = MenuRegion("TitleComposition", screen, Vector2.zero, Vector2.one);
+            var backdrop = MenuRegion("LaboratoryBackdrop", composition, Vector2.zero, Vector2.one);
             var art = backdrop.gameObject.AddComponent<RawImage>();
-            art.texture = Resources.Load<Texture2D>("Menu/LaboratoryTitle");
+            var referenceArt = Resources.Load<Texture2D>("Menu/LaboratoryTitleReference");
+            art.texture = referenceArt ? referenceArt : Resources.Load<Texture2D>("Menu/LaboratoryTitle");
             art.color = art.texture ? Color.white : new Color32(12, 29, 32, 255);
             art.raycastTarget = false;
-            var cover = backdrop.gameObject.AddComponent<AspectRatioFitter>();
-            cover.aspectRatio = art.texture ? (float)art.texture.width / art.texture.height : 16f / 9f;
-            cover.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
+            var fit = composition.gameObject.AddComponent<AspectRatioFitter>();
+            fit.aspectRatio = art.texture ? (float)art.texture.width / art.texture.height : 16f / 9f;
+            fit.aspectMode = AspectRatioFitter.AspectMode.FitInParent;
 
             var menuFont = Resources.Load<Font>("Menu/PixelifySans");
             if (!menuFont) menuFont = font;
-            var wordmark = Resources.Load<Texture2D>("Menu/Wordmark");
-            var titleMin = new Vector2(.086f, .643f);
-            var titleMax = new Vector2(.58f, .805f);
-            if (wordmark)
+            if (!referenceArt)
             {
-                var logo = MenuRegion("Wordmark", screen, titleMin, titleMax).gameObject.AddComponent<RawImage>();
-                logo.texture = wordmark;
-                logo.raycastTarget = false;
-                FitMenuGraphic(logo.rectTransform, (float)wordmark.width / wordmark.height);
-            }
-            else
-            {
-                var logo = MenuLabel("Wordmark", screen, titleMin, titleMax, menuFont, 96, TitlePaper, "GOLOVOMKA");
+                var logo = MenuLabel("Wordmark", composition, new Vector2(.086f, .643f), new Vector2(.58f, .805f),
+                    menuFont, 96, TitlePaper, "GOLOVOMKA");
                 AddMenuOutline(logo, 3);
             }
 
-            titleNotice = MenuLabel("Confirmation", screen, new Vector2(.105f, .594f), new Vector2(.50f, .637f),
+            titleNotice = MenuLabel("Confirmation", composition, new Vector2(.105f, .594f), new Vector2(.50f, .637f),
                 menuFont, 23, TitlePaper, "Заменить текущее сохранение?");
             titleNotice.alignment = TextAnchor.MiddleLeft;
             AddMenuOutline(titleNotice, 1);
@@ -70,7 +67,7 @@ namespace Golovomka
             for (int i = 0; i < titleButtons.Length; i++)
             {
                 float top = .595f - i * .109f;
-                var frame = MenuRegion("Option" + (i + 1), screen, new Vector2(.106f, top - .093f),
+                var frame = MenuRegion("Option" + (i + 1), composition, new Vector2(.106f, top - .093f),
                     new Vector2(.395f, top));
                 var image = frame.gameObject.AddComponent<Image>();
                 var button = frame.gameObject.AddComponent<Button>();
@@ -81,12 +78,13 @@ namespace Golovomka
                     menuFont, 33, TitlePaper, "");
                 AddMenuOutline(titleLabels[i], 1);
 
-                var icon = MenuRegion("Icon", frame, new Vector2(.09f, .21f), new Vector2(.23f, .79f))
+                var icon = MenuRegion("Icon", frame, new Vector2(.08f, .21f), new Vector2(.23f, .79f))
                     .gameObject.AddComponent<RawImage>();
                 icon.texture = iconAtlas;
                 icon.enabled = iconAtlas != null;
                 icon.raycastTarget = false;
                 FitMenuGraphic(icon.rectTransform, 1);
+                AddMenuOutline(icon, 1);
                 titleIcons[i] = icon;
 
                 int index = i;
