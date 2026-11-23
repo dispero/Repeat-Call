@@ -66,6 +66,8 @@ namespace Golovomka
         TargetRangeRoom currentRange;
         FinaleRoom currentFinale;
         float finaleRetryDelay;
+        bool officerDying;
+        float officerDeathTime;
         bool replayFinale;
         TargetRangeRoom pistolArt;
         bool pistolDrawn;
@@ -293,6 +295,14 @@ namespace Golovomka
             }
             if (mode == "finale-failed")
             {
+                currentFinale.AdvanceFailureVisual(Time.unscaledDeltaTime);
+                if (officerDying)
+                {
+                    officerDeathTime += Time.unscaledDeltaTime;
+                    hero.sprite = officerWalk.GetDeathFrame(facing, officerDeathTime);
+                    if (officerDeathTime >= CharacterWalk.DeathAnimationDuration && !panel.gameObject.activeSelf)
+                        Panel("ПОПЫТКА ПРОВАЛЕНА", currentFinale.Failure + "\n\nВозврат ко входу…    R — сразу");
+                }
                 finaleRetryDelay -= Time.unscaledDeltaTime;
                 if (finaleRetryDelay <= 0 || k.rKey.wasPressedThisFrame) ReturnToRoom();
                 return;
@@ -538,6 +548,8 @@ namespace Golovomka
 
         void ActivateRoom(LaboratoryRoom targetRoom, Transform arrival = null, bool keepPosition = false, bool returning = false)
         {
+            officerDying = false;
+            officerDeathTime = 0;
             HideSpeechUI();
             shotAudio.Stop();
             room2PreviewDoor = null;
@@ -616,9 +628,17 @@ namespace Golovomka
             UpdateGhosts();
             if (currentFinale.Failure != null)
             {
+                officerDying = currentFinale.Failure == "Иван погиб." && officerWalk.HasDeathAnimation;
+                officerDeathTime = 0;
+                if (officerDying)
+                {
+                    pistolArt.HidePistols();
+                    hero.sprite = officerWalk.GetDeathFrame(facing, 0);
+                }
                 finaleRetryDelay = 2f;
                 mode = "finale-failed";
-                Panel("ПОПЫТКА ПРОВАЛЕНА", currentFinale.Failure + "\n\nВозврат ко входу…    R — сразу");
+                if (officerDying) panel.gameObject.SetActive(false);
+                else Panel("ПОПЫТКА ПРОВАЛЕНА", currentFinale.Failure + "\n\nВозврат ко входу…    R — сразу");
                 return true;
             }
             int hostage = currentFinale.NearbyCaptive(position);

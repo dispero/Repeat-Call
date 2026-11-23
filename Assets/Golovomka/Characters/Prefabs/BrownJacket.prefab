@@ -157,7 +157,23 @@ MonoBehaviour:
   - {fileID: 1244338484, guid: 217ab1b4848dce54a9f90e565cd26a65, type: 3}
   - {fileID: 793464014, guid: 217ab1b4848dce54a9f90e565cd26a65, type: 3}
   armedMuzzles:
-  - {x: 1.2886762, y: 1.8373206}
-  - {x: -1.2759171, y: 1.8373206}
+  - {x: 1.2886761, y: 1.8373206}
+  - {x: -1.275917, y: 1.8373206}
   - {x: 0, y: 1.9776715}
   - {x: 0.0127592, y: 1.6842105}
+  deathFrames:
+  - {fileID: -1135638550, guid: 6a14ffdebc782f3439dd80a9fcfedb41, type: 3}
+  - {fileID: -890574198, guid: 6a14ffdebc782f3439dd80a9fcfedb41, type: 3}
+  - {fileID: -2141611326, guid: 6a14ffdebc782f3439dd80a9fcfedb41, type: 3}
+  - {fileID: 599792826, guid: 6a14ffdebc782f3439dd80a9fcfedb41, type: 3}
+  - {fileID: 751399156, guid: 6a14ffdebc782f3439dd80a9fcfedb41, type: 3}
+  - {fileID: 1447242147, guid: 6a14ffdebc782f3439dd80a9fcfedb41, type: 3}
+  - {fileID: 341598421, guid: 6a14ffdebc782f3439dd80a9fcfedb41, type: 3}
+  - {fileID: 1427029250, guid: 6a14ffdebc782f3439dd80a9fcfedb41, type: 3}
+  - {fileID: -631313545, guid: 6a14ffdebc782f3439dd80a9fcfedb41, type: 3}
+  - {fileID: 145593115, guid: 6a14ffdebc782f3439dd80a9fcfedb41, type: 3}
+  - {fileID: -1622687166, guid: 6a14ffdebc782f3439dd80a9fcfedb41, type: 3}
+  - {fileID: -341576491, guid: 6a14ffdebc782f3439dd80a9fcfedb41, type: 3}
+  armedLeftReady: {fileID: 0}
+  armedLeftShoot: []
+  armedLeftMuzzle: {x: 0, y: 0}

@@ -161,3 +161,19 @@ MonoBehaviour:
   - {x: -1.2376395, y: 1.7097288}
   - {x: 0, y: 1.8755981}
   - {x: -0.03827751, y: 1.569378}
+  deathFrames:
+  - {fileID: 1872432303, guid: 74db650f81a66f845bf737ad991408bf, type: 3}
+  - {fileID: 340847858, guid: 74db650f81a66f845bf737ad991408bf, type: 3}
+  - {fileID: 437035485, guid: 74db650f81a66f845bf737ad991408bf, type: 3}
+  - {fileID: -143193901, guid: 74db650f81a66f845bf737ad991408bf, type: 3}
+  - {fileID: -582869057, guid: 74db650f81a66f845bf737ad991408bf, type: 3}
+  - {fileID: 1666432286, guid: 74db650f81a66f845bf737ad991408bf, type: 3}
+  - {fileID: -641706618, guid: 74db650f81a66f845bf737ad991408bf, type: 3}
+  - {fileID: 1051560646, guid: 74db650f81a66f845bf737ad991408bf, type: 3}
+  - {fileID: 2071492783, guid: 74db650f81a66f845bf737ad991408bf, type: 3}
+  - {fileID: 1168716362, guid: 74db650f81a66f845bf737ad991408bf, type: 3}
+  - {fileID: 268397337, guid: 74db650f81a66f845bf737ad991408bf, type: 3}
+  - {fileID: -2079251529, guid: 74db650f81a66f845bf737ad991408bf, type: 3}
+  armedLeftReady: {fileID: 0}
+  armedLeftShoot: []
+  armedLeftMuzzle: {x: 0, y: 0}

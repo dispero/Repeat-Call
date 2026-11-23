@@ -122,3 +122,14 @@ MonoBehaviour:
   - {fileID: -567611523, guid: b8e6b25f2d908844aa1e31fb5665229b, type: 3}
   - {fileID: -940981765, guid: b8e6b25f2d908844aa1e31fb5665229b, type: 3}
   - {fileID: 4970411, guid: b8e6b25f2d908844aa1e31fb5665229b, type: 3}
+  armedWalk: []
+  armedShoot: []
+  armedMuzzles: []
+  deathFrames: []
+  armedLeftReady: {fileID: 52898406, guid: 90aac7261a0d27846b70e82a4c5bf818, type: 3}
+  armedLeftShoot:
+  - {fileID: 2127035126, guid: 90aac7261a0d27846b70e82a4c5bf818, type: 3}
+  - {fileID: -786121371, guid: 90aac7261a0d27846b70e82a4c5bf818, type: 3}
+  - {fileID: 255167145, guid: 90aac7261a0d27846b70e82a4c5bf818, type: 3}
+  - {fileID: -2042348992, guid: 90aac7261a0d27846b70e82a4c5bf818, type: 3}
+  armedLeftMuzzle: {x: -1.55, y: 1.84}

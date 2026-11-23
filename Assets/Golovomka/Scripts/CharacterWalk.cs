@@ -16,18 +16,38 @@ namespace Golovomka
         [SerializeField] Sprite[] armedWalk = Array.Empty<Sprite>();
         [SerializeField] Sprite[] armedShoot = Array.Empty<Sprite>();
         [SerializeField] Vector2[] armedMuzzles = Array.Empty<Vector2>();
+        [SerializeField] Sprite[] deathFrames = Array.Empty<Sprite>();
+        [SerializeField] Sprite armedLeftReady;
+        [SerializeField] Sprite[] armedLeftShoot = Array.Empty<Sprite>();
+        [SerializeField] Vector2 armedLeftMuzzle;
+        bool HasLeftArmedAnimation => armedLeftReady && armedLeftShoot.Length == 4 &&
+            Array.TrueForAll(armedLeftShoot, frame => frame);
 
-        internal bool HasArmedAnimation => armedWalk.Length == CardinalFrameCount && armedShoot.Length == CardinalFrameCount &&
+        internal bool HasDeathAnimation => deathFrames.Length == 12 && Array.TrueForAll(deathFrames, frame => frame);
+        internal const float DeathAnimationDuration = .54f;
+        internal Sprite GetDeathFrame(int facing, float time) =>
+            deathFrames[facing * 3 + Mathf.Clamp(Mathf.FloorToInt(time / (DeathAnimationDuration / 3f)), 0, 2)];
+
+        internal bool HasArmedAnimation => HasLeftArmedAnimation || armedWalk.Length == CardinalFrameCount && armedShoot.Length == CardinalFrameCount &&
             armedMuzzles.Length == CardinalDirectionCount && Array.TrueForAll(armedWalk, frame => frame) &&
             Array.TrueForAll(armedShoot, frame => frame);
 
-        internal Sprite GetArmedWalkFrame(int facing, bool moving, float time) =>
-            armedWalk[CharacterWalkCycle.FrameIndex(facing, CardinalDirectionCount, moving, time)];
+        internal Sprite GetArmedWalkFrame(int facing, bool moving, float time)
+        {
+            if (HasLeftArmedAnimation)
+                return facing == 1 ? armedLeftReady : GetFrame(facing, moving, time);
+            return armedWalk[CharacterWalkCycle.FrameIndex(facing, CardinalDirectionCount, moving, time)];
+        }
 
-        internal Sprite GetArmedShootFrame(int facing, int phase) =>
-            armedShoot[facing * CharacterWalkCycle.FramesPerDirection + phase];
+        internal Sprite GetArmedShootFrame(int facing, int phase)
+        {
+            if (HasLeftArmedAnimation)
+                return facing == 1 ? armedLeftShoot[phase] : GetFrame(facing, false, 0);
+            return armedShoot[facing * CharacterWalkCycle.FramesPerDirection + phase];
+        }
 
-        internal Vector2 GetArmedMuzzle(int facing) => transform.TransformPoint(armedMuzzles[facing]);
+        internal Vector2 GetArmedMuzzle(int facing) =>
+            transform.TransformPoint(HasLeftArmedAnimation ? armedLeftMuzzle : armedMuzzles[facing]);
 
         SpriteRenderer spriteRenderer;
         Vector2 previousPosition;

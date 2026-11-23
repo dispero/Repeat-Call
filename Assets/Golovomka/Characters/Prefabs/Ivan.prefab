@@ -126,3 +126,19 @@ MonoBehaviour:
   - {fileID: 1614387735, guid: fef451b411ffe3b4bac965a61e3cabc5, type: 3}
   - {fileID: 1154921329, guid: fef451b411ffe3b4bac965a61e3cabc5, type: 3}
   - {fileID: 929883020, guid: fef451b411ffe3b4bac965a61e3cabc5, type: 3}
+  armedWalk: []
+  armedShoot: []
+  armedMuzzles: []
+  deathFrames:
+  - {fileID: -590998926, guid: a73b3bd6827c9044d8886d07d776c020, type: 3}
+  - {fileID: -1661386948, guid: a73b3bd6827c9044d8886d07d776c020, type: 3}
+  - {fileID: -627737343, guid: a73b3bd6827c9044d8886d07d776c020, type: 3}
+  - {fileID: 2069826228, guid: a73b3bd6827c9044d8886d07d776c020, type: 3}
+  - {fileID: 1031423756, guid: a73b3bd6827c9044d8886d07d776c020, type: 3}
+  - {fileID: -565772355, guid: a73b3bd6827c9044d8886d07d776c020, type: 3}
+  - {fileID: 590149997, guid: a73b3bd6827c9044d8886d07d776c020, type: 3}
+  - {fileID: 147059194, guid: a73b3bd6827c9044d8886d07d776c020, type: 3}
+  - {fileID: 1231942005, guid: a73b3bd6827c9044d8886d07d776c020, type: 3}
+  - {fileID: -259343423, guid: a73b3bd6827c9044d8886d07d776c020, type: 3}
+  - {fileID: 1159516252, guid: a73b3bd6827c9044d8886d07d776c020, type: 3}
+  - {fileID: 96592737, guid: a73b3bd6827c9044d8886d07d776c020, type: 3}

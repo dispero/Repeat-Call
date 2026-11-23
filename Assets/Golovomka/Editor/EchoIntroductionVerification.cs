@@ -584,10 +584,31 @@ public static class EchoIntroductionVerification
             finale.Tick(0, .1f, entry, copy);
             finale.Tick(0, .7f, entry, copy);
             check(finale.CopyHit && finale.Failure == null, "A point-blank shot aimed at an overlapping copy hits only the copy");
+
+            foreach (var bandit in new[] { finale.pursuer, finale.guard, finale.lookout })
+            {
+                finale.Begin(entry);
+                var tape = new EchoTape { room = 5, duration = .5f };
+                Vector2 overlap = bandit.transform.position;
+                finale.Shoot(overlap, Vector2.right, .1f, tape, Vector2.right * .75f);
+                check(BanditDefeated(bandit) && finale.Failure == null,
+                    "Ivan hits an overlapping bandit even when his muzzle is past the target");
+
+                finale.Begin(entry);
+                finale.Replay(tape, .1f);
+                check(BanditDefeated(bandit) && finale.Failure == null,
+                    "The copy can replay a point-blank hit");
+            }
         }
         finally
         {
             finale.Begin(entry);
         }
+    }
+
+    static bool BanditDefeated(CharacterWalk body)
+    {
+        if (!body.gameObject.activeSelf) return true;
+        return body.GetComponent<SpriteRenderer>().sprite.name.Contains("Death_");
     }
 }

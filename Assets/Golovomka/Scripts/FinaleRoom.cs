@@ -43,6 +43,7 @@ namespace Golovomka
         Material traceMaterial;
         Trace playerTrace, copyTrace, pursuerTrace, lookoutTrace;
         float nextPlayerShot, lureUntil;
+        float guardShotTime;
         int replayShot;
         bool recordedMovement;
         Vector2 startPosition;
@@ -63,6 +64,9 @@ namespace Golovomka
             public Vector2? firingPosition;
             public float chargeUntil, nextShot, firedAt;
             public bool tracked, chargingCopy;
+            public bool dead;
+            public float deathTime;
+            public int deathFacing;
 
             public Bandit(CharacterWalk body, SpriteRenderer gun, Sprite pistolFlash)
             {
@@ -80,12 +84,31 @@ namespace Golovomka
                 body.enabled = false;
             }
 
-            public bool Alive => body.gameObject.activeSelf;
+            public bool Alive => !dead && body.gameObject.activeSelf;
+
+            public void Die()
+            {
+                dead = true;
+                deathTime = 0;
+                deathFacing = Facing(direction);
+                gun.enabled = false;
+                if (body.HasDeathAnimation) sprite.sprite = body.GetDeathFrame(deathFacing, 0);
+                else body.gameObject.SetActive(false);
+            }
+
+            public void AdvanceDeath(float deltaTime)
+            {
+                if (!dead || !body.HasDeathAnimation || !body.gameObject.activeSelf) return;
+                deathTime = Mathf.Min(CharacterWalk.DeathAnimationDuration, deathTime + deltaTime);
+                sprite.sprite = body.GetDeathFrame(deathFacing, deathTime);
+            }
 
             public void Reset(Vector2 look)
             {
                 body.transform.position = start;
                 body.gameObject.SetActive(true);
+                dead = false;
+                deathTime = 0;
                 lastSeen = start;
                 direction = look;
                 chargingDirection = Vector2.zero;
@@ -132,6 +155,7 @@ namespace Golovomka
             HideTraces();
             chaser.Reset(Vector2.left);
             watcher.Reset(Vector2.left);
+            guardShotTime = 0;
             sentry.Reset(Vector2.left);
             for (int i = 0; i < captives.Length; i++)
             {
@@ -159,6 +183,7 @@ namespace Golovomka
             playerTrace.line.enabled = copyTrace.line.enabled = pursuerTrace.line.enabled = lookoutTrace.line.enabled = false;
             if (chaser.hasArmedAnimation) chaser.gun.enabled = false;
             if (sentry.hasArmedAnimation) sentry.gun.enabled = false;
+            if (watcher.hasArmedAnimation) watcher.gun.enabled = false;
         }
 
         public void RestoreCompletion()
@@ -198,6 +223,7 @@ namespace Golovomka
             Vector2 direction = shot.direction;
             Vector2 shooterFeet = shot.origin - Vector2.up * TargetRangeRoom.MuzzleHeight;
             float distance = Cast(origin, direction, Range, shooterFeet: shooterFeet);
+            float closestOverlap = float.PositiveInfinity;
             Bandit victim = null;
             bool stoppedByHostage = false;
             Test(chaser);
@@ -207,9 +233,12 @@ namespace Golovomka
                 if (captives[i].gameObject.activeSelf && Hit(origin, direction, captives[i].transform.position, ref distance))
                     stoppedByHostage = true;
 
-            DrawTrace(copy ? copyTrace : playerTrace, origin, direction, distance, time, shooterFeet.y);
+            var trace = copy ? copyTrace : playerTrace;
+            if (float.IsPositiveInfinity(closestOverlap))
+                DrawTrace(trace, origin, direction, distance, time, shooterFeet.y);
+            else trace.line.enabled = false;
             if (stoppedByHostage) return;
-            if (victim != null) victim.body.gameObject.SetActive(false);
+            if (victim != null) victim.Die();
             if (watcher.Alive && !chaser.Alive && !sentry.Alive)
                 LoseHostage(0, "Охранник убил заложника после гибели обоих сообщников.");
 
@@ -222,7 +251,16 @@ namespace Golovomka
 
             void Test(Bandit bandit)
             {
-                if (bandit.Alive && Hit(origin, direction, bandit.body.transform.position, ref distance)) victim = bandit;
+                if (!bandit.Alive) return;
+                Vector2 target = bandit.body.transform.position;
+                Vector2 offset = target - shooterFeet;
+                if (FeetOverlap(offset) && offset.sqrMagnitude < closestOverlap && Clear(shooterFeet, target))
+                {
+                    closestOverlap = offset.sqrMagnitude;
+                    distance = 0f;
+                    victim = bandit;
+                }
+                else if (Hit(origin, direction, target, ref distance)) victim = bandit;
             }
         }
 
@@ -245,6 +283,14 @@ namespace Golovomka
             if (sentry.Alive && Failure == null) UpdateBandit(sentry, player, CopyHit ? null : copy, dt, time, true);
         }
 
+        void LateUpdate()
+        {
+            if (!Active || chaser == null) return;
+            chaser.AdvanceDeath(Time.deltaTime);
+            watcher.AdvanceDeath(Time.deltaTime);
+            sentry.AdvanceDeath(Time.deltaTime);
+        }
+
         bool DetectsUpper(Vector2 target) => upperApproach.OverlapPoint(target) && Clear(watcher.start, target);
 
         void UpdateBandit(Bandit bandit, Vector2 player, Vector2? copy, float dt, float time, bool local)
@@ -259,7 +305,7 @@ namespace Golovomka
             Vector2 target = targetCopy ? copy.Value : player;
             Vector2 aim = target - point;
             bool seesTarget = seesPlayer || seesCopy;
-            bool pointBlank = seesTarget && Mathf.Abs(aim.x) < BodySize.x && Mathf.Abs(aim.y) < BodySize.y;
+            bool pointBlank = seesTarget && FeetOverlap(aim);
             // В упор ствол может находиться за целью. Для наложившихся фигур сохраняем ракурс.
             Vector2 direction = pointBlank ? bandit.direction : Cardinal(aim);
             Vector2 muzzle = BanditMuzzle(bandit, direction);
@@ -384,8 +430,22 @@ namespace Golovomka
 
         void LoseHostage(int index, string reason)
         {
+            if (reason.StartsWith("Охранник"))
+            {
+                watcher.firedAt = 0;
+                watcher.direction = watcher.firedDirection = Vector2.left;
+                guardShotTime = 0;
+                ShowBandit(watcher, false, 0);
+            }
             captives[index].gameObject.SetActive(false);
             Failure = reason;
+        }
+
+        internal void AdvanceFailureVisual(float deltaTime)
+        {
+            if (!watcher.Alive || watcher.firedAt != 0) return;
+            guardShotTime += deltaTime;
+            ShowBandit(watcher, false, guardShotTime);
         }
 
         public int NearbyCaptive(Vector2 player)
@@ -411,6 +471,8 @@ namespace Golovomka
 
         public string Status(float time) => Cleared ? "ОСВОБОЖДЕНО: " + ((released[0] ? 1 : 0) + (released[1] ? 1 : 0)) + " / 2"
             : time < lureUntil && sentry.Alive ? "СТРЕЛОК ОТВЛЕЧЁН" : "ЗАЛОЖНИКИ: 2 / 2";
+
+        static bool FeetOverlap(Vector2 offset) => Mathf.Abs(offset.x) < BodySize.x && Mathf.Abs(offset.y) < BodySize.y;
 
         static Vector2 Cardinal(Vector2 delta) => Mathf.Abs(delta.x) >= Mathf.Abs(delta.y)
             ? (delta.x >= 0 ? Vector2.right : Vector2.left)
