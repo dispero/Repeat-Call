@@ -22,7 +22,7 @@ namespace Golovomka
         public const int Waves = 5;
         public const float StartDelay = 4f;
         public const float WaveInterval = 2.2f;
-        public const float Window = 1f;
+        public const float Window = 1.2f;
         public const float ShotInterval = 1f;
         public const float MuzzleHeight = .85f;
         const float Range = 24f;

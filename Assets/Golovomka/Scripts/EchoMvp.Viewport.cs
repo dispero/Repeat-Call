@@ -116,6 +116,7 @@ namespace Golovomka
         {
             FitRoomCamera();
             PositionStationExitLabel();
+            PositionSpeechBubble();
             UpdatePhoneRing();
         }
 

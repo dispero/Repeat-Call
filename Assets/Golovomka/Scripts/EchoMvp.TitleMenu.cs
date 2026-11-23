@@ -147,6 +147,7 @@ namespace Golovomka
 
         void ShowMenu()
         {
+            HideSpeechUI();
             shotAudio.Stop();
             bool canContinue = EchoHistory.Load(saveFileOverride) != null;
             mode = "menu";
@@ -222,7 +223,7 @@ namespace Golovomka
             {
                 case 0:
                     history = EchoHistory.Load(saveFileOverride);
-                    if (history != null) BeginCycle();
+                    if (history != null) StartFromTitle();
                     else ShowMenu();
                     break;
                 case 1:
@@ -252,6 +253,13 @@ namespace Golovomka
         {
             history = new EchoHistory();
             Save();
+            StartFromTitle();
+        }
+
+        void StartFromTitle()
+        {
+            remoteLineShown = false;
+            rangeGuideShown = false;
             BeginCycle();
         }
     }

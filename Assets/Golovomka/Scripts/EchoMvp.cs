@@ -238,8 +238,24 @@ namespace Golovomka
                 AdvanceRoom2DoorPreview(Mathf.Min(Time.unscaledDeltaTime, .05f));
                 return;
             }
-            var k = Keyboard.current; if (k == null) return;
-            bool enter = k.enterKey.wasPressedThisFrame || k.numpadEnterKey.wasPressedThisFrame;
+            var k = Keyboard.current;
+            bool enter = k != null && (k.enterKey.wasPressedThisFrame || k.numpadEnterKey.wasPressedThisFrame);
+            bool advance = enter || (k != null && k.eKey.wasPressedThisFrame);
+            if (mode == "speech")
+            {
+                UpdateSpeech(Time.unscaledDeltaTime, advance);
+                return;
+            }
+            if (mode == "pistol-help")
+            {
+                if (advance)
+                {
+                    rangeGuideShown = true;
+                    HideSpeechUI();
+                }
+                return;
+            }
+            if (k == null) return;
             if (mode == "menu" || mode == "confirm")
             {
                 UpdateTitleMenu(k, enter);
@@ -310,6 +326,12 @@ namespace Golovomka
             if (recordingActive && (toggledPistol || elapsed >= nextSample)) { Record(); nextSample = elapsed + .05f; }
             if (currentFinale && UpdateFinale(dt, fire, k.eKey.wasPressedThisFrame)) return;
             var target = Nearby();
+            if (target == Interaction.InspectRemote && !remoteLineShown)
+            {
+                remoteLineShown = true;
+                StartSpeech(RemoteLine);
+                return;
+            }
             prompt.text = target == Interaction.None ? (history.remoteObtained && currentRoom ? "WASD — идти    E — осмотр    R — вернуться к точке пульта    ESC — пауза" : "WASD / СТРЕЛКИ — идти    E — осмотр    ESC — пауза") : "[ E ]  " +
                 (target == Interaction.UseRoomPassage ? FindPassage().label : InteractionLabel(target));
             if (CanDrawPistol) prompt.text += pistolDrawn ? "    Q — убрать пистолет" : "    Q — достать пистолет";
@@ -516,6 +538,7 @@ namespace Golovomka
 
         void ActivateRoom(LaboratoryRoom targetRoom, Transform arrival = null, bool keepPosition = false, bool returning = false)
         {
+            HideSpeechUI();
             shotAudio.Stop();
             room2PreviewDoor = null;
             bool enteringLaboratory = targetRoom && !currentRoom;
@@ -558,6 +581,7 @@ namespace Golovomka
             FitRoomCamera(snap: enteringLaboratory);
             PositionStationExitLabel();
             RefreshActors();
+            if (currentRange && !returning && !rangeGuideShown) StartSpeech(RangeLine, showPistolHelp: true);
             if (currentFinale && history.completed && !replayFinale)
             {
                 currentFinale.RestoreCompletion();
@@ -659,6 +683,7 @@ namespace Golovomka
             dialogBody = Text("Body", panel, new Vector2(820, 340), new Vector2(0, TitledDialogBodyY), DialogFontSize, new Color(.86f, .9f, .89f));
             CreatePauseMenu();
             ArrangeOverlayHUD();
+            CreateSpeechUI();
             CreateTitleMenu();
             var fadeObject = new GameObject("StationFade", typeof(RectTransform), typeof(UnityEngine.UI.Image));
             stationFade = fadeObject.GetComponent<UnityEngine.UI.Image>();
@@ -682,7 +707,11 @@ namespace Golovomka
             dialogBody.rectTransform.anchoredPosition = new Vector2(0, hasTitle ? TitledDialogBodyY : 0f);
             dialogBody.fontSize = hasTitle ? DialogFontSize : DialogFontSize + 1;
         }
-        void Dialog(string title, string body) { mode = "dialog"; Panel(title, body + "\n\nE / ENTER — продолжить"); }
+        void Dialog(string title, string body, string continueHint = "E / ENTER — продолжить")
+        {
+            mode = "dialog";
+            Panel(title, body + "\n\n" + continueHint);
+        }
         void Close() { mode = "play"; panel.gameObject.SetActive(false); }
 
         void CreatePauseMenu()

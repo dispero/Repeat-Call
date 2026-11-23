@@ -295,8 +295,8 @@ public static class EchoIntroductionVerification
         for (int wave = 0; wave < pairs.Length; wave++)
         {
             float start = TargetRangeRoom.WaveStart(wave);
-            Check(TargetRangeRoom.ActiveWave(start + .99f) == wave && TargetRangeRoom.ActiveWave(start + 1f) == -1,
-                $"Wave {wave + 1} is hittable for one second");
+            Check(TargetRangeRoom.ActiveWave(start + 1.19f) == wave && TargetRangeRoom.ActiveWave(start + 1.21f) == -1,
+                $"Wave {wave + 1} is hittable for 1.2 seconds");
             m.elapsed = start + .05f;
             m.UpdateGhosts();
             Check(range.targets.Count(target => target.enabled) == 2, $"Two targets rise in wave {wave + 1}");
@@ -304,7 +304,7 @@ public static class EchoIntroductionVerification
             m.elapsed += .7f;
             Check(!ShootTarget(pairs[wave].Item2), $"The pistol cannot fire again within wave {wave + 1}");
         }
-        m.elapsed += .45f;
+        m.elapsed = TargetRangeRoom.WaveStart(pairs.Length - 1) + 1.4f;
         m.UpdateGhosts();
         Check(range.targets.All(target => !target.enabled) && range.HasCompleteRecording &&
             !range.exitDoor.Passage.isTrigger, "Five single hits prepare a recording and leave the exit closed");
@@ -320,9 +320,10 @@ public static class EchoIntroductionVerification
         Check(m.history.ForRoom(4)?.shots.Count == 5, "An empty retry retains the recording");
         for (int wave = 0; wave < pairs.Length; wave++)
         {
-            m.elapsed = TargetRangeRoom.WaveStart(wave) + .15f;
+            m.elapsed = TargetRangeRoom.WaveStart(wave) + 1.19f;
             m.UpdateGhosts();
-            Check(ShootTarget(pairs[wave].Item2), $"Live shot complements the echo in wave {wave + 1}");
+            Check(range.targets.Count(target => target.enabled && target.transform.localScale.y == 1f) == 2 &&
+                ShootTarget(pairs[wave].Item2), $"Both targets are fully raised for the late live shot in wave {wave + 1}");
             m.UpdateGhosts();
         }
         Check(range.Solved && range.exitDoor.Passage.isTrigger, "Five pairs open the exit");

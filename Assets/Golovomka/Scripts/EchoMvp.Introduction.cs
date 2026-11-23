@@ -52,7 +52,11 @@ namespace Golovomka
             else if (!history.remoteObtained)
             {
                 history.remoteObtained = true;
-                Save(); UpdateIntroductionVisuals();
+                Save();
+                UpdateIntroductionVisuals();
+                prompt.text = string.Empty;
+                Dialog(string.Empty, "Вы взяли временной пульт. Нажмите R, чтобы вернуться в прошлое и оставить копию",
+                    "E/ENTER - продолжить");
             }
         }
 
