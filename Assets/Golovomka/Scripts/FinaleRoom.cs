@@ -124,6 +124,8 @@ namespace Golovomka
             routeCorners != null && routeCorners.Length >= 4 && System.Array.TrueForAll(routeCorners, corner => corner) &&
             pursuer.IsConfigured && guard.IsConfigured && lookout.IsConfigured && fyodor.IsConfigured && alexei.IsConfigured;
         public string Failure { get; private set; }
+        internal enum DefeatIllustration { None, Approach, Accomplices }
+        internal DefeatIllustration FailureIllustration { get; private set; }
         public bool CopyHit { get; private set; }
         public bool Cleared => !chaser.Alive && !watcher.Alive && !sentry.Alive;
         public bool Complete => released[0] && released[1];
@@ -149,6 +151,7 @@ namespace Golovomka
             Active = true;
             startPosition = entry;
             Failure = null;
+            FailureIllustration = DefeatIllustration.None;
             CopyHit = recordedMovement = false;
             replayShot = 0;
             nextPlayerShot = lureUntil = 0;
@@ -240,7 +243,7 @@ namespace Golovomka
             if (stoppedByHostage) return;
             if (victim != null) victim.Die();
             if (watcher.Alive && !chaser.Alive && !sentry.Alive)
-                LoseHostage(0, "Охранник убил заложника после гибели обоих сообщников.");
+                LoseHostage(0, "Охранник убил заложника после гибели обоих сообщников.", DefeatIllustration.Accomplices);
 
             // Выстрел в сторону укрытия привлекает внимание, даже если пуля остановилась в оборудовании.
             Vector2 toLookout = sentry.start - shooterFeet;
@@ -275,7 +278,7 @@ namespace Golovomka
             if (Failure != null || Cleared) return;
             if (watcher.Alive && (DetectsUpper(player) || (copy.HasValue && DetectsUpper(copy.Value))))
             {
-                LoseHostage(0, "Охранник заметил движение в верхнем проходе.");
+                LoseHostage(0, "Охранник заметил движение в верхнем проходе.", DefeatIllustration.Approach);
                 return;
             }
 
@@ -428,7 +431,7 @@ namespace Golovomka
             else if (hitPlayer) Failure = "Иван погиб.";
         }
 
-        void LoseHostage(int index, string reason)
+        void LoseHostage(int index, string reason, DefeatIllustration illustration = DefeatIllustration.None)
         {
             if (reason.StartsWith("Охранник"))
             {
@@ -439,6 +442,7 @@ namespace Golovomka
             }
             captives[index].gameObject.SetActive(false);
             Failure = reason;
+            FailureIllustration = illustration;
         }
 
         internal void AdvanceFailureVisual(float deltaTime)

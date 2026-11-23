@@ -68,6 +68,8 @@ namespace Golovomka
         float finaleRetryDelay;
         bool officerDying;
         float officerDeathTime;
+        RawImage finaleDefeatCard;
+        Texture2D approachDefeatArt, accomplicesDefeatArt;
         bool replayFinale;
         TargetRangeRoom pistolArt;
         bool pistolDrawn;
@@ -303,8 +305,13 @@ namespace Golovomka
                     if (officerDeathTime >= CharacterWalk.DeathAnimationDuration && !panel.gameObject.activeSelf)
                         Panel("ПОПЫТКА ПРОВАЛЕНА", currentFinale.Failure + "\n\nВозврат ко входу…    R — сразу");
                 }
-                finaleRetryDelay -= Time.unscaledDeltaTime;
-                if (finaleRetryDelay <= 0 || k.rKey.wasPressedThisFrame) ReturnToRoom();
+                if (k.rKey.wasPressedThisFrame)
+                    ReturnToRoom();
+                else if (!finaleDefeatCard.isActiveAndEnabled)
+                {
+                    finaleRetryDelay -= Time.unscaledDeltaTime;
+                    if (finaleRetryDelay <= 0) ReturnToRoom();
+                }
                 return;
             }
             if (k.escapeKey.wasPressedThisFrame)
@@ -551,6 +558,7 @@ namespace Golovomka
             officerDying = false;
             officerDeathTime = 0;
             HideSpeechUI();
+            finaleDefeatCard.gameObject.SetActive(false);
             shotAudio.Stop();
             room2PreviewDoor = null;
             bool enteringLaboratory = targetRoom && !currentRoom;
@@ -638,7 +646,7 @@ namespace Golovomka
                 finaleRetryDelay = 2f;
                 mode = "finale-failed";
                 if (officerDying) panel.gameObject.SetActive(false);
-                else Panel("ПОПЫТКА ПРОВАЛЕНА", currentFinale.Failure + "\n\nВозврат ко входу…    R — сразу");
+                else ShowFinaleDefeat();
                 return true;
             }
             int hostage = currentFinale.NearbyCaptive(position);
@@ -716,6 +724,7 @@ namespace Golovomka
             CreatePauseMenu();
             ArrangeOverlayHUD();
             CreateSpeechUI();
+            CreateFinaleDefeatCard();
             CreateTitleMenu();
             var fadeObject = new GameObject("StationFade", typeof(RectTransform), typeof(UnityEngine.UI.Image));
             stationFade = fadeObject.GetComponent<UnityEngine.UI.Image>();
@@ -726,6 +735,39 @@ namespace Golovomka
             fadeRect.offsetMin = fadeRect.offsetMax = Vector2.zero;
             stationFade.raycastTarget = false;
             fadeObject.SetActive(false);
+        }
+
+        void CreateFinaleDefeatCard()
+        {
+            approachDefeatArt = Resources.Load<Texture2D>("Menu/defeat-01-approach");
+            accomplicesDefeatArt = Resources.Load<Texture2D>("Menu/defeat-02-accomplices");
+            var card = MenuRegion("FinaleDefeatCard", canvas.transform, new Vector2(.05f, .05f), new Vector2(.95f, .95f));
+            finaleDefeatCard = card.gameObject.AddComponent<RawImage>();
+            finaleDefeatCard.raycastTarget = false;
+            FitMenuGraphic(card, 4f / 3f);
+            card.gameObject.SetActive(false);
+        }
+
+        void ShowFinaleDefeat()
+        {
+            mode = "finale-failed";
+            var art = currentFinale.FailureIllustration switch
+            {
+                FinaleRoom.DefeatIllustration.Approach => approachDefeatArt,
+                FinaleRoom.DefeatIllustration.Accomplices => accomplicesDefeatArt,
+                _ => null
+            };
+            if (!art)
+            {
+                finaleRetryDelay = 2f;
+                Panel("ПОПЫТКА ПРОВАЛЕНА", currentFinale.Failure + "\n\nВозврат ко входу…    R — сразу");
+                return;
+            }
+
+            panel.gameObject.SetActive(false);
+            finaleDefeatCard.texture = art;
+            finaleDefeatCard.transform.parent.SetAsLastSibling();
+            finaleDefeatCard.gameObject.SetActive(true);
         }
         void Panel(string title, string body)
         {
