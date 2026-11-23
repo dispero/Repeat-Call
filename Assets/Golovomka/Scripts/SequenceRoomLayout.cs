@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace Golovomka
 {
@@ -25,7 +26,25 @@ namespace Golovomka
         }
 
         public Gate first = new Gate(), second = new Gate();
+        [SerializeField] SpriteRenderer cabinetPlant;
+        [SerializeField] SortingGroup cabinet;
         public bool IsConfigured => first.IsConfigured && second.IsConfigured && first.door != second.door;
+
+        public void UpdateCabinetPlant(SpriteRenderer actor)
+        {
+            if (!cabinetPlant || !cabinet) return;
+            bool covered = false;
+            if (actor && actor.sortingOrder > cabinet.sortingOrder)
+            {
+                var body = actor.bounds;
+                var plant = cabinetPlant.bounds;
+                float headHalfWidth = body.extents.x * .55f;
+                float headBottom = body.min.y + body.size.y * .7f;
+                covered = Mathf.Abs(body.center.x - plant.center.x) < headHalfWidth + plant.extents.x &&
+                    headBottom < plant.max.y && body.max.y > plant.min.y;
+            }
+            cabinetPlant.enabled = !covered;
+        }
 
         public void Apply(bool plateA, bool plateB, Bounds feet, bool immediate)
         {

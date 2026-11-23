@@ -28,7 +28,12 @@ namespace Golovomka
         const float ShotRecoilEnd = .16f;
         const float ShotAnimationEnd = .24f;
         static readonly Vector2 BodySize = new Vector2(.44f, .28f);
-        static readonly ContactFilter2D Solid = new ContactFilter2D { useTriggers = false };
+        static readonly ContactFilter2D Solid = new ContactFilter2D
+        {
+            useTriggers = false,
+            useLayerMask = true,
+            layerMask = Physics2D.DefaultRaycastLayers
+        };
         readonly List<RaycastHit2D> hits = new List<RaycastHit2D>();
         Bandit chaser, watcher, sentry;
         CharacterWalk[] captives;

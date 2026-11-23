@@ -11,7 +11,8 @@ namespace Golovomka
         const float SpeechReadTime = 1.7f;
         const float SpeechPadding = 36f;
 
-        ComicPanel speechBubble, pistolHelp;
+        ComicPanel speechBubble;
+        RectTransform pistolHelp;
         Text speechBody;
         string speechLine;
         float speechTime;
@@ -26,35 +27,21 @@ namespace Golovomka
                 Color.white, TextAnchor.MiddleCenter);
             speechBody.supportRichText = true;
 
-            pistolHelp = CreateComicPanel("PistolHelp");
-            pistolHelp.rectTransform.sizeDelta = new Vector2(448, 296);
-            var title = Text("Heading", pistolHelp.transform, new Vector2(400, 36), new Vector2(0, 112),
-                27, Color.white, TextAnchor.MiddleCenter);
-            title.text = "Пистолет";
-            title.fontStyle = FontStyle.Bold;
+            pistolHelp = new GameObject("PistolHelp", typeof(RectTransform)).GetComponent<RectTransform>();
+            pistolHelp.SetParent(canvas.transform, false);
+            pistolHelp.anchorMin = new Vector2(.11f, .09f);
+            pistolHelp.anchorMax = new Vector2(.89f, .91f);
+            pistolHelp.offsetMin = pistolHelp.offsetMax = Vector2.zero;
 
-            var tile = new GameObject("PistolPreview", typeof(RectTransform), typeof(UnityEngine.UI.Image))
-                .GetComponent<UnityEngine.UI.Image>();
-            tile.transform.SetParent(pistolHelp.transform, false);
-            tile.rectTransform.sizeDelta = new Vector2(138, 78);
-            tile.rectTransform.anchoredPosition = new Vector2(0, 49);
-            tile.color = new Color(.68f, .71f, .73f);
-            tile.raycastTarget = false;
-            var icon = new GameObject("Pistol", typeof(RectTransform), typeof(UnityEngine.UI.Image))
-                .GetComponent<UnityEngine.UI.Image>();
-            icon.transform.SetParent(tile.transform, false);
-            icon.rectTransform.sizeDelta = new Vector2(94, 54);
-            icon.sprite = Resources.Load<Sprite>("Art/BanditPistol");
-            icon.preserveAspect = true;
-            icon.raycastTarget = false;
-            tile.gameObject.SetActive(icon.sprite != null);
-
-            var controls = Text("Controls", pistolHelp.transform, new Vector2(408, 80), new Vector2(0, -34),
-                21, Color.white, TextAnchor.MiddleCenter);
-            controls.supportRichText = true;
-            controls.text = "<b>Q</b> — достать или убрать\n<b>ЛКМ / ПРОБЕЛ</b> — выстрел\nИван стреляет туда, куда смотрит";
-            Text("Continue", pistolHelp.transform, new Vector2(408, 30), new Vector2(0, -108),
-                18, Color.white, TextAnchor.MiddleCenter).text = "E/ENTER - продолжить";
+            var card = new GameObject("ControlsCard", typeof(RectTransform), typeof(RawImage), typeof(AspectRatioFitter));
+            card.transform.SetParent(pistolHelp, false);
+            var image = card.GetComponent<RawImage>();
+            image.texture = Resources.Load<Texture2D>("Menu/PistolHelp");
+            image.raycastTarget = false;
+            var fit = card.GetComponent<AspectRatioFitter>();
+            fit.aspectMode = AspectRatioFitter.AspectMode.FitInParent;
+            fit.aspectRatio = (float)image.texture.width / image.texture.height;
+            pistolHelp.gameObject.SetActive(false);
         }
 
         ComicPanel CreateComicPanel(string name)

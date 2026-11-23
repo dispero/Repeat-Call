@@ -49,6 +49,7 @@ namespace Golovomka
         Text heading, objective, status, prompt, dialogTitle, dialogBody, caution;
         Text stationExitLabel;
         static readonly string[] PauseOptions = { "Продолжить", "Вернуться к входу комнаты", "Главное меню", "Выход" };
+        const int PauseReturnOption = 1;
         readonly Text[] pauseLabels = new Text[PauseOptions.Length];
         RectTransform pauseMenu;
         int pauseSelection;
@@ -263,10 +264,16 @@ namespace Golovomka
             }
             if (mode == "pause")
             {
-                int index = pauseSelection;
-                if (k.downArrowKey.wasPressedThisFrame || k.sKey.wasPressedThisFrame) index++;
-                if (k.upArrowKey.wasPressedThisFrame || k.wKey.wasPressedThisFrame) index--;
-                if (index != pauseSelection) FocusPauseOption((index + PauseOptions.Length) % PauseOptions.Length);
+                int direction = 0;
+                if (k.downArrowKey.wasPressedThisFrame || k.sKey.wasPressedThisFrame) direction++;
+                if (k.upArrowKey.wasPressedThisFrame || k.wKey.wasPressedThisFrame) direction--;
+                if (direction != 0)
+                {
+                    int index = pauseSelection;
+                    do { index = (index + direction + PauseOptions.Length) % PauseOptions.Length; }
+                    while (!pauseLabels[index].transform.parent.gameObject.activeSelf);
+                    FocusPauseOption(index);
+                }
                 if (enter) UsePauseOption(pauseSelection);
                 else if (k.escapeKey.wasPressedThisFrame) Close();
                 return;
@@ -291,6 +298,7 @@ namespace Golovomka
             if (k.escapeKey.wasPressedThisFrame)
             {
                 mode = "pause";
+                LayoutPauseMenu();
                 FocusPauseOption(0);
                 Panel("ПАУЗА", "Запись и копии приостановлены.");
                 return;
@@ -542,6 +550,7 @@ namespace Golovomka
             shotAudio.Stop();
             room2PreviewDoor = null;
             bool enteringLaboratory = targetRoom && !currentRoom;
+            if (currentSequence) currentSequence.UpdateCabinetPlant(null);
             if (currentFinale) currentFinale.End();
             if (currentRange)
             {
@@ -727,7 +736,6 @@ namespace Golovomka
                 var rect = row.GetComponent<RectTransform>();
                 rect.SetParent(pauseMenu, false);
                 rect.anchorMin = rect.anchorMax = new Vector2(.5f, .5f);
-                rect.anchoredPosition = new Vector2(0, 12 - i * 46);
                 rect.sizeDelta = new Vector2(820, 40);
                 var button = row.AddComponent<UnityEngine.UI.Button>();
                 button.targetGraphic = row.GetComponent<UnityEngine.UI.Image>();
@@ -738,6 +746,18 @@ namespace Golovomka
                 pauseLabels[i] = Text("Label", rect, new Vector2(794, 40), Vector2.zero, 23, Color.white, TextAnchor.MiddleLeft);
             }
             pauseMenu.gameObject.SetActive(false);
+        }
+
+        void LayoutPauseMenu()
+        {
+            int visibleRow = 0;
+            for (int i = 0; i < pauseLabels.Length; i++)
+            {
+                var row = (RectTransform)pauseLabels[i].transform.parent;
+                bool visible = i != PauseReturnOption || currentRoom != null;
+                row.gameObject.SetActive(visible);
+                if (visible) row.anchoredPosition = new Vector2(0, 12 - visibleRow++ * 46);
+            }
         }
 
         void FocusPauseOption(int index)
@@ -751,7 +771,7 @@ namespace Golovomka
         {
             if (mode != "pause") return;
             if (index == 0) Close();
-            else if (index == 1) RestartCycle();
+            else if (index == PauseReturnOption) RestartCycle();
             else if (index == 2) ShowMenu();
             else QuitGame();
         }

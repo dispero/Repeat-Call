@@ -117,6 +117,7 @@ namespace Golovomka
             FitRoomCamera();
             PositionStationExitLabel();
             PositionSpeechBubble();
+            if (currentSequence) currentSequence.UpdateCabinetPlant(hero);
             UpdatePhoneRing();
         }
 

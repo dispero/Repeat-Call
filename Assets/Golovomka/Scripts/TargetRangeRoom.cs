@@ -44,7 +44,12 @@ namespace Golovomka
         Vector3[] raisedPositions;
         SpriteRenderer[] hatches;
         Sprite[] closedHatches;
-        static readonly ContactFilter2D Solid = new ContactFilter2D { useTriggers = false };
+        static readonly ContactFilter2D Solid = new ContactFilter2D
+        {
+            useTriggers = false,
+            useLayerMask = true,
+            layerMask = Physics2D.DefaultRaycastLayers
+        };
         int nextReplayShot;
         int recordedWaves;
         float nextShot;

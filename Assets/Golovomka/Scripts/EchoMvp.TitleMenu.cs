@@ -8,7 +8,7 @@ namespace Golovomka
 {
     public partial class EchoMvp
     {
-        static readonly string[] TitleLabels = { "Продолжить", "Новая Игра", "Выход" };
+        static readonly string[] TitleLabels = { "Продолжить", "Новая игра", "Выход" };
         static readonly string[] ConfirmLabels = { "Начать Заново", "Отмена" };
         static readonly Color TitleAccent = new Color32(255, 195, 107, 255);
         static readonly Color TitlePaper = new Color32(230, 214, 181, 255);
@@ -77,9 +77,8 @@ namespace Golovomka
                 button.targetGraphic = image;
                 button.transition = Selectable.Transition.None;
                 titleButtons[i] = button;
-                titleLabels[i] = MenuLabel("Label", frame, new Vector2(.34f, .09f), new Vector2(.95f, .91f),
+                titleLabels[i] = MenuLabel("Label", frame, new Vector2(.05f, .09f), new Vector2(.95f, .91f),
                     menuFont, 33, TitlePaper, "");
-                titleLabels[i].alignment = TextAnchor.MiddleLeft;
                 AddMenuOutline(titleLabels[i], 1);
 
                 var icon = MenuRegion("Icon", frame, new Vector2(.09f, .21f), new Vector2(.23f, .79f))
@@ -165,7 +164,13 @@ namespace Golovomka
                 titleButtons[i].gameObject.SetActive(i < labels.Length);
                 if (i >= labels.Length) continue;
                 titleButtons[i].interactable = i != 0 || firstEnabled;
-                titleLabels[i].text = labels[i];
+                // В Pixelify Sans эти строчные буквы имеют высоту прописных.
+                titleLabels[i].text = titleLabels[i].font == font ? labels[i] : labels[i] switch
+                {
+                    "Продолжить" => "Продолжит<size=24>ь</size>",
+                    "Выход" => "В<size=24>ы</size>ход",
+                    _ => labels[i]
+                };
                 titleIcons[i].uvRect = new Rect((mode == "confirm" ? i + 1 : i) / 3f, 0, 1f / 3f, 1);
             }
             FocusTitleOption(selected);

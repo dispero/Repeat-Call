@@ -134,7 +134,8 @@ public static class EchoIntroductionVerification
         Check(m.history.ForRoom(1) != null,"One recording limit in first room");
         m.elapsed=holdStart+1; m.UpdateGhosts(); Check(m.plateA,"Prepared copy holds panel");
         Vector2 inside = intro.door.Passage.bounds.center;
-        var approach = new Vector2(intro.door.Passage.bounds.min.x - .27f, inside.y);
+        var doorApproach = intro.door.transform.Find("Door Approach").GetComponent<BoxCollider2D>();
+        var approach = new Vector2(doorApproach.bounds.min.x - .27f, inside.y);
         m.position=approach; Check(Can(inside),"Open mechanical passage allows entry");
         m.elapsed=1000; m.UpdateGhosts(); Check(!intro.door.Passage.isTrigger && !Can(inside),"Closed door blocks entry");
         m.elapsed=holdStart+1; m.UpdateGhosts();

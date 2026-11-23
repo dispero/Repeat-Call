@@ -10,12 +10,14 @@ namespace Golovomka
         [SerializeField, Min(0)] float travel = .65f;
         [SerializeField, Min(.01f)] float duration = .24f;
 
+        const float SideClearance = .60f;
         Vector3 leftClosed;
         Vector3 rightClosed;
         float openingTravel;
         float opening;
         float target;
         BoxCollider2D passage;
+        BoxCollider2D approach;
         public BoxCollider2D Passage => passage ? passage : (passage = GetComponent<BoxCollider2D>());
 
         void Awake()
@@ -37,6 +39,7 @@ namespace Golovomka
             var right = LocalSpriteBounds(rightRenderer);
             var aperture = left;
             aperture.Encapsulate(right);
+            ConfigureApproach(aperture);
             var maskBounds = mask.sprite.bounds;
             var scale = new Vector3(aperture.size.x / maskBounds.size.x, aperture.size.y / maskBounds.size.y, 1);
             mask.transform.SetParent(transform, false);
@@ -55,6 +58,21 @@ namespace Golovomka
 
             float requiredTravel = Mathf.Max(left.max.x - aperture.min.x, aperture.max.x - right.min.x);
             openingTravel = Mathf.Max(travel, requiredTravel + .001f);
+        }
+
+        void ConfigureApproach(Bounds aperture)
+        {
+            var box = Passage;
+            // Ось X вдоль проёма, ось Y поперёк створок.
+            Vector2 min = Vector2.Min(box.offset - box.size * .5f, aperture.min - Vector3.up * SideClearance);
+            Vector2 max = Vector2.Max(box.offset + box.size * .5f, aperture.max + Vector3.up * SideClearance);
+            var blocker = new GameObject("Door Approach");
+            blocker.layer = LayerMask.NameToLayer("Ignore Raycast");
+            blocker.transform.SetParent(transform, false);
+            approach = blocker.AddComponent<BoxCollider2D>();
+            approach.offset = (min + max) * .5f;
+            approach.size = max - min;
+            approach.isTrigger = box.isTrigger;
         }
 
         Bounds LocalSpriteBounds(SpriteRenderer renderer)
@@ -80,8 +98,10 @@ namespace Golovomka
             SetOpen(open, immediate);
             var box = Passage;
             // Коллайдер остаётся доступен для проверки области, пока работает как триггер.
-            bool passable = open || box.bounds.Intersects(feet);
+            bool passable = open || box.bounds.Intersects(feet) ||
+                (box.isTrigger && approach && approach.bounds.Intersects(feet));
             if (box.isTrigger != passable) box.isTrigger = passable;
+            if (approach && approach.isTrigger != passable) approach.isTrigger = passable;
         }
 
         void LateUpdate()
