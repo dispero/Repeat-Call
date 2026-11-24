@@ -6,9 +6,8 @@ namespace Golovomka
     {
         AudioSource phoneAudio, shotAudio, menuSelectAudio, menuMusicAudio;
         AudioSource gameMusicAudio;
-        AudioSource buttonCountdownAudio, buttonSignalAudio, correctButtonAudio;
+        AudioSource buttonSignalAudio, correctButtonAudio;
         AudioSource targetRiseAudio, teleportAudio;
-        bool buttonCountdownStarted;
 
         void InitializeAudio()
         {
@@ -23,7 +22,6 @@ namespace Golovomka
             menuMusicAudio.loop = true;
             gameMusicAudio = CreateAudioSource("GameMusic", .3f);
             gameMusicAudio.loop = true;
-            buttonCountdownAudio = CreateAudioSource("CountDown2", .65f);
             buttonSignalAudio = CreateAudioSource("Room3Sound", .65f);
             correctButtonAudio = CreateAudioSource("CorrectSound3", .65f);
             targetRiseAudio = CreateAudioSource("TargetSound", .65f);
@@ -59,21 +57,8 @@ namespace Golovomka
             if (menuSelectAudio.clip) menuSelectAudio.Play();
         }
 
-        void UpdateButtonCountdown()
-        {
-            var clip = buttonCountdownAudio.clip;
-            if (buttonCountdownStarted || !clip || currentButtons.Solved) return;
-
-            float timeLeft = currentButtons.startDelay - elapsed;
-            if (timeLeft <= 0 || timeLeft > clip.length) return;
-
-            buttonCountdownStarted = true;
-            buttonCountdownAudio.Play();
-        }
-
         void PlayButtonSignal()
         {
-            if (buttonCountdownAudio.isPlaying) buttonCountdownAudio.Stop();
             if (buttonSignalAudio.clip) buttonSignalAudio.Play();
         }
 

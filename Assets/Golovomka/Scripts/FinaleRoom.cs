@@ -126,7 +126,7 @@ namespace Golovomka
             routeCorners != null && routeCorners.Length >= 4 && System.Array.TrueForAll(routeCorners, corner => corner) &&
             pursuer.IsConfigured && guard.IsConfigured && lookout.IsConfigured && fyodor.IsConfigured && alexei.IsConfigured;
         public string Failure { get; private set; }
-        internal enum DefeatIllustration { None, Approach, Accomplices }
+        internal enum DefeatIllustration { None, Approach, Accomplices, IvanDeath }
         internal DefeatIllustration FailureIllustration { get; private set; }
         public bool CopyHit { get; private set; }
         public bool Cleared => !chaser.Alive && !watcher.Alive && !sentry.Alive;
@@ -426,7 +426,11 @@ namespace Golovomka
             {
                 trace.line.enabled = false;
                 if (bandit.chargingCopy) CopyHit = true;
-                else Failure = "Иван погиб.";
+                else
+                {
+                    Failure = "Иван погиб.";
+                    FailureIllustration = DefeatIllustration.IvanDeath;
+                }
                 return;
             }
             float distance = Cast(origin, direction, Range, shooterFeet: bandit.body.transform.position);
@@ -439,7 +443,11 @@ namespace Golovomka
             DrawTrace(trace, origin, direction, distance, time, bandit.body.transform.position.y);
             if (hostage >= 0) LoseHostage(hostage, "В заложника попала пуля.");
             else if (hitCopy) CopyHit = true;
-            else if (hitPlayer) Failure = "Иван погиб.";
+            else if (hitPlayer)
+            {
+                Failure = "Иван погиб.";
+                FailureIllustration = DefeatIllustration.IvanDeath;
+            }
         }
 
         void LoseHostage(int index, string reason, DefeatIllustration illustration = DefeatIllustration.None)

@@ -14,15 +14,6 @@ public static class EchoMvpTools
     public static void Prepare()
     {
         if (EditorApplication.isPlaying) throw new InvalidOperationException("Stop Play Mode first.");
-        foreach (string path in new[] { "Assets/Golovomka/Resources/Art/Interiors.png", "Assets/Golovomka/Resources/Art/Room.png" })
-        {
-            var importer = (TextureImporter)AssetImporter.GetAtPath(path);
-            importer.textureType = TextureImporterType.Default;
-            importer.filterMode = FilterMode.Point; importer.mipmapEnabled = false;
-            importer.textureCompression = TextureImporterCompression.Uncompressed;
-            importer.npotScale = TextureImporterNPOTScale.None; importer.maxTextureSize = 4096;
-            importer.alphaIsTransparency = true; importer.SaveAndReimport();
-        }
         Directory.CreateDirectory("Assets/Golovomka/Scenes"); AssetDatabase.Refresh();
         string materialPath = "Assets/Golovomka/Resources/Art/MvpSprite.mat";
         if (!AssetDatabase.LoadAssetAtPath<Material>(materialPath))

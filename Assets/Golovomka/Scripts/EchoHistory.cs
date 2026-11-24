@@ -18,11 +18,13 @@ namespace Golovomka
     {
         public float time;
         public int button;
+        public bool startsSequence;
 
-        public EchoButtonPress(float time, int button)
+        public EchoButtonPress(float time, int button, bool startsSequence = false)
         {
             this.time = time;
             this.button = button;
+            this.startsSequence = startsSequence;
         }
     }
 
@@ -92,7 +94,15 @@ namespace Golovomka
             cycle++;
         }
         public static bool OnPlate(EchoFrame actor, Vector2 plate)
-        { return actor.zone > 0 && Vector2.Distance(new Vector2(actor.x, actor.y), plate) < .65f; }
+        {
+            const float plateRadius = .65f;
+            const float introductionPlateHalfWidth = 1.3f;
+
+            var offset = new Vector2(actor.x, actor.y) - plate;
+            if (actor.zone == 1)
+                offset.x *= plateRadius / introductionPlateHalfWidth;
+            return actor.zone > 0 && offset.magnitude < plateRadius;
+        }
         public static string SavePath => Path.Combine(Application.persistentDataPath, "echoes-mvp-v3.json");
         public void Save(string path = null)
         {

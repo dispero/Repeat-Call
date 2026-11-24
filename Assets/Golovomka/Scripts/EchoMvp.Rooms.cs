@@ -115,7 +115,6 @@ namespace Golovomka
                     recording = new EchoTape();
                     UpdateGhosts();
                     mode = "done";
-                    HUD();
                     Panel(passage.messageTitle, passage.message);
                     break;
             }

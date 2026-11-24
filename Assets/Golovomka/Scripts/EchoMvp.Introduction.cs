@@ -46,11 +46,10 @@ namespace Golovomka
             Save();
             UpdateIntroductionVisuals();
             prompt.text = string.Empty;
-            Dialog("Пульт возвращения",
-                "Вы взяли временной пульт. Нажмите R, чтобы вернуться в прошлое и оставить копию.\n\n" +
-                "Пульт разработал Фёдор Карамазов. Он создал его втайне, когда работал учёным в СССР, " +
-                "а затем увёз с собой в США.",
-                "E/ENTER - продолжить");
+            if (!remoteHelpArt) return;
+
+            mode = "dialog";
+            ShowIllustratedCard(remoteHelpArt, scale: .8f);
         }
 
         void ReturnToRoom()
@@ -64,8 +63,11 @@ namespace Golovomka
                 if ((currentRange || currentFinale) && recording.shots.Count > 0 &&
                     recording.shots[recording.shots.Count - 1].time >= elapsed)
                     elapsed += .001f;
+                if (currentButtons && recording.buttonPresses.Count > 0 &&
+                    recording.buttonPresses[recording.buttonPresses.Count - 1].time >= elapsed)
+                    elapsed += .001f;
                 Record(); recording.duration = elapsed;
-                if (elapsed > 0 && (!currentButtons || recording.buttonPresses.Count > 0) &&
+                if (elapsed > 0 &&
                     (!currentRange || currentRange.HasCompleteRecording) &&
                     (!currentFinale || currentFinale.HasRecording(recording)))
                     history.Push(recording);

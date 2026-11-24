@@ -28,6 +28,7 @@ namespace Golovomka
         public const float MuzzleHeight = .85f;
         const float Range = 24f;
         const float HatchTravelTime = .14f;
+        const float RetryHintDelay = 5f;
 
         static readonly (int first, int second)[] Pairs = { (1, 5), (0, 3), (2, 6), (1, 4), (0, 5) };
 
@@ -96,6 +97,8 @@ namespace Golovomka
 
         public Vector2 TargetPosition(int target) => targets[target].transform.parent.TransformPoint(raisedPositions[target]);
         public static float WaveStart(int wave) => StartDelay + wave * WaveInterval;
+        public bool ShouldShowRetryHint(float time) =>
+            time >= WaveStart(Waves - 1) + RetryHintDelay && !Solved;
 
         public static int ActiveWave(float time)
         {

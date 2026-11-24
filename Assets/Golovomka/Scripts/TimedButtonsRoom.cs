@@ -18,7 +18,6 @@ namespace Golovomka
         public Button[] buttons = new Button[3];
         public int[] order = { 1, 3, 2, 3, 2, 2, 1 };
         public SpriteRenderer[] indicators = new SpriteRenderer[7];
-        [Min(0)] public float startDelay = 6.5f;
         [Min(.1f)] public float stepInterval = 1.6f;
         [Min(.05f)] public float pressWindow = .8f;
         [Min(.1f)] public float interactionRadius = .85f;
@@ -27,19 +26,24 @@ namespace Golovomka
         int replayIndex;
         int displayedStep = -1;
         bool unlocked;
+        float? sequenceStart;
 
         public event Action SignalShown;
-        public event Action PlayerPressAccepted;
+        public event Action PressAccepted;
 
         public bool Solved => unlocked || accepted == (1 << order.Length) - 1;
-        public float EndTime => startDelay + (order.Length - 1) * stepInterval + pressWindow;
+        public bool AwaitingStart => !Solved && !sequenceStart.HasValue;
+        float SequenceDuration => (order.Length - 1) * stepInterval + pressWindow;
+
+        public bool CanRetry(float time) =>
+            !Solved && sequenceStart.HasValue && time - sequenceStart.Value >= SequenceDuration;
 
         public bool IsConfigured
         {
             get
             {
                 if (!exitDoor || !exitDoor.Passage || buttons.Length != 3 || order.Length < 1 ||
-                    order.Length > 30 || indicators.Length != order.Length || pressWindow >= stepInterval)
+                    order.Length > 30 || order[0] != 1 || indicators.Length != order.Length || pressWindow >= stepInterval)
                     return false;
                 foreach (var button in buttons)
                     if (button == null || !button.interactionPoint || !button.lamp) return false;
@@ -54,15 +58,17 @@ namespace Golovomka
             accepted = replayIndex = 0;
             displayedStep = -1;
             unlocked = alreadyPassed;
+            sequenceStart = null;
             Show(0);
         }
 
         int WindowAt(float time)
         {
-            float offset = time - startDelay;
-            if (offset < 0 || time >= EndTime) return -1;
+            if (!sequenceStart.HasValue) return -1;
+            float offset = time - sequenceStart.Value;
+            if (offset < 0 || offset >= SequenceDuration) return -1;
             int step = Mathf.FloorToInt(offset / stepInterval);
-            return time < startDelay + step * stepInterval + pressWindow ? step : -1;
+            return offset < step * stepInterval + pressWindow ? step : -1;
         }
 
         public int NearbyButton(Vector2 position)
@@ -75,21 +81,27 @@ namespace Golovomka
 
         bool Accept(EchoButtonPress press)
         {
+            if (Solved) return false;
+            if (!sequenceStart.HasValue && press.startsSequence && press.button == 1)
+                sequenceStart = press.time;
             int step = WindowAt(press.time);
             if (step < 0 || order[step] != press.button) return false;
-            accepted |= 1 << step;
+            int stepMask = 1 << step;
+            if ((accepted & stepMask) == 0)
+            {
+                accepted |= stepMask;
+                PressAccepted?.Invoke();
+            }
             return true;
         }
 
         public void Press(int button, float time, EchoTape recording)
         {
-            var press = new EchoButtonPress(time, button);
-            int previousAccepted = accepted;
+            var press = new EchoButtonPress(time, button, !sequenceStart.HasValue && button == 1);
             if (!Accept(press)) return;
             var presses = recording.buttonPresses;
             if (presses.Count == 0 || WindowAt(presses[presses.Count - 1].time) != WindowAt(time))
                 presses.Add(press);
-            if (accepted != previousAccepted) PlayerPressAccepted?.Invoke();
         }
 
         public void Replay(EchoTape tape, float time)
@@ -121,15 +133,6 @@ namespace Golovomka
             bool newSignal = active >= 0 && active != displayedStep;
             displayedStep = active;
             if (newSignal) SignalShown?.Invoke();
-        }
-
-        public string Status(float time)
-        {
-            if (Solved) return "ВЫХОД ОТКРЫТ";
-            if (time < startDelay) return $"ДО ПЕРВОГО СИГНАЛА: {startDelay - time:0.0} с";
-            if (time >= EndTime) return "ПОСЛЕДОВАТЕЛЬНОСТЬ НЕ ЗАВЕРШЕНА   /   R — ПОВТОР";
-            int step = WindowAt(time);
-            return step < 0 ? "ЖДИТЕ СИГНАЛА" : $"СИГНАЛ {step + 1}/{order.Length}   /   КНОПКА {order[step]}";
         }
     }
 }

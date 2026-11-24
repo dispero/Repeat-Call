@@ -11,6 +11,9 @@ namespace Golovomka
         [SerializeField, Min(.01f)] float laboratoryCameraSmoothTime = .22f;
         Bounds laboratoryCameraBounds;
         float laboratoryCameraVelocity;
+        // Внешние края верхней и нижней стен коридора в мировых координатах.
+        const float LaboratoryWallTop = 5.64f;
+        const float LaboratoryWallBottom = -7.36f;
         const float DoorPreviewPan = .55f;
         const float DoorPreviewHold = .65f;
         SlidingDoor room2PreviewDoor;
@@ -84,7 +87,7 @@ namespace Golovomka
             }
 
             var bounds = laboratoryCameraBounds;
-            roomCamera.orthographicSize = Mathf.Max(.01f, bounds.extents.y) * 1.005f;
+            roomCamera.orthographicSize = (LaboratoryWallTop - LaboratoryWallBottom) * .5f;
             float halfWidth = roomCamera.orthographicSize * aspect;
             float minX = Mathf.Min(bounds.center.x, bounds.min.x + halfWidth);
             float maxX = Mathf.Max(bounds.center.x, bounds.max.x - halfWidth);
@@ -109,35 +112,45 @@ namespace Golovomka
                     cameraX = Mathf.Clamp(Mathf.SmoothDamp(cameraX, target, ref laboratoryCameraVelocity,
                         laboratoryCameraSmoothTime), minX, maxX);
             }
-            roomCamera.transform.position = new Vector3(cameraX, bounds.center.y, bounds.center.z - 10);
+            float cameraY = (LaboratoryWallTop + LaboratoryWallBottom) * .5f;
+            roomCamera.transform.position = new Vector3(cameraX, cameraY, bounds.center.z - 10);
         }
 
         void LateUpdate()
         {
             FitRoomCamera();
-            PositionStationExitLabel();
-            PositionSpeechBubble();
+            UpdateStationExitLabel();
+            if (returnHint) returnHint.enabled = ShouldShowReturnHint();
             if (currentSequence) currentSequence.UpdateCabinetPlant(hero);
             UpdatePhoneRing();
         }
 
-        void PositionStationExitLabel()
+        bool ShouldShowReturnHint()
         {
-            if (!stationExitLabel || !stationExitLabel.enabled) return;
-            Vector3 viewport = roomCamera.WorldToViewportPoint(station.exitLabel.position);
-            // Подпись не пересекает строки HUD.
-            viewport.y = Mathf.Clamp(viewport.y, .14f, .82f);
-            var rect = stationExitLabel.rectTransform;
-            rect.anchorMin = rect.anchorMax = new Vector2(viewport.x, viewport.y);
-            rect.anchoredPosition = Vector2.zero;
+            if (mode != "play" || !recordingActive || !currentRoom || !history.remoteObtained || room2PreviewDoor)
+                return false;
+
+            if (currentRoom == introductionRoom) return true;
+            if (currentSequence) return elapsed >= 30f && history.returnRoom <= zone;
+            if (currentButtons) return currentButtons.CanRetry(elapsed);
+            return currentRange && currentRange.ShouldShowRetryHint(elapsed);
         }
 
-        void TopHUD(Text text, float left, float right, float y, float height)
+        void UpdateStationExitLabel()
         {
-            var rect = text.rectTransform;
-            rect.anchorMin = new Vector2(left, 1); rect.anchorMax = new Vector2(right, 1);
-            rect.pivot = new Vector2(.5f, 1); rect.sizeDelta = new Vector2(-32, height);
-            rect.anchoredPosition = new Vector2(0, -y);
+            if (!stationExitLabel) return;
+            stationExitLabel.enabled = !currentRoom && phoneRead && mode == "play";
+            if (!stationExitLabel.enabled) return;
+            Vector3 viewport = roomCamera.WorldToViewportPoint(station.exitLabel.position);
+            var rect = stationExitLabel.rectTransform;
+            // Подпись остаётся в безопасной области экрана.
+            Vector2 canvasSize = ((RectTransform)canvas.transform).rect.size;
+            float horizontalMargin = Mathf.Min(.5f, (rect.rect.width * .5f + 16f) / canvasSize.x);
+            float verticalMargin = Mathf.Min(.5f, (rect.rect.height * .5f + 8f) / canvasSize.y);
+            viewport.x = Mathf.Clamp(viewport.x, horizontalMargin, 1f - horizontalMargin);
+            viewport.y = Mathf.Clamp(viewport.y, verticalMargin, 1f - verticalMargin);
+            rect.anchorMin = rect.anchorMax = new Vector2(viewport.x, viewport.y);
+            rect.anchoredPosition = Vector2.zero;
         }
 
         void BottomHUD(Text text, float y, float height)
@@ -150,14 +163,10 @@ namespace Golovomka
 
         void ArrangeOverlayHUD()
         {
-            TopHUD(heading, 0, .55f, 12, 36);
-            TopHUD(objective, 0, .55f, 50, 38);
-            TopHUD(status, .55f, 1, 14, 96);
             BottomHUD(prompt, 28, 55);
+            BottomHUD(returnHint, 6, 28);
             BottomHUD(caution, 85, 30);
-            var credits = canvas.transform.Find("Credits").GetComponent<Text>();
-            BottomHUD(credits, 3, 23);
-            foreach (var text in new[] { heading, objective, status, prompt, caution, credits })
+            foreach (var text in new[] { prompt, returnHint, caution, stationExitLabel })
             {
                 var outline = text.gameObject.AddComponent<UnityEngine.UI.Outline>();
                 outline.effectColor = new Color(0, 0, 0, .9f);

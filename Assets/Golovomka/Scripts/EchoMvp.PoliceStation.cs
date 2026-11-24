@@ -4,6 +4,24 @@ namespace Golovomka
 {
     public partial class EchoMvp
     {
+        Texture2D phoneCallArt;
+
+        void AnswerPhone()
+        {
+            phoneRead = true;
+            if (!phoneCallArt)
+            {
+                Dialog("ТЕЛЕФОННЫЙ ВЫЗОВ",
+                    "Maple Street, 7 — лаборатория Карамазовых.\nСработала система безопасности.\nАвтоматический вызов полиции.");
+                return;
+            }
+
+            prompt.text = string.Empty;
+            mode = "dialog";
+            shotAudio.Stop();
+            ShowIllustratedCard(phoneCallArt, scale: .8f);
+        }
+
         Interaction StationNearby()
         {
             if (Vector2.Distance(position, station.phone.position) < 1.6f) return Interaction.AnswerPhone;

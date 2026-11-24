@@ -10,7 +10,7 @@ namespace Golovomka
     public partial class EchoMvp
     {
         static readonly string[] TitleLabels = { "Продолжить", "Новая игра", "Выход" };
-        static readonly string[] ConfirmLabels = { "Начать Заново", "Отмена" };
+        static readonly string[] ConfirmLabels = { "Начать заново", "Отмена" };
         static readonly Color TitleAccent = new Color32(255, 195, 107, 255);
         static readonly Color TitlePaper = new Color32(230, 214, 181, 255);
         static readonly Color TitleDisabled = new Color32(147, 148, 132, 255);
@@ -39,8 +39,7 @@ namespace Golovomka
             var composition = MenuRegion("TitleComposition", screen, Vector2.zero, Vector2.one);
             var backdrop = MenuRegion("LaboratoryBackdrop", composition, Vector2.zero, Vector2.one);
             var art = backdrop.gameObject.AddComponent<RawImage>();
-            var referenceArt = Resources.Load<Texture2D>("Menu/LaboratoryTitleReference");
-            art.texture = referenceArt ? referenceArt : Resources.Load<Texture2D>("Menu/LaboratoryTitle");
+            art.texture = Resources.Load<Texture2D>("Menu/LaboratoryTitleReference");
             art.color = art.texture ? Color.white : new Color32(12, 29, 32, 255);
             art.raycastTarget = false;
             var fit = composition.gameObject.AddComponent<AspectRatioFitter>();
@@ -49,7 +48,7 @@ namespace Golovomka
 
             var menuFont = Resources.Load<Font>("Menu/PixelifySans");
             if (!menuFont) menuFont = font;
-            if (!referenceArt)
+            if (!art.texture)
             {
                 var logo = MenuLabel("Wordmark", composition, new Vector2(.086f, .643f), new Vector2(.58f, .805f),
                     menuFont, 96, TitlePaper, "GOLOVOMKA");
@@ -57,7 +56,8 @@ namespace Golovomka
             }
 
             titleNotice = MenuLabel("Confirmation", composition, new Vector2(.105f, .594f), new Vector2(.50f, .637f),
-                menuFont, 23, TitlePaper, "Заменить текущее сохранение?");
+                menuFont, 23, TitlePaper, menuFont == font ? "Заменить текущее сохранение?"
+                    : "Заменит<size=17>ь</size> текущее сохранение?");
             titleNotice.alignment = TextAnchor.MiddleLeft;
             AddMenuOutline(titleNotice, 1);
 
@@ -153,7 +153,7 @@ namespace Golovomka
 
         void ShowMenu()
         {
-            HideSpeechUI();
+            HidePistolHelp();
             shotAudio.Stop();
             targetRiseAudio.Stop();
             teleportAudio.Stop();
@@ -162,6 +162,8 @@ namespace Golovomka
             bool canContinue = EchoHistory.Load(saveFileOverride) != null;
             mode = "menu";
             panel.gameObject.SetActive(false);
+            pauseMenu.gameObject.SetActive(false);
+            illustratedCard.gameObject.SetActive(false);
             titleScreen.transform.SetAsLastSibling();
             titleScreen.SetActive(true);
             SetTitleOptions(TitleLabels, canContinue, canContinue ? 0 : 1);
@@ -175,10 +177,13 @@ namespace Golovomka
                 titleButtons[i].gameObject.SetActive(i < labels.Length);
                 if (i >= labels.Length) continue;
                 titleButtons[i].interactable = i != 0 || firstEnabled;
+                bool isRestart = mode == "confirm" && i == 0;
+                titleLabels[i].rectTransform.anchorMin = new Vector2(isRestart ? .25f : .05f, .09f);
                 // В Pixelify Sans эти строчные буквы имеют высоту прописных.
                 titleLabels[i].text = titleLabels[i].font == font ? labels[i] : labels[i] switch
                 {
                     "Продолжить" => "Продолжит<size=24>ь</size>",
+                    "Начать заново" => "Начат<size=24>ь</size> заново",
                     "Выход" => "В<size=24>ы</size>ход",
                     _ => labels[i]
                 };

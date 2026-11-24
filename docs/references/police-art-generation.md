@@ -3,8 +3,8 @@
 18 ноября 2026. Встроенный imagegen, без CLI/API fallback. Автор одобрил пример средней детализации и поручил реализовать в Unity; затем попросил круглую ручку двери.
 
 ## Результаты
-- Assets/Golovomka/Resources/Art/PoliceFurniture.png — прозрачный лист мебели, четыре секции.
-- Assets/Golovomka/Resources/Art/PoliceSurfaces.png — непрозрачный лист пола и стен, четыре секции; финальная версия с круглой ручкой.
+- Assets/Golovomka/Rooms/PoliceStation/PoliceFurniture.png — прозрачный лист мебели, четыре секции.
+- Assets/Golovomka/Rooms/PoliceStation/PoliceSurfaces.png — непрозрачный лист пола и стен, четыре секции; финальная версия с круглой ручкой.
 - police-station-medium-detail.png — одобренный пример направления.
 - police-station-unity.png — результат в работающей игре, не генерация.
 

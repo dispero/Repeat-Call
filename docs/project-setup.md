@@ -15,10 +15,10 @@ Unity 6000.6.8f1, Universal 2D/URP, Input System, uGUI, Windows x64. Сверя�
 
 ## Графика и камера
 
-- Ручной кадр в `Game`: отключи `Auto Fit Room` у `EchoMvp`, настрой `Main Camera`. Участок виден целиком. В подвале `EchoMvp.Viewport.cs` держит высоту и плавно следует по X за пределами центральной зоны (0,4 ширины, сглаживание 0,22 с). Переходы непрерывны, R мгновенно переносит камеру.
+- Ручной кадр в `Game`: отключи `Auto Fit Room` у `EchoMvp`, настрой `Main Camera`. Участок виден целиком. В подвале `EchoMvp.Viewport.cs` держит высоту и плавно следует по X за пределами центральной зоны (0,4 ширины, сглаживание 0,22 с). Переходы непрерывны, R мгновенно переносит камеру. По уточнению автора от 24 ноября 2026 в комнатах 1–4 верх и низ кадра совпадают с наружными краями стен.
 - `Ivan.prefab` в `Assets/Golovomka/Characters/Prefabs`. Масштаб — Transform, скорость — `Move Speed`, в комнате 1 масштаб Ивана и копии ×0,65. В Editor виден `IvanIdlePreview`, в игре — кадры `CharacterWalk`. Атласы Ивана лежат в `Assets/Golovomka/Characters/Sprites`. `IvanUnifiedWalk` содержит 16 кадров для основных направлений и четыре статичные диагональные позы. `IvanPistolPoses` содержит четыре стойки с пистолетом, `IvanPistolWalk` — двенадцать кадров ходьбы с ним.
 - PixelPerfectCamera отключён (временные 16 PPU, 480×270). Point, сетка движения 1/16. HUD 1280×720, подписи мира в пределах viewport 0,14–0,82 по вертикали.
-- Лицензия Modern Interiors Free v2.2 (LimeZu) — `Assets/Golovomka/Resources/Art/LICENSE-LimeZu.txt`, некоммерческое использование.
+- Modern Interiors Free v2.2 (LimeZu) предназначен для некоммерческого использования. [Текст лицензии](references/LICENSE-LimeZu.txt).
 
 ## Столкновения
 
@@ -28,11 +28,9 @@ Unity 6000.6.8f1, Universal 2D/URP, Input System, uGUI, Windows x64. Сверя�
 
 У створок подвала есть отдельный боковой упор `Door Approach` на слое `Ignore Raycast`. При открытии он становится триггером вместе с проёмом. При закрытии коллайдеры дают Ивану выйти за край створок. Для перехода между комнатами используется основной коллайдер проёма.
 
-<<<<<<< Updated upstream
 После уточнения автора от 23 ноября 2026 открытие и закрытие створок занимают по 0,45 с от одного крайнего положения до другого. При переходе вперёд анимация сохраняет текущее положение створок.
-=======
+
 `SlidingDoor` один раз воспроизводит `DoorOpen` в начале открытия и `DoorClose` в начале закрытия. При мгновенной смене положения звучит соответствующий клип. Если створки меняют направление на ходу, начинается новый звук.
->>>>>>> Stashed changes
 
 ## Сохранение
 
@@ -46,12 +44,12 @@ Unity 6000.6.8f1, Universal 2D/URP, Input System, uGUI, Windows x64. Сверя�
 
 ## Проверка
 
-Unity CLI — `%LOCALAPPDATA%/Unity/bin/unity.exe`. Перед запуском сверь Editor. Ниже `<проект>` — полный путь. Команда сборки показывает прежнюю папку вывода, готовая папка указана в [README](../README.md).
+Unity CLI — `%LOCALAPPDATA%/Unity/bin/unity.exe`. Перед запуском сверь Editor. Ниже `<проект>` — полный путь. Папка Windows-сборки указана в [README](../README.md).
 
 ```text
 unity recompile --project-path <проект> --format json
 unity command script eval --project-path <проект> --code "return EchoMvpTools.Verify();" --format json
-unity command build run --project-path <проект> --target StandaloneWindows64 --output-path outputs/Golovomka-Echo-MVP/Golovomka.exe --confirm true --format json
+unity command build run --project-path <проект> --target StandaloneWindows64 --output-path Builds/Golovomka-Windows-x64/Golovomka.exe --confirm true --format json
 unity command build status --project-path <проект> --format json
 ```
 

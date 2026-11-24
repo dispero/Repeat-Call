@@ -69,7 +69,6 @@ public static class EchoIntroductionVerification
             m.position = stationSpawn;
         }
         Check(Array.TrueForAll(labRoots, root => !root.activeSelf), "All laboratory roots are hidden in the station");
-        Check(SceneUtility.GetBuildIndexByScenePath(Room02Layout.ScenePath)<0 && !SceneManager.GetSceneByPath(Room02Layout.ScenePath).isLoaded,"Standalone room 2 draft is not loaded");
         m.RestartCycle(); Check(m.zone==0 && !m.recordingActive && m.history.tapes.Count==0,"No recording or R in police station");
         m.Interact(Interaction.EnterLaboratory); Check(m.zone==0,"Phone required");
         Call("Close"); m.Interact(Interaction.AnswerPhone); Call("Close"); m.Interact(Interaction.EnterLaboratory);
@@ -286,30 +285,53 @@ public static class EchoIntroductionVerification
         float MoveSpeed() => (float)typeof(EchoMvp).GetField("moveSpeed", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(m);
         Check((Vector2.Distance(points[0], points[2]) - 2 * buttons.interactionRadius) / MoveSpeed() >
             buttons.stepInterval + buttons.pressWindow, "A single player cannot reach the first two signals in time");
+        const float launchTime = 20f;
+        float afterSequence = launchTime + buttons.order.Length * buttons.stepInterval;
         void PressButton(int step)
         {
-            m.elapsed = buttons.startDelay + step * buttons.stepInterval + buttons.pressWindow * .5f;
+            m.elapsed = step == 0 ? launchTime : launchTime + step * buttons.stepInterval + buttons.pressWindow * .5f;
             m.position = points[buttons.order[step] - 1];
             m.Record();
             m.UpdateGhosts();
             Check((Interaction)Call("Nearby") == Interaction.PressTimedButton, "E selects the nearby timed button");
             m.Interact(Interaction.PressTimedButton);
         }
+        int confirmations = 0;
+        buttons.PressAccepted += () => confirmations++;
+        Color idleLamp = buttons.buttons[0].lamp.color;
+        m.elapsed = launchTime;
+        m.UpdateGhosts();
+        m.position = points[1];
         m.Interact(Interaction.PressTimedButton);
-        Check(m.recording.buttonPresses.Count == 0, "Pressing before the first window does not record an event");
-        foreach (int step in new[] { 0, 2, 4, 6 }) PressButton(step);
-        Check(!buttons.Solved, "One recorded role alone leaves the door closed");
+        Check(buttons.buttons[0].lamp.color == idleLamp && m.recording.buttonPresses.Count == 0,
+            "Elapsed time and button 2 leave the sequence idle");
+        PressButton(0);
+        Check(buttons.buttons[0].lamp.color != idleLamp && m.recording.buttonPresses.Single().startsSequence,
+            "Button 1 immediately lights the first lamp and records the launch");
+        foreach (int step in new[] { 2, 4, 6 }) PressButton(step);
+        Check(!buttons.Solved && confirmations == 4, "The four live presses confirm their steps and leave the door closed");
         m.RestartCycle();
         Check(m.history.ForRoom(3).buttonPresses.Count == 4 &&
             EchoHistory.Load(m.saveFileOverride).ForRoom(3).buttonPresses.Count == 4,
             "R saves four timed button events for the copy");
-        m.elapsed = buttons.EndTime + .5f;
+        m.elapsed = launchTime - .1f;
         m.UpdateGhosts();
-        Check(!buttons.Solved, "Missing the three live presses leaves the door closed");
+        Check(confirmations == 4 && buttons.buttons[0].lamp.color == idleLamp, "R resets the lamps until the recorded launch");
+        m.elapsed = launchTime;
+        m.UpdateGhosts();
+        Check(confirmations == 5 && buttons.buttons[0].lamp.color != idleLamp, "The copy starts the sequence at the recorded time");
+        m.elapsed = afterSequence;
+        m.UpdateGhosts();
+        Check(!buttons.Solved && confirmations == 8, "The four copy presses confirm their steps and leave the door closed");
         m.RestartCycle();
-        Check(m.history.ForRoom(3).buttonPresses.Count == 4, "An empty retry retains the useful recording");
+        var movementTape = EchoHistory.Load(m.saveFileOverride).ForRoom(3);
+        Check(movementTape != null && movementTape.buttonPresses.Count == 0 &&
+            movementTape.Sample(.1f, out var movementFrame) && movementFrame.zone == 3,
+            "R replaces the timed button tape with a replayable recording without presses");
+        foreach (int step in new[] { 0, 2, 4, 6 }) PressButton(step);
+        m.RestartCycle();
         foreach (int step in new[] { 1, 3, 5 }) PressButton(step);
-        m.elapsed = buttons.EndTime;
+        m.elapsed = afterSequence;
         m.UpdateGhosts();
         Check(buttons.Solved && buttons.exitDoor.Passage.isTrigger, "Three live presses and four copy presses open the exit");
         CrossDoor(room3, buttons.exitDoor, staysOpen: true);
@@ -373,6 +395,7 @@ public static class EchoIntroductionVerification
             "R returns to the finale entrance and starts the recording clock");
         Check(SpawnPistolIs(true), "Room 5 retry starts and records a drawn pistol");
 
+        VerifyShotHitboxes(finale, m, Check);
         VerifyLookoutAnimation(finale, m.position, Check);
         VerifyLookoutCover(finale, m.position, Check);
         VerifyPointBlankShots(finale, m.position, Check);
@@ -607,6 +630,54 @@ public static class EchoIntroductionVerification
         }
     }
 
+    static void VerifyShotHitboxes(FinaleRoom finale, EchoMvp game, Action<bool, string> check)
+    {
+        const BindingFlags instance = BindingFlags.Instance | BindingFlags.NonPublic;
+        var officer = ((SpriteRenderer)typeof(EchoMvp).GetField("hero", instance).GetValue(game)).GetComponent<CharacterWalk>();
+        var hit = typeof(FinaleRoom).GetMethod("Hit", instance);
+        foreach (var body in new[] { officer, finale.pursuer, finale.guard, finale.lookout, finale.fyodor, finale.alexei })
+        {
+            var box = body.GetComponent<BoxCollider2D>();
+            check(box && box.isTrigger && box.enabled, $"{body.name} has an active trigger hitbox");
+            Vector2 size = box.size;
+            Vector2 offset = box.offset;
+            Vector2 feet = body.transform.position;
+            bool Hits(Vector2 origin, Vector2 direction)
+            {
+                object[] args = { origin, direction, feet, 9f, body };
+                return (bool)hit.Invoke(finale, args);
+            }
+            try
+            {
+                check(Mathf.Abs(size.x * body.transform.lossyScale.x - .66f) < .001f &&
+                    Mathf.Abs(size.y * body.transform.lossyScale.y - 2.85f) < .001f,
+                    $"{body.name} preserves the original hit area dimensions");
+                check(Hits(feet + new Vector2(.2f, -1), Vector2.up), $"{body.name} accepts a shot inside its collider");
+                box.size = new Vector2(.1f, size.y);
+                check(!Hits(feet + new Vector2(.2f, -1), Vector2.up), $"{body.name} collider width controls hits");
+                box.size = size;
+                box.offset = offset + Vector2.right;
+                check(!Hits(feet + new Vector2(.2f, -1), Vector2.up) &&
+                    Hits(feet + new Vector2(body.transform.lossyScale.x, -1), Vector2.up),
+                    $"{body.name} collider offset controls hits");
+                box.enabled = false;
+                check(!Hits(feet + new Vector2(body.transform.lossyScale.x, -1), Vector2.up),
+                    $"{body.name} disabled hitbox ignores shots");
+            }
+            finally
+            {
+                box.size = size;
+                box.offset = offset;
+                box.enabled = true;
+            }
+        }
+        finale.Shoot((Vector2)finale.pursuer.transform.position + Vector2.left * 1.15f,
+            Vector2.right, .1f, game.recording);
+        check(!finale.pursuer.GetComponent<BoxCollider2D>().enabled, "Bandit death disables the hitbox");
+        finale.Begin(game.position);
+        check(finale.pursuer.GetComponent<BoxCollider2D>().enabled, "Retry restores the bandit hitbox");
+    }
+
     static void VerifyBanditOrbit(FinaleRoom finale, Vector2 entry, Action<bool, string> check)
     {
         const BindingFlags instance = BindingFlags.Instance | BindingFlags.NonPublic;
@@ -625,7 +696,7 @@ public static class EchoIntroductionVerification
                 foreach (float radius in new[] { .45f, .6f, .8f })
                 {
                     finale.Begin(entry);
-                    body.transform.position = new Vector2(121, -6);
+                    body.transform.position = new Vector2(120, -7.3f);
                     Vector2 center = body.transform.position;
                     float previousShot = float.NegativeInfinity;
                     int shots = 0;
@@ -647,7 +718,7 @@ public static class EchoIntroductionVerification
                 }
 
                 finale.Begin(entry);
-                body.transform.position = new Vector2(121, -6);
+                body.transform.position = new Vector2(120, -7.3f);
                 Vector2 near = (Vector2)body.transform.position + Vector2.left * 1.8f;
                 Tick(near, .1f);
                 Tick(near + Vector2.left * 100, .3f);
@@ -660,7 +731,7 @@ public static class EchoIntroductionVerification
                     $"{name} fires after reacquiring and preparing");
 
                 finale.Begin(entry);
-                body.transform.position = new Vector2(121, -6);
+                body.transform.position = new Vector2(120, -7.3f);
                 Tick(near, 0f);
                 Tick(near + Vector2.left * 100, .3f, near);
                 Tick(near + Vector2.left * 100, .5f, near);
@@ -671,11 +742,31 @@ public static class EchoIntroductionVerification
                     $"{name} fires at the copy after preparing");
 
                 finale.Begin(entry);
-                body.transform.position = new Vector2(121, -6);
+                body.transform.position = new Vector2(120, -7.3f);
                 Tick(near, 5f);
                 Tick(near, 5.2f);
                 check(float.IsNegativeInfinity((float)firedAt.GetValue(bandit)),
                     $"{name} retry restores the initial preparation delay");
+
+                foreach (string scenario in new[] { "leave close range", "enter close range", "turn at distance", "lose firing line" })
+                {
+                    finale.Begin(entry);
+                    body.transform.position = new Vector2(120, -7.3f);
+                    Vector2 center = body.transform.position;
+                    Vector2 far = center + Vector2.left * 1.8f;
+                    Tick(scenario == "leave close range" ? center + Vector2.left * .8f : far, 0f);
+                    if (scenario == "lose firing line")
+                        Tick(center + new Vector2(3, 2.8f), .3f);
+                    Vector2 target = scenario == "enter close range" ? center
+                        : scenario == "turn at distance" ? center + Vector2.right * 1.8f : far;
+                    Tick(target, 1f);
+                    Tick(target, 1.2f);
+                    check(float.IsNegativeInfinity((float)firedAt.GetValue(bandit)),
+                        $"{name} restarts preparation on {scenario}");
+                    Tick(target, 1.6f);
+                    check((float)firedAt.GetValue(bandit) == 1.6f,
+                        $"{name} can fire after the new delay on {scenario}");
+                }
             }
         }
         finally

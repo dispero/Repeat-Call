@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -45,11 +46,13 @@ namespace Golovomka
         RectTransform panel;
         const int DialogFontSize = 21;
         const float TitledDialogBodyY = -20f;
-        Text heading, objective, status, prompt, dialogTitle, dialogBody, caution;
+        Text prompt, returnHint, dialogTitle, dialogBody, caution;
         Text stationExitLabel;
-        static readonly string[] PauseOptions = { "Продолжить", "Вернуться к входу комнаты", "Главное меню", "Выход" };
-        const int PauseReturnOption = 1;
-        readonly Text[] pauseLabels = new Text[PauseOptions.Length];
+        static readonly string[] PauseOptions = { "Продолжить", "Главное меню", "Выход" };
+        static readonly int[] PauseOptionTop = { 355, 481, 606 };
+        static readonly Vector2 PauseArtworkSize = new Vector2(1672, 941);
+        const float PauseRowLeft = 86, PauseRowWidth = 728, PauseRowHeight = 122;
+        readonly RawImage[] pauseRows = new RawImage[PauseOptions.Length];
         RectTransform pauseMenu;
         int pauseSelection;
         bool phoneRead;
@@ -68,8 +71,8 @@ namespace Golovomka
         float finaleRetryDelay;
         bool officerDying;
         float officerDeathTime;
-        RawImage finaleDefeatCard;
-        Texture2D approachDefeatArt, accomplicesDefeatArt;
+        RawImage illustratedCard;
+        Texture2D approachDefeatArt, accomplicesDefeatArt, ivanDeathArt, victoryArt, remoteHelpArt;
         bool replayFinale;
         TargetRangeRoom pistolArt;
         bool pistolDrawn;
@@ -123,7 +126,7 @@ namespace Golovomka
                         yield break;
                     }
                     buttons.SignalShown += PlayButtonSignal;
-                    buttons.PlayerPressAccepted += PlayCorrectButton;
+                    buttons.PressAccepted += PlayCorrectButton;
                 }
                 if (room.TryGetComponent<TargetRangeRoom>(out var range) && !range.IsConfigured)
                 {
@@ -255,17 +258,12 @@ namespace Golovomka
             if (mode != "play" || k == null) ResetOfficerMovement();
             bool enter = k != null && (k.enterKey.wasPressedThisFrame || k.numpadEnterKey.wasPressedThisFrame);
             bool advance = enter || (k != null && k.eKey.wasPressedThisFrame);
-            if (mode == "speech")
-            {
-                UpdateSpeech(Time.unscaledDeltaTime, advance);
-                return;
-            }
             if (mode == "pistol-help")
             {
                 if (advance)
                 {
                     rangeGuideShown = true;
-                    HideSpeechUI();
+                    HidePistolHelp();
                 }
                 return;
             }
@@ -281,25 +279,25 @@ namespace Golovomka
                 if (k.downArrowKey.wasPressedThisFrame || k.sKey.wasPressedThisFrame) direction++;
                 if (k.upArrowKey.wasPressedThisFrame || k.wKey.wasPressedThisFrame) direction--;
                 if (direction != 0)
-                {
-                    int index = pauseSelection;
-                    do { index = (index + direction + PauseOptions.Length) % PauseOptions.Length; }
-                    while (!pauseLabels[index].transform.parent.gameObject.activeSelf);
-                    FocusPauseOption(index);
-                }
+                    FocusPauseOption((pauseSelection + direction + PauseOptions.Length) % PauseOptions.Length);
                 if (enter) UsePauseOption(pauseSelection);
                 else if (k.escapeKey.wasPressedThisFrame) Close();
                 return;
             }
-            if (mode == "dialog") { if (enter || k.eKey.wasPressedThisFrame || k.escapeKey.wasPressedThisFrame) Close(); return; }
+            if (mode == "dialog")
+            {
+                if (enter || k.eKey.wasPressedThisFrame || k.escapeKey.wasPressedThisFrame)
+                    Close();
+                return;
+            }
             if (mode == "done")
             {
-                if (currentFinale && k.rKey.wasPressedThisFrame)
+                if (enter) ShowMenu();
+                else if (currentFinale && k.rKey.wasPressedThisFrame)
                 {
                     replayFinale = true;
                     ReturnToRoom();
                 }
-                else if (enter) ShowMenu();
                 return;
             }
             if (mode == "finale-failed")
@@ -309,12 +307,15 @@ namespace Golovomka
                 {
                     officerDeathTime += Time.unscaledDeltaTime;
                     hero.sprite = officerWalk.GetDeathFrame(facing, officerDeathTime);
-                    if (officerDeathTime >= CharacterWalk.DeathAnimationDuration && !panel.gameObject.activeSelf)
-                        Panel("ПОПЫТКА ПРОВАЛЕНА", currentFinale.Failure + "\n\nВозврат ко входу…    R — сразу");
+                    if (officerDeathTime >= CharacterWalk.DeathAnimationDuration)
+                    {
+                        officerDying = false;
+                        ShowFinaleDefeat();
+                    }
                 }
                 if (k.rKey.wasPressedThisFrame)
                     ReturnToRoom();
-                else if (!finaleDefeatCard.isActiveAndEnabled)
+                else if (!illustratedCard.isActiveAndEnabled)
                 {
                     finaleRetryDelay -= Time.unscaledDeltaTime;
                     if (finaleRetryDelay <= 0) ReturnToRoom();
@@ -324,9 +325,10 @@ namespace Golovomka
             if (k.escapeKey.wasPressedThisFrame)
             {
                 mode = "pause";
-                LayoutPauseMenu();
+                shotAudio.Stop();
                 FocusPauseOption(0, playSound: false);
-                Panel("ПАУЗА", "Запись и копии приостановлены.");
+                pauseMenu.SetAsLastSibling();
+                pauseMenu.gameObject.SetActive(true);
                 return;
             }
             if (k.rKey.wasPressedThisFrame) { RestartCycle(); return; }
@@ -357,12 +359,9 @@ namespace Golovomka
             { Record(); nextSample = elapsed + .05f; }
             if (currentFinale && UpdateFinale(dt, fire, k.eKey.wasPressedThisFrame)) return;
             var target = Nearby();
-            prompt.text = target == Interaction.None ? (history.remoteObtained && currentRoom ? "WASD — идти    E — осмотр    R — вернуться к точке пульта    ESC — пауза" : "WASD / СТРЕЛКИ — идти    E — осмотр    ESC — пауза") : "[ E ]  " +
-                (target == Interaction.UseRoomPassage ? FindPassage().label : InteractionLabel(target));
-            if (CanDrawPistol) prompt.text += pistolDrawn ? "    Q — убрать пистолет" : "    Q — достать пистолет";
-            if ((currentRange || currentFinale) && pistolDrawn) prompt.text += "    ЛКМ / ПРОБЕЛ — выстрел";
+            string hint = InteractionHint(target);
+            prompt.text = string.IsNullOrEmpty(hint) ? string.Empty : "[ E ]  " + hint;
             if (!room2PreviewDoor && k.eKey.wasPressedThisFrame && target != Interaction.None) Interact(target);
-            HUD();
         }
         public void Record()
         {
@@ -407,7 +406,6 @@ namespace Golovomka
             if (currentButtons)
             {
                 if (recordingActive && tape != null) currentButtons.Replay(tape, elapsed);
-                if (recordingActive) UpdateButtonCountdown();
                 currentButtons.Show(elapsed);
                 currentButtons.exitDoor.SetPassage(currentButtons.Solved, feet, immediateDoor);
             }
@@ -471,14 +469,16 @@ namespace Golovomka
             return FindPassage() != null ? Interaction.UseRoomPassage : Interaction.None;
         }
 
-        static string InteractionLabel(Interaction target) => target switch
+        string InteractionHint(Interaction target) => target switch
         {
             Interaction.AnswerPhone => "Телефон дежурного",
-            Interaction.EnterLaboratory => "Отправиться в лабораторию",
             Interaction.PickUpRemote => "Взять пульт",
-            Interaction.PressTimedButton => "Нажать кнопку",
+            Interaction.PressTimedButton when recordingActive && !currentButtons.Solved =>
+                currentButtons.AwaitingStart && currentButtons.NearbyButton(position) == 1
+                    ? "Запустить последовательность" : "Нажать кнопку",
             Interaction.ReadNoticeBoard => "Прочитать заметки",
-            _ => ""
+            Interaction.UseRoomPassage => FindPassage()?.label,
+            _ => string.Empty
         };
 
         public void Interact(Interaction target)
@@ -499,7 +499,7 @@ namespace Golovomka
                     var passage = FindPassage();
                     if (passage != null) UsePassage(passage);
                     break;
-                case Interaction.AnswerPhone: phoneRead = true; Dialog("АВТОМАТИЧЕСКИЙ ВЫЗОВ", "Лаборатория в подвале предприятия. Сработала система безопасности. Автоматический вызов полиции.\n\nИван узнаёт адрес: здесь работают его отец и брат. Выход из участка справа у дальней стены."); break;
+                case Interaction.AnswerPhone: AnswerPhone(); break;
                 case Interaction.EnterLaboratory:
                     if (!phoneRead) { Dialog("ДЕЖУРНЫЙ", "Сначала ответьте на телефон. Поступил вызов."); break; }
                     stationFadeTime = 0;
@@ -527,7 +527,6 @@ namespace Golovomka
                     Save();
                 }
                 ActivateRoom(introductionRoom);
-                prompt.text = "";
                 stationFadeTime = 0;
             }
             else
@@ -535,41 +534,14 @@ namespace Golovomka
                 stationFade.gameObject.SetActive(false);
             }
         }
-        void HUD()
-        {
-            var tape = ActiveTape;
-            heading.text = zone == 0 ? "ПОЛИЦЕЙСКИЙ УЧАСТОК" : "ПОДВАЛ / КОМНАТА " + zone;
-            objective.text = zone == 0 ? "Ответить на вызов и отправиться к отцу"
-                : currentRange ? currentRange.Objective(tape != null)
-                : currentRoom != introductionRoom ? currentRoom.objective
-                : history.remoteObtained ? "Оставьте копию на панели и пройдите дверь справа"
-                : "Заберите пульт у стола";
-            status.text = "ЦИКЛ " + history.cycle.ToString("00") + "   •   " + (recordingActive ? "ЗАПИСЬ " + elapsed.ToString("0.0") + " с" : "ЗАПИСЬ НЕ АКТИВНА");
-            if (currentRoom && !currentRoom.disableRecording) status.text += "   /   КОПИЙ: 1";
-            if (currentRoom && tape != null)
-                status.text += currentFinale && currentFinale.CopyHit ? "\nКОПИЯ ИСЧЕЗЛА" :
-                    "\nКОПИЯ: " + Mathf.Max(0, tape.duration - elapsed).ToString("0.0") + " с";
-            if (currentRoom && (currentRoom == introductionRoom || currentSequence))
-                status.text += "\nПЛИТА А: " + (plateA ? "АКТИВНА" : "—");
-            if (currentSequence) status.text += "   ПЛИТА Б: " + (plateB ? "АКТИВНА" : "—");
-            if (currentButtons) status.text += "\n" + currentButtons.Status(elapsed);
-            if (currentRange) status.text += "\n" + currentRange.Status(elapsed, tape != null);
-            if (currentFinale)
-            {
-                objective.text = currentFinale.Cleared ? "Освободите Фёдора и Алексея" : currentRoom.objective;
-                status.text += "\n" + currentFinale.Status(elapsed);
-            }
-        }
-
         void ActivateRoom(LaboratoryRoom targetRoom, Transform arrival = null, bool keepPosition = false, bool returning = false)
         {
+            prompt.text = string.Empty;
             officerDying = false;
             officerDeathTime = 0;
-            HideSpeechUI();
-            finaleDefeatCard.gameObject.SetActive(false);
+            HidePistolHelp();
+            illustratedCard.gameObject.SetActive(false);
             shotAudio.Stop();
-            buttonCountdownAudio.Stop();
-            buttonCountdownStarted = false;
             buttonSignalAudio.Stop();
             correctButtonAudio.Stop();
             targetRiseAudio.Stop();
@@ -624,12 +596,11 @@ namespace Golovomka
                 currentFinale.Begin(position);
             }
 
-            stationExitLabel.enabled = inStation;
             if (enteringLaboratory) CacheLaboratoryCameraBounds();
             FitRoomCamera(snap: enteringLaboratory);
-            PositionStationExitLabel();
+            UpdateStationExitLabel();
             RefreshActors(immediateDoor: !continuingForward);
-            if (currentRange && !returning && !rangeGuideShown) StartSpeech(RangeLine, showPistolHelp: true);
+            if (currentRange && !returning && !rangeGuideShown) ShowPistolHelp();
             if (currentFinale && history.completed && !replayFinale)
             {
                 currentFinale.RestoreCompletion();
@@ -673,12 +644,12 @@ namespace Golovomka
                 currentFinale.Release(hostage);
                 if (currentFinale.Complete) FinishFinale();
             }
-            HUD();
             return true;
         }
 
         void FinishFinale()
         {
+            prompt.text = string.Empty;
             if (!history.completed)
             {
                 history.completed = true;
@@ -688,8 +659,8 @@ namespace Golovomka
             recording = new EchoTape();
             UpdateGhosts();
             mode = "done";
-            HUD();
-            Panel("ЗАЛОЖНИКИ СПАСЕНЫ", "Фёдор и Алексей живы.\n\nENTER — главное меню    R — повторить финал");
+            if (victoryArt) ShowIllustratedCard(victoryArt);
+            else Panel("ЗАЛОЖНИКИ СПАСЕНЫ", "Фёдор и Алексей живы.\n\nENTER — главное меню    R — повторить финал");
         }
 
         void UpdateFurnitureSorting(Transform group, SpriteRenderer interactiveSprite)
@@ -713,7 +684,6 @@ namespace Golovomka
             Place(hero, position);
             ghost.transform.localScale = hero.transform.localScale;
             UpdateGhosts(immediateDoor);
-            HUD();
         }
         Text Text(string name, Transform parent, Vector2 size, Vector2 p, int fontSize, Color color, TextAnchor align = TextAnchor.UpperLeft)
         {
@@ -726,21 +696,21 @@ namespace Golovomka
             var go = new GameObject("EchoUI", typeof(Canvas), typeof(CanvasScaler)); canvas = go.GetComponent<Canvas>(); canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             SceneManager.MoveGameObjectToScene(go, gameObject.scene);
             var scaler = go.GetComponent<CanvasScaler>(); scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize; scaler.referenceResolution = new Vector2(1280, 720); scaler.matchWidthOrHeight = .5f;
-            stationExitLabel = Text("WorldLabel", go.transform, new Vector2(280, 34), Vector2.zero, 17, amber, TextAnchor.MiddleCenter);
-            stationExitLabel.text = "В ЛАБОРАТОРИЮ / E";
-            heading = Text("Location", go.transform, new Vector2(700, 40), new Vector2(-230, 320), 25, new Color(.87f, .91f, .9f));
-            objective = Text("Objective", go.transform, new Vector2(700, 38), new Vector2(-225, 260), 19, new Color(.58f, .73f, .73f));
-            status = Text("Status", go.transform, new Vector2(520, 80), new Vector2(330, 300), 17, amber, TextAnchor.UpperRight);
+            stationExitLabel = Text("WorldLabel", go.transform, new Vector2(340, 34), Vector2.zero, 20, Color.white, TextAnchor.MiddleCenter);
+            stationExitLabel.text = "[E] Отправиться в лабораторию";
+            stationExitLabel.enabled = false;
             prompt = Text("Prompt", go.transform, new Vector2(1220, 42), new Vector2(0, -292), 20, Color.white, TextAnchor.MiddleCenter);
+            returnHint = Text("ReturnHint", go.transform, new Vector2(1220, 28), Vector2.zero, 20, Color.white, TextAnchor.MiddleCenter);
+            returnHint.text = "[R] Вернуться к точке пульта";
+            returnHint.enabled = false;
             caution = Text("SaveStatus", go.transform, new Vector2(1180, 30), new Vector2(0, -250), 15, amber, TextAnchor.MiddleCenter);
-            Text("Credits", go.transform, new Vector2(1200, 30), new Vector2(0, -318), 14, new Color(.45f, .57f, .58f), TextAnchor.MiddleCenter).text = "GOLOVOMKA • MVP КОПИЙ   /   Графика создана с помощью AI • Некоммерческий прототип";
             var panelGo = new GameObject("Dialog", typeof(RectTransform), typeof(UnityEngine.UI.Image)); panelGo.transform.SetParent(go.transform, false); panel = panelGo.GetComponent<RectTransform>(); panel.sizeDelta = new Vector2(920, 490); panelGo.GetComponent<UnityEngine.UI.Image>().color = new Color(.035f, .065f, .085f, .99f);
             dialogTitle = Text("Title", panel, new Vector2(820, 55), new Vector2(0, 180), 27, amber);
             dialogBody = Text("Body", panel, new Vector2(820, 340), new Vector2(0, TitledDialogBodyY), DialogFontSize, new Color(.86f, .9f, .89f));
             CreatePauseMenu();
             ArrangeOverlayHUD();
-            CreateSpeechUI();
-            CreateFinaleDefeatCard();
+            CreatePistolHelp();
+            CreateIllustratedCard();
             CreateTitleMenu();
             var fadeObject = new GameObject("StationFade", typeof(RectTransform), typeof(UnityEngine.UI.Image));
             stationFade = fadeObject.GetComponent<UnityEngine.UI.Image>();
@@ -753,13 +723,17 @@ namespace Golovomka
             fadeObject.SetActive(false);
         }
 
-        void CreateFinaleDefeatCard()
+        void CreateIllustratedCard()
         {
             approachDefeatArt = Resources.Load<Texture2D>("Menu/defeat-01-approach");
             accomplicesDefeatArt = Resources.Load<Texture2D>("Menu/defeat-02-accomplices");
-            var card = MenuRegion("FinaleDefeatCard", canvas.transform, new Vector2(.05f, .05f), new Vector2(.95f, .95f));
-            finaleDefeatCard = card.gameObject.AddComponent<RawImage>();
-            finaleDefeatCard.raycastTarget = false;
+            ivanDeathArt = Resources.Load<Texture2D>("Menu/defeat-03-ivan");
+            victoryArt = Resources.Load<Texture2D>("Menu/victory");
+            remoteHelpArt = Resources.Load<Texture2D>("Menu/RemoteHelp");
+            phoneCallArt = Resources.Load<Texture2D>("Menu/PhoneCall");
+            var card = MenuRegion("IllustratedCard", canvas.transform, new Vector2(.05f, .05f), new Vector2(.95f, .95f));
+            illustratedCard = card.gameObject.AddComponent<RawImage>();
+            illustratedCard.raycastTarget = false;
             FitMenuGraphic(card, 4f / 3f);
             card.gameObject.SetActive(false);
         }
@@ -771,6 +745,7 @@ namespace Golovomka
             {
                 FinaleRoom.DefeatIllustration.Approach => approachDefeatArt,
                 FinaleRoom.DefeatIllustration.Accomplices => accomplicesDefeatArt,
+                FinaleRoom.DefeatIllustration.IvanDeath => ivanDeathArt,
                 _ => null
             };
             if (!art)
@@ -780,19 +755,24 @@ namespace Golovomka
                 return;
             }
 
+            ShowIllustratedCard(art);
+        }
+
+        void ShowIllustratedCard(Texture2D art, float scale = 1f)
+        {
             panel.gameObject.SetActive(false);
-            finaleDefeatCard.texture = art;
-            finaleDefeatCard.transform.parent.SetAsLastSibling();
-            finaleDefeatCard.gameObject.SetActive(true);
+            illustratedCard.texture = art;
+            illustratedCard.rectTransform.localScale = new Vector3(scale, scale, 1f);
+            illustratedCard.GetComponent<AspectRatioFitter>().aspectRatio = (float)art.width / art.height;
+            illustratedCard.transform.parent.SetAsLastSibling();
+            illustratedCard.gameObject.SetActive(true);
         }
         void Panel(string title, string body)
         {
-            if (mode == "pause" || mode == "dialog")
+            if (mode == "dialog")
             {
                 shotAudio.Stop();
-                buttonCountdownAudio.Pause();
             }
-            pauseMenu.gameObject.SetActive(mode == "pause");
             panel.gameObject.SetActive(true);
             panel.SetAsLastSibling();
             dialogTitle.text = title;
@@ -801,65 +781,98 @@ namespace Golovomka
             dialogBody.rectTransform.anchoredPosition = new Vector2(0, hasTitle ? TitledDialogBodyY : 0f);
             dialogBody.fontSize = hasTitle ? DialogFontSize : DialogFontSize + 1;
         }
-        void Dialog(string title, string body, string continueHint = "E / ENTER — продолжить")
+        void Dialog(string title, string body)
         {
+            prompt.text = string.Empty;
             mode = "dialog";
-            Panel(title, body + "\n\n" + continueHint);
+            Panel(title, body + "\n\nE / ENTER — продолжить");
         }
         void Close()
         {
             mode = "play";
             panel.gameObject.SetActive(false);
-            buttonCountdownAudio.UnPause();
+            pauseMenu.gameObject.SetActive(false);
+            illustratedCard.gameObject.SetActive(false);
         }
 
         void CreatePauseMenu()
         {
-            pauseMenu = MenuRegion("PauseMenu", panel, Vector2.zero, Vector2.one);
-            var colors = ColorBlock.defaultColorBlock;
-            colors.normalColor = new Color(1f, 1f, 1f, .06f);
-            colors.highlightedColor = new Color(1f, 1f, 1f, .16f);
-            colors.pressedColor = new Color(1f, .74f, .36f, .25f);
+            pauseMenu = MenuRegion("PauseMenu", canvas.transform, Vector2.zero, Vector2.one);
+            var backdrop = pauseMenu.gameObject.AddComponent<UnityEngine.UI.Image>();
+            backdrop.color = new Color32(10, 9, 10, 211);
+
+            var composition = MenuRegion("PauseComposition", pauseMenu, Vector2.zero, Vector2.one);
+            FitMenuGraphic(composition, PauseArtworkSize.x / PauseArtworkSize.y);
+            var atlas = Resources.Load<Texture2D>("Menu/PauseMenu");
+            if (atlas)
+            {
+                const float headingHeight = 330;
+                var headingArt = MenuRegion("HeadingArt", composition,
+                    new Vector2(0, 1 - headingHeight / PauseArtworkSize.y), Vector2.one).gameObject.AddComponent<RawImage>();
+                headingArt.texture = atlas;
+                headingArt.uvRect = PauseArtworkUv(atlas, 0, 0, PauseArtworkSize.x, headingHeight);
+                headingArt.raycastTarget = false;
+            }
+            else
+            {
+                MenuLabel("Heading", composition, new Vector2(.05f, .77f), new Vector2(.44f, .87f),
+                    font, 52, TitlePaper, "ПАУЗА").alignment = TextAnchor.MiddleLeft;
+                MenuLabel("Status", composition, new Vector2(.05f, .64f), new Vector2(.49f, .75f),
+                    font, 26, TitlePaper, "Запись и копии приостановлены.").alignment = TextAnchor.MiddleLeft;
+            }
+
             for (int i = 0; i < PauseOptions.Length; i++)
             {
-                var row = new GameObject("Option" + (i + 1), typeof(RectTransform), typeof(UnityEngine.UI.Image));
-                var rect = row.GetComponent<RectTransform>();
-                rect.SetParent(pauseMenu, false);
-                rect.anchorMin = rect.anchorMax = new Vector2(.5f, .5f);
-                rect.sizeDelta = new Vector2(820, 40);
-                var button = row.AddComponent<UnityEngine.UI.Button>();
-                button.targetGraphic = row.GetComponent<UnityEngine.UI.Image>();
+                float top = 1 - PauseOptionTop[i] / PauseArtworkSize.y;
+                var row = MenuRegion("Option" + (i + 1), composition,
+                    new Vector2(PauseRowLeft / PauseArtworkSize.x, top - PauseRowHeight / PauseArtworkSize.y),
+                    new Vector2((PauseRowLeft + PauseRowWidth) / PauseArtworkSize.x, top));
+                var graphic = row.gameObject.AddComponent<RawImage>();
+                graphic.texture = atlas;
+                if (!atlas)
+                    MenuLabel("Label", row, Vector2.zero, Vector2.one, font, 32, TitlePaper, PauseOptions[i]);
+                pauseRows[i] = graphic;
+
+                var button = row.gameObject.AddComponent<UnityEngine.UI.Button>();
+                button.targetGraphic = graphic;
                 button.navigation = new Navigation { mode = Navigation.Mode.None };
-                button.colors = colors;
+                button.transition = Selectable.Transition.None;
                 int index = i;
                 button.onClick.AddListener(() => UsePauseOption(index));
                 AddMenuHover(button, () =>
                 {
                     if (mode == "pause") FocusPauseOption(index);
                 });
-                pauseLabels[i] = Text("Label", rect, new Vector2(794, 40), Vector2.zero, 23, Color.white, TextAnchor.MiddleLeft);
             }
             pauseMenu.gameObject.SetActive(false);
         }
 
-        void LayoutPauseMenu()
+        static Rect PauseArtworkUv(Texture2D atlas, float x, float y, float width, float height)
         {
-            int visibleRow = 0;
-            for (int i = 0; i < pauseLabels.Length; i++)
-            {
-                var row = (RectTransform)pauseLabels[i].transform.parent;
-                bool visible = i != PauseReturnOption || currentRoom != null;
-                row.gameObject.SetActive(visible);
-                if (visible) row.anchoredPosition = new Vector2(0, 12 - visibleRow++ * 46);
-            }
+            return new Rect(x / atlas.width, 1 - (y + height) / atlas.height, width / atlas.width, height / atlas.height);
         }
 
         void FocusPauseOption(int index, bool playSound = true)
         {
             if (playSound && pauseSelection != index) PlayMenuSelect();
             pauseSelection = index;
-            for (int i = 0; i < PauseOptions.Length; i++)
-                pauseLabels[i].text = (i == index ? ">  " : "    ") + PauseOptions[i];
+            for (int i = 0; i < pauseRows.Length; i++)
+            {
+                bool selected = i == index;
+                var row = pauseRows[i];
+                if (row.texture is Texture2D atlas)
+                {
+                    // Под макетом в атласе лежат альтернативные состояния кнопок.
+                    bool alternate = selected != (i == 0);
+                    float x = alternate ? 0 : PauseRowLeft;
+                    float y = alternate ? PauseArtworkSize.y + i * PauseRowHeight : PauseOptionTop[i];
+                    row.uvRect = PauseArtworkUv(atlas, x, y, PauseRowWidth, PauseRowHeight);
+                }
+                else
+                {
+                    row.color = selected ? new Color32(83, 66, 43, 255) : new Color32(38, 48, 47, 255);
+                }
+            }
         }
 
         void UsePauseOption(int index)
@@ -867,8 +880,7 @@ namespace Golovomka
             if (mode != "pause") return;
             PlayMenuSelect();
             if (index == 0) Close();
-            else if (index == PauseReturnOption) RestartCycle();
-            else if (index == 2) ShowMenu();
+            else if (index == 1) ShowMenu();
             else QuitGame();
         }
     }

@@ -16381,7 +16381,6 @@ MonoBehaviour:
   - {fileID: 474192721}
   - {fileID: 996648679}
   - {fileID: 1565329701}
-  startDelay: 6.5
   stepInterval: 1.6
   pressWindow: 0.8
   interactionRadius: 0.85
@@ -16696,7 +16695,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 116
+  m_SortingOrder: 100
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 51bf40be07126b4419f089e5f0064872, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -19449,7 +19448,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 115
+  m_SortingOrder: 90
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 29c319b297963b048ae506c676a73f5a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -48484,22 +48483,6 @@ MonoBehaviour:
   disableRecording: 0
   objective: "\u041F\u043E\u0440\u0430\u0437\u0438\u0442\u0435 \u0434\u0432\u0435 \u043C\u0438\u0448\u0435\u043D\u0438 \u0432 \u043A\u0430\u0436\u0434\u043E\u0439 \u0432\u043E\u043B\u043D\u0435"
   passages:
-  - marker: {fileID: 414962211}
-    interactionRadius: 0.85
-    approachFromRight: 0
-    minimumXOffset: 0
-    crossingDoor: {fileID: 0}
-    crossToRight: 0
-    crossingOffset: 0
-    requiresRemote: 0
-    setsReturnPoint: 0
-    destination: 0
-    targetRoom: {fileID: 1206165905}
-    finishDemoWithoutTarget: 0
-    arrival: {fileID: 282786225}
-    label: "\u0412\u0435\u0440\u043D\u0443\u0442\u044C\u0441\u044F \u043A \u0446\u0432\u0435\u0442\u043D\u044B\u043C \u043A\u043D\u043E\u043F\u043A\u0430\u043C"
-    messageTitle: 
-    message: 
   - marker: {fileID: 2100018571}
     interactionRadius: 0.9
     approachFromRight: 0
